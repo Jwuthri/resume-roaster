@@ -76,11 +76,34 @@ export default function DownloadPage() {
   }, [router, showAlert])
 
   const handleDownloadPDF = async () => {
-    if (!optimizedResult || !resumeData) return
+    if (!optimizedResult) return
     
     try {
-      const blob = await generatePDF(resumeData, optimizedResult.resume)
-      downloadBlob(blob, `${resumeData.personalInfo.name}_Resume.pdf`)
+      // If we don't have proper resume data, try to generate PDF from HTML content
+      if (!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
+        // Use the HTML content directly for PDF generation
+        const response = await fetch('/api/generate-pdf-from-html', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            htmlContent: optimizedResult.resume,
+            fileName: 'optimized-resume'
+          }),
+        })
+
+        if (response.ok) {
+          const blob = await response.blob()
+          downloadBlob(blob, 'optimized-resume.pdf')
+        } else {
+          throw new Error('Failed to generate PDF from HTML')
+        }
+      } else {
+        // Use the standard PDF generation with resume data
+        const blob = await generatePDF(resumeData, optimizedResult.resume)
+        downloadBlob(blob, `${resumeData.personalInfo.name}_Resume.pdf`)
+      }
     } catch (error) {
       console.error('Error generating PDF:', error)
       showAlert({
@@ -93,9 +116,20 @@ export default function DownloadPage() {
   }
 
   const handleDownloadDOCX = async () => {
-    if (!optimizedResult || !resumeData) return
+    if (!optimizedResult) return
     
     try {
+      // DOCX generation requires proper resume data structure
+      if (!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
+        showAlert({
+          title: "DOCX Generation Not Available",
+          description: "DOCX download requires complete resume data. Please use PDF download instead.",
+          type: "warning",
+          confirmText: "OK"
+        })
+        return
+      }
+      
       const blob = await generateDOCX(resumeData)
       downloadBlob(blob, `${resumeData.personalInfo.name}_Resume.docx`)
     } catch (error) {
@@ -131,7 +165,7 @@ export default function DownloadPage() {
     )
   }
 
-  if (!optimizedResult || !resumeData) {
+  if (!optimizedResult) {
     return (
       <div className="text-center py-12">
         <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -163,6 +197,16 @@ export default function DownloadPage() {
       {/* Download Actions */}
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
         <CardContent className="p-8">
+          {/* Show notice if we have limited resume data */}
+          {(!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800 flex items-center">
+                <FileText className="h-4 w-4 mr-2" />
+                Limited download options available. PDF download will work, but DOCX requires complete resume data.
+              </p>
+            </div>
+          )}
+          
           <div className="flex flex-wrap gap-4 mb-8 justify-center">
             <Button 
               onClick={handleDownloadPDF} 

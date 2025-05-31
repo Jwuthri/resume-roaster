@@ -361,9 +361,6 @@ function DashboardContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          resumeData: selectedAnalysis.data.resumeData,
-          jobDescription: selectedAnalysis.data.jobDescription,
-          analysisData: selectedAnalysis.data.analysis,
           analysisId: selectedAnalysis.id,
           llm: selectedLLM
         }),
@@ -377,13 +374,64 @@ function DashboardContent() {
       const result = await response.json()
       
       if (result.success) {
-        const message = result.data.cached 
+        const message = result.cached 
           ? 'Resume optimization retrieved from cache!'
           : 'Resume optimization generated successfully!'
         toast.success(message)
         
-        // You could store the optimized resume data or navigate to a results page
-        // For now, we'll just show success
+        // Transform the result to match the expected OptimizedResumeResponse format for the download page
+        const transformedResult = {
+          resume: result.content,
+          format: 'html' as const,
+          template: {
+            id: 'optimized-content',
+            name: 'AI-Optimized Resume',
+            description: 'AI-optimized resume tailored to the job description',
+            category: 'modern' as const,
+            atsOptimized: true
+          },
+          optimizations: {
+            suggestions: result.metadata?.optimizationSuggestions || ['Resume optimized for target job'],
+            keywordsFound: result.metadata?.keywordsMatched || [],
+            atsScore: result.metadata?.atsScore || 85
+          }
+        }
+
+        // Store the optimized result in sessionStorage for the download page
+        sessionStorage.setItem('optimizedResumeResult', JSON.stringify(transformedResult))
+        
+        // Store resume data if available from the analysis, or create a fallback
+        let resumeDataForDownload = selectedAnalysis.data.resumeData
+        if (!resumeDataForDownload) {
+          // Create a minimal fallback resume data object
+          resumeDataForDownload = {
+            personalInfo: {
+              name: 'Your Name',
+              email: 'your.email@example.com',
+              phone: '',
+              location: '',
+              linkedin: '',
+              portfolio: '',
+              github: '',
+              jobTitle: '',
+              jobDescription: ''
+            },
+            summary: '',
+            experience: [],
+            education: [],
+            skills: {
+              technical: [],
+              soft: [],
+              languages: [],
+              certifications: []
+            },
+            projects: []
+          }
+        }
+        sessionStorage.setItem('resumeDataForDownload', JSON.stringify(resumeDataForDownload))
+        
+        // Navigate to the download page to view the optimized resume
+        window.location.href = '/download'
       } else {
         throw new Error(result.error || 'Failed to optimize resume')
       }
