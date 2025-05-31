@@ -3,6 +3,7 @@
 ## Overview
 The Resume Roaster application now includes a cache bypass feature that allows users to force regenerate optimized resumes without using cached data.
 
+
 ## Problem Solved
 Previously, when users clicked "Generate Optimized Version", the system would always use cached data if available, which could lead to:
 - Stale optimization results
