@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/database'
+import { db, UserService } from '@/lib/database'
 import { LLMLogger, MessageRole } from '@/lib/llm-logger'
 import { ANTHROPIC_MODELS, ANTHROPIC_CONTEXT_SIZES, ANTHROPIC_TEMPERATURES, callAnthropicResumeOptimization } from '@/lib/anthropic-utils'
 import { callOpenAIText, callOpenAIResumeOptimization, CONTEXT_SIZES, TEMPERATURES } from '@/lib/openai-utils'
@@ -45,6 +45,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      )
+    }
+
+    // Check if user can afford this model
+    const affordability = await UserService.checkModelAffordability(user.id, llm)
+    if (!affordability.canAfford) {
+      return NextResponse.json(
+        { 
+          error: `Insufficient credits. This model costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+          creditCost: affordability.creditCost,
+          remaining: affordability.remaining,
+          tier: affordability.tier
+        },
+        { status: 402 } // Payment Required
       )
     }
 
@@ -299,6 +313,15 @@ Please use the optimize_resume_data function to return the structured optimizati
     console.log('Processing time:', processingTime, 'ms')
     console.log('Tokens used:', tokensUsed)
 
+    // Deduct credits for successful model usage
+    try {
+      await UserService.deductModelCredits(user.id, llm)
+      console.log(`Successfully deducted ${affordability.creditCost} credits for model ${llm}`)
+    } catch (creditError) {
+      console.error('Failed to deduct credits:', creditError)
+      // Log the error but don't fail the request since the optimization was successful
+    }
+
     // Calculate ATS score and extract keywords
     const atsScore = calculateATSScore(optimizedData, jobContent)
     const keywordsMatched = extractKeywordsMatched(optimizedData, jobContent)
@@ -384,7 +407,8 @@ Please use the optimize_resume_data function to return the structured optimizati
         atsScore,
         keywordsMatched,
         optimizationSuggestions: optimizedData.suggestions || ['Resume optimized for target job'],
-        llmCallId
+        llmCallId,
+        creditsDeducted: affordability.creditCost
       }
     })
 

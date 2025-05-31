@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { callOpenAIAnswerEvaluation } from '@/lib/openai-utils'
-import { db } from '@/lib/database'
+import { callOpenAIAnswerEvaluation, OPENAI_MODELS } from '@/lib/openai-utils'
+import { db, UserService } from '@/lib/database'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -14,6 +14,24 @@ export async function POST(request: NextRequest) {
         { error: 'User answer, question, and suggested answer are required' },
         { status: 400 }
       )
+    }
+
+    // Check if user can afford this model (only for authenticated users)
+    const userId = session?.user?.id;
+    if (userId) {
+      const modelToUse = OPENAI_MODELS.NANO; // Using NANO model for individual answer evaluation
+      const affordability = await UserService.checkModelAffordability(userId, modelToUse);
+      if (!affordability.canAfford) {
+        return NextResponse.json(
+          { 
+            error: `Insufficient credits. Answer evaluation costs ${affordability.creditCost} credit, but you only have ${affordability.remaining} credits remaining.`,
+            creditCost: affordability.creditCost,
+            remaining: affordability.remaining,
+            tier: affordability.tier
+          },
+          { status: 402 } // Payment Required
+        );
+      }
     }
 
     // Create evaluation prompt
@@ -52,6 +70,18 @@ Focus on the most impactful feedback that will help the user improve their inter
 
     // Call OpenAI Nano for fast evaluation
     const response = await callOpenAIAnswerEvaluation(evaluationPrompt)
+
+    // Deduct credits for successful AI usage (only for authenticated users)
+    if (userId) {
+      try {
+        const modelToUse = OPENAI_MODELS.NANO;
+        await UserService.deductModelCredits(userId, modelToUse);
+        console.log(`Successfully deducted 1 credit for answer evaluation`);
+      } catch (creditError) {
+        console.error('Failed to deduct credits:', creditError);
+        // Log error but don't fail the request since AI call succeeded
+      }
+    }
 
     // Save individual evaluation to database if analysisId is provided
     let savedEvaluationId = null
@@ -97,7 +127,8 @@ Focus on the most impactful feedback that will help the user improve their inter
       evaluation: response.data,
       processingTime: response.processingTime,
       cost: response.cost,
-      id: savedEvaluationId
+      id: savedEvaluationId,
+      ...(userId && { creditsDeducted: 1 })
     })
 
   } catch (error) {

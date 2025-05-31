@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/database'
+import { db, UserService } from '@/lib/database'
 import { callAnthropicResumeOptimization, ANTHROPIC_MODELS, ANTHROPIC_CONTEXT_SIZES, ANTHROPIC_TEMPERATURES } from '@/lib/anthropic-utils'
 import crypto from 'crypto'
 
@@ -49,6 +49,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      )
+    }
+
+    // Check if user can afford this model (using Claude Sonnet)
+    const modelToUse = ANTHROPIC_MODELS.SONNET
+    const affordability = await UserService.checkModelAffordability(user.id, modelToUse)
+    if (!affordability.canAfford) {
+      return NextResponse.json(
+        { 
+          error: `Insufficient credits. This model costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+          creditCost: affordability.creditCost,
+          remaining: affordability.remaining,
+          tier: affordability.tier
+        },
+        { status: 402 } // Payment Required
       )
     }
 
@@ -154,6 +169,15 @@ Please use the optimize_resume_data function to return the structured data.`
     console.log('Tokens used:', tokensUsed)
     console.log('Used tools:', response.usedTools)
 
+    // Deduct credits for successful model usage
+    try {
+      await UserService.deductModelCredits(user.id, modelToUse)
+      console.log(`Successfully deducted ${affordability.creditCost} credits for model ${modelToUse}`)
+    } catch (creditError) {
+      console.error('Failed to deduct credits:', creditError)
+      // Log the error but don't fail the request since the extraction was successful
+    }
+
     // Calculate ATS score and keyword matching
     const atsScore = calculateATSScore(extractedData, jobDescription || '')
     const keywordsMatched = extractKeywordsMatched(extractedData, jobDescription || '')
@@ -203,7 +227,7 @@ Please use the optimize_resume_data function to return the structured data.`
         }
       })
 
-      // Save the generated resume to database
+      // Save the extracted data as a generated resume
       const generatedResume = await db.generatedResume.create({
         data: {
           userId: user.id,
@@ -218,7 +242,7 @@ Please use the optimize_resume_data function to return the structured data.`
 
       generatedResumeId = generatedResume.id
 
-      console.log('Resume extraction and optimized resume saved to database')
+      console.log('Resume extraction saved to database')
     } catch (dbError) {
       console.error('Failed to store resume extraction:', dbError)
       // Continue without failing the request
@@ -235,7 +259,8 @@ Please use the optimize_resume_data function to return the structured data.`
         estimatedCost,
         atsScore,
         keywordsMatched,
-        llmCallId
+        llmCallId,
+        creditsDeducted: affordability.creditCost
       }
     })
 

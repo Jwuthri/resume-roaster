@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { callOpenAIBatchAnswerEvaluation } from '@/lib/openai-utils'
-import { db } from '@/lib/database'
+import { callOpenAIBatchAnswerEvaluation, OPENAI_MODELS } from '@/lib/openai-utils'
+import { db, UserService } from '@/lib/database'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -21,6 +21,24 @@ export async function POST(request: NextRequest) {
         { error: 'User answers object is required' },
         { status: 400 }
       )
+    }
+
+    // Check if user can afford this model (only for authenticated users)
+    const userId = session?.user?.id;
+    if (userId) {
+      const modelToUse = OPENAI_MODELS.MINI; // Using MINI model for comprehensive evaluation
+      const affordability = await UserService.checkModelAffordability(userId, modelToUse);
+      if (!affordability.canAfford) {
+        return NextResponse.json(
+          { 
+            error: `Insufficient credits. Session evaluation costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+            creditCost: affordability.creditCost,
+            remaining: affordability.remaining,
+            tier: affordability.tier
+          },
+          { status: 402 } // Payment Required
+        );
+      }
     }
 
     // Filter questions that have user answers
@@ -71,6 +89,18 @@ Focus on patterns across all answers and provide insights that help the candidat
     // Call OpenAI for comprehensive evaluation
     const response = await callOpenAIBatchAnswerEvaluation(evaluationPrompt)
 
+    // Deduct credits for successful AI usage (only for authenticated users)
+    if (userId) {
+      try {
+        const modelToUse = OPENAI_MODELS.MINI;
+        await UserService.deductModelCredits(userId, modelToUse);
+        console.log(`Successfully deducted 4 credits for session evaluation`);
+      } catch (creditError) {
+        console.error('Failed to deduct credits:', creditError);
+        // Log error but don't fail the request since AI call succeeded
+      }
+    }
+
     // Save evaluation to database if analysisId is provided
     let savedEvaluationId = null
     if (analysisId) {
@@ -107,7 +137,8 @@ Focus on patterns across all answers and provide insights that help the candidat
       questionsEvaluated: answeredQuestions.length,
       processingTime: response.processingTime,
       cost: response.cost,
-      id: savedEvaluationId
+      id: savedEvaluationId,
+      ...(userId && { creditsDeducted: 4 })
     })
 
   } catch (error) {

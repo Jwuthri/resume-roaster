@@ -53,26 +53,20 @@ export async function POST(request: NextRequest) {
 
     console.log('Content hash:', contentHash)
 
-    // Check for cached summarized resume first (unless bypassing cache)
+    // Check for existing summarized data (unless bypassing cache)
     if (!bypassCache) {
-      const cachedSummarizedResume = await db.summarizedResume.findUnique({
+      const existingSummarized = await db.summarizedResume.findFirst({
         where: { contentHash }
       })
 
-      if (cachedSummarizedResume) {
-        console.log('Returning cached summarized resume')
-        
-        const data = cachedSummarizedResume.summary as any
+      if (existingSummarized) {
+        console.log('Found cached summarized resume, returning it...')
         return NextResponse.json({
           success: true,
-          data: data,
-          summarizedResumeId: cachedSummarizedResume.id,
+          data: existingSummarized.summary,
           cached: true,
-          metadata: {
-            contentHash,
-            createdAt: cachedSummarizedResume.createdAt.toISOString(),
-            fromCache: true
-          }
+          summarizedResumeId: existingSummarized.id,
+          contentHash
         })
       }
     }
@@ -85,27 +79,24 @@ export async function POST(request: NextRequest) {
       provider: 'anthropic',
       model: ANTHROPIC_MODELS.SONNET,
       operationType: 'resume_summarization',
-      resumeId: resumeId || undefined
+      extractedResumeId: extractedResumeId || undefined
     })
 
     // Create the summarization prompt
-    const prompt = `Extract and structure the following resume data into a comprehensive JSON format:
+    const prompt = `Please extract and structure the following resume data into a comprehensive JSON format:
 
-RESUME TEXT:
 ${resumeText}
 
-IMPORTANT INSTRUCTIONS:
-1. Extract information accurately from the resume text
-2. Structure the data in a clean, organized JSON format
-3. Include all relevant sections: personal info, experience, education, skills, etc.
-4. Ensure all dates are in MM/YYYY format
-5. If information is missing, use null or empty arrays as appropriate
-6. Make sure you don't omit any information from the resume text
-7. Organize achievements and responsibilities clearly
-8. Extract technical and soft skills separately
-9. Include any certifications, projects, or additional sections
+Extract all relevant information including:
+- Personal information (name, contact details, location)
+- Professional summary/objective
+- Work experience (with dates, companies, positions, responsibilities)
+- Education (degrees, institutions, dates, relevant coursework)
+- Skills (technical, soft skills, certifications)
+- Projects, achievements, awards
+- Any other relevant sections
 
-Please use the optimize_resume_data function to return the structured data.`
+Please use the optimize_resume_data function to return structured data that captures all information accurately.`
 
     await LLMLogger.logMessage({
       llmCallId,
@@ -166,26 +157,21 @@ Please use the optimize_resume_data function to return the structured data.`
       }
     })
 
-    console.log('Summarized resume saved with ID:', savedSummarized.id)
-
     return NextResponse.json({
       success: true,
       data: summarizedData,
-      summarizedResumeId: savedSummarized.id,
       cached: false,
+      summarizedResumeId: savedSummarized.id,
+      contentHash,
       metadata: {
-        contentHash,
-        createdAt: savedSummarized.createdAt.toISOString(),
-        fromCache: false,
         tokensUsed,
         processingTime,
-        estimatedCost,
-        llmCallId
+        estimatedCost
       }
     })
 
   } catch (error) {
-    console.error('Summarized resume error:', error)
+    console.error('Resume summarization error:', error)
     
     // Update LLM call with error if we have an ID
     if (llmCallId) {
@@ -197,10 +183,7 @@ Please use the optimize_resume_data function to return the structured data.`
     }
     
     return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'Failed to summarize resume data',
-        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
-      },
+      { error: 'Failed to summarize resume' },
       { status: 500 }
     )
   }

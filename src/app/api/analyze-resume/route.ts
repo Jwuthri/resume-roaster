@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { LLMLogger, MessageRole } from '@/lib/llm-logger'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { db, GeneratedRoastService } from '@/lib/database'
+import { db, GeneratedRoastService, UserService } from '@/lib/database'
 import crypto from 'crypto'
 import { callAnthropicResumeAnalysis } from '@/lib/anthropic-utils'
 import { callOpenAIResumeAnalysis } from '@/lib/openai-utils'
@@ -48,10 +48,10 @@ Start with 0 and add:
 
 ### Presentation Quality (5 points max)
 Start with 5 and deduct (NEVER GO BELOW 0 - MINIMUM IS ALWAYS 0):
-- Poor formatting: -2
-- Typos/grammar errors: -1 per error
-- Missing key sections: -1 each
-- Wall of text/poor readability: -2
+- Poor formatting
+- Typos/grammar errors
+- Missing key sections
+- Wall of text/poor readability
 **CRITICAL: Minimum score is 0 points (NEVER NEGATIVE). If deductions would result in negative, set to 0.**
 
 **SCORE CALIBRATION EXAMPLES**:
@@ -151,6 +151,27 @@ export async function POST(request: NextRequest) {
     // Get user session for logging
     const session = await getServerSession(authOptions)
     const userId = session?.user?.id || null
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    // Check if user can afford this model
+    const affordability = await UserService.checkModelAffordability(userId, modelToUse)
+    if (!affordability.canAfford) {
+      return NextResponse.json(
+        { 
+          error: `Insufficient credits. This model costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+          creditCost: affordability.creditCost,
+          remaining: affordability.remaining,
+          tier: affordability.tier
+        },
+        { status: 402 } // Payment Required
+      )
+    }
 
     // Generate analysis title
     let analysisTitle = analysisName?.trim() || `Analysis ${Date.now()}`
@@ -290,6 +311,15 @@ Please provide a comprehensive analysis following the framework above.`
       )
     }
 
+    // Deduct credits for successful model usage
+    try {
+      await UserService.deductModelCredits(userId, modelToUse)
+      console.log(`Successfully deducted ${affordability.creditCost} credits for model ${modelToUse}`)
+    } catch (creditError) {
+      console.error('Failed to deduct credits:', creditError)
+      // Log the error but don't fail the request since the analysis was successful
+    }
+
     // Update LLM call as completed
     await LLMLogger.updateLlmCall({
       llmCallId,
@@ -329,7 +359,8 @@ Please provide a comprehensive analysis following the framework above.`
         totalCost,
         processingTime,
         provider,
-        model: modelToUse
+        model: modelToUse,
+        creditsDeducted: affordability.creditCost
       }
     })
 

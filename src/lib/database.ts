@@ -1,5 +1,6 @@
 import { PrismaClient } from '@/generated/prisma'
 import { createHash } from 'crypto'
+import { MODEL_CREDIT_COSTS } from '@/lib/constants'
 
 declare global {
   var prisma: PrismaClient | undefined
@@ -316,20 +317,7 @@ export class UserService {
 
   // Get credit cost for a model
   static getModelCreditCost(model: string): number {
-    // Map models to credit costs based on new system
-    const creditCosts: Record<string, number> = {
-      // OpenAI models
-      'gpt-4.1-nano': 1,
-      'gpt-4.1-mini': 4,
-      'gpt-4.1': 8,
-      'o4-mini-high': 12,
-      // Anthropic models
-      'claude-3-5-haiku-20241022': 1,
-      'claude-sonnet-4-20250514': 8,
-      'claude-opus-4-20250514': 12,
-    }
-    
-    return creditCosts[model] || 4 // Default to 4 credits if model not found
+    return MODEL_CREDIT_COSTS[model as keyof typeof MODEL_CREDIT_COSTS] || 1 // Default to 1 credit if model not found
   }
 
   // Check if user can afford a specific model
@@ -373,7 +361,7 @@ export class UserService {
     // Get limits based on subscription tier
     const MONTHLY_LIMITS = {
       FREE: 5,
-      PLUS: 100,
+      PLUS: 200,
       PREMIUM: -1 // Unlimited
     } as const
 
@@ -418,7 +406,7 @@ export class UserService {
 
     // First use monthly allowance, then bonus credits
     const monthlyLimit = user.subscriptionTier === 'FREE' ? 5 : 
-                        user.subscriptionTier === 'PLUS' ? 100 : -1
+                        user.subscriptionTier === 'PLUS' ? 200 : -1
     
     if (monthlyLimit === -1) {
       // Premium users have unlimited monthly credits

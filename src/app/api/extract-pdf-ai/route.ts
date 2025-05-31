@@ -173,6 +173,27 @@ export async function POST(request: NextRequest) {
       console.log(`No cached extraction found for method: ${extractionMethod}, provider: ${useAI ? provider : 'basic'}, model: ${model || 'default'}. Proceeding with new extraction.`)
     }
 
+    // Only check and deduct credits if using AI extraction
+    let affordability: any = null
+    if (useAI && userId) {
+      // Determine the model to use for credit calculation
+      const selectedModel = model || (provider === 'openai' ? OPENAI_MODELS.MINI : ANTHROPIC_MODELS.SONNET)
+      
+      // Check if user can afford this model
+      affordability = await UserService.checkModelAffordability(userId, selectedModel)
+      if (!affordability.canAfford) {
+        return NextResponse.json(
+          { 
+            error: `Insufficient credits. This model costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+            creditCost: affordability.creditCost,
+            remaining: affordability.remaining,
+            tier: affordability.tier
+          },
+          { status: 402 } // Payment Required
+        )
+      }
+    }
+
     // Extract text from PDF
     let extractedText: string
     let structuredData: any = null
@@ -364,6 +385,18 @@ Please use the extract_resume_content function to return the formatted content.`
           totalProcessingTimeMs: processingTime,
           completedAt: new Date()
         })
+
+        // Deduct credits for successful model usage
+        if (affordability) {
+          try {
+            const selectedModel = model || (provider === 'openai' ? OPENAI_MODELS.MINI : ANTHROPIC_MODELS.SONNET)
+            await UserService.deductModelCredits(userId!, selectedModel)
+            console.log(`Successfully deducted ${affordability.creditCost} credits for model ${selectedModel}`)
+          } catch (creditError) {
+            console.error('Failed to deduct credits:', creditError)
+            // Log the error but don't fail the request since the extraction was successful
+          }
+        }
 
       } catch (aiError) {
         console.error('AI extraction failed:', aiError)

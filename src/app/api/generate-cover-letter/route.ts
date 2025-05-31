@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/database'
+import { db, UserService } from '@/lib/database'
 import { getOrCreateJobSummary, shouldSummarizeJobDescription } from '@/lib/job-summary-utils'
 import { checkCachedCoverLetter, saveCoverLetterToCache } from '@/lib/cache-utils'
 import { callOpenAIText, CONTEXT_SIZES, TEMPERATURES } from '@/lib/openai-utils'
@@ -40,6 +40,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      )
+    }
+
+    // Check if user can afford this model
+    const affordability = await UserService.checkModelAffordability(user.id, llm)
+    if (!affordability.canAfford) {
+      return NextResponse.json(
+        { 
+          error: `Insufficient credits. This model costs ${affordability.creditCost} credits, but you only have ${affordability.remaining} credits remaining.`,
+          creditCost: affordability.creditCost,
+          remaining: affordability.remaining,
+          tier: affordability.tier
+        },
+        { status: 402 } // Payment Required
       )
     }
 
@@ -181,6 +195,15 @@ Generate only the cover letter content without any additional formatting or expl
       )
     }
 
+    // Deduct credits for successful model usage
+    try {
+      await UserService.deductModelCredits(user.id, llm)
+      console.log(`Successfully deducted ${affordability.creditCost} credits for model ${llm}`)
+    } catch (creditError) {
+      console.error('Failed to deduct credits:', creditError)
+      // Log the error but don't fail the request since the cover letter was generated successfully
+    }
+
     // Store the cover letter generation in database using LlmCall
     let llmCallId = null
     try {
@@ -250,7 +273,8 @@ Generate only the cover letter content without any additional formatting or expl
         metadata: {
           tokensUsed,
           processingTime,
-          estimatedCost
+          estimatedCost,
+          creditsDeducted: affordability.creditCost
         }
       }
     })
