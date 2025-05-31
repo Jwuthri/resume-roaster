@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     // Ignore TypeScript errors during build for now
     ignoreBuildErrors: false,
   },
-  serverExternalPackages: ['@prisma/client'],
+  serverExternalPackages: ['@prisma/client', 'canvas', 'pdfjs-dist'],
   // Set maximum duration for all API routes to 800 seconds (Pro plan limit)
   maxDuration: 800,
   // Optimize for production

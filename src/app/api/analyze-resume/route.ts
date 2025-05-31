@@ -28,6 +28,7 @@ Start with 40 points and deduct:
 - Missing preferred skills: -2 points each
 - Outdated skill versions: -3 points each
 - No evidence of skill proficiency: -3 points each
+**Minimum: 0 points**
 
 ### Experience Relevance (35 points max)
 Start with 35 points and adjust:
@@ -36,6 +37,7 @@ Start with 35 points and adjust:
 - Different role, similar skills: -12 to -18
 - Entry-level for senior position: -25
 - Years of experience gap: -3 per year short
+**Minimum: 0 points**
 
 ### Achievement Alignment (20 points max)
 Start with 0 and add:
@@ -50,6 +52,7 @@ Start with 5 and deduct:
 - Typos/grammar errors: -1 per error
 - Missing key sections: -1 each
 - Wall of text/poor readability: -2
+**IMPORTANT: Minimum score is 0 points (never negative)**
 
 **SCORE CALIBRATION EXAMPLES**:
 - 95: Fortune 500 exec applying to similar role, perfect match

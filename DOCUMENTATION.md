@@ -175,6 +175,7 @@ Deduction-based scoring:
 - Missing preferred skills: -2 points each
 - Outdated skill versions: -3 points each
 - No evidence of skill proficiency: -3 points each
+**Minimum: 0 points**
 ```
 
 **2. Experience Relevance (35 points max)**
@@ -185,6 +186,7 @@ Adjustment-based scoring:
 - Different role, similar skills: -12 to -18 points
 - Entry-level for senior position: -25 points
 - Years of experience gap: -3 per year short
+**Minimum: 0 points**
 ```
 
 **3. Achievement Alignment (20 points max)**
@@ -202,6 +204,7 @@ Deduction-based scoring:
 - Typos/grammar errors: -1 per error
 - Missing key sections: -1 each
 - Wall of text/poor readability: -2 points
+**IMPORTANT: Minimum score is 0 points (never negative)**
 ```
 
 ### Analysis Results Structure

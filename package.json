@@ -14,7 +14,8 @@
     "deploy": "vercel --prod",
     "postinstall": "prisma generate",
     "index-docs": "node scripts/index-documentation.js",
-    "test-pdf": "node scripts/test-pdf-extraction.js"
+    "test-pdf": "node scripts/test-pdf-extraction.js",
+    "test-pdf-images": "node scripts/test-pdf-to-image.js"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",
