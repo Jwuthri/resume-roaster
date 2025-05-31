@@ -1,8 +1,9 @@
 import { Pinecone } from '@pinecone-database/pinecone';
 import { createHash } from 'crypto';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, readdirSync, statSync } from 'fs';
+import { join, relative } from 'path';
 import OpenAI from 'openai';
+import { glob } from 'glob';
 
 interface DocumentationChunk {
   id: string;
@@ -445,6 +446,157 @@ export class DocumentationIndexer {
     } catch (error) {
       console.error('Error getting index status:', error);
       return { totalChunks: 0, sections: [] };
+    }
+  }
+
+  /**
+   * Find all markdown files in the repository
+   */
+  private async findMarkdownFiles(): Promise<string[]> {
+    try {
+      const pattern = '**/*.md';
+      const files = await glob(pattern, {
+        cwd: process.cwd(),
+        ignore: [
+          'node_modules/**',
+          '.next/**',
+          '.git/**',
+          'dist/**',
+          'build/**'
+        ]
+      });
+      
+      // Convert to relative paths and filter out any unwanted files
+      const markdownFiles = files
+        .map(file => relative(process.cwd(), join(process.cwd(), file)))
+        .filter(file => {
+          // Additional filtering if needed
+          return !file.includes('node_modules') && 
+                 !file.includes('.next') && 
+                 !file.includes('.git');
+        });
+
+      console.log(`📁 Found ${markdownFiles.length} markdown files:`, markdownFiles);
+      return markdownFiles;
+    } catch (error) {
+      console.error('❌ Error finding markdown files:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Index all markdown files in the repository
+   */
+  async indexAllDocumentation(): Promise<void> {
+    console.log('🔍 Starting indexing of all markdown files with Pinecone...');
+    
+    try {
+      // Find all markdown files
+      const markdownFiles = await this.findMarkdownFiles();
+      
+      if (markdownFiles.length === 0) {
+        console.log('📄 No markdown files found to index');
+        return;
+      }
+
+      let totalProcessed = 0;
+      let totalSkipped = 0;
+      let totalErrors = 0;
+
+      // Process each file
+      for (const filePath of markdownFiles) {
+        try {
+          console.log(`\n📝 Processing: ${filePath}`);
+          
+          // Check if file exists and is readable
+          const fullPath = join(process.cwd(), filePath);
+          try {
+            const stats = statSync(fullPath);
+            if (!stats.isFile()) {
+              console.log(`⚠️ Skipping ${filePath}: Not a file`);
+              totalSkipped++;
+              continue;
+            }
+          } catch (error) {
+            console.log(`⚠️ Skipping ${filePath}: File not accessible`);
+            totalSkipped++;
+            continue;
+          }
+
+          // Index the individual file
+          await this.indexDocumentation(filePath);
+          totalProcessed++;
+          
+          // Small delay between files to avoid rate limits
+          if (totalProcessed < markdownFiles.length) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (error) {
+          console.error(`❌ Error processing ${filePath}:`, error);
+          totalErrors++;
+          // Continue with other files even if one fails
+        }
+      }
+
+      console.log('\n📊 Indexing Summary:');
+      console.log(`✅ Successfully processed: ${totalProcessed} files`);
+      console.log(`⚠️ Skipped: ${totalSkipped} files`);
+      console.log(`❌ Errors: ${totalErrors} files`);
+      console.log('🎉 All markdown files indexing completed!');
+      
+    } catch (error) {
+      console.error('❌ Error indexing all documentation:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get comprehensive indexing status for all files
+   */
+  async getAllIndexStatus(): Promise<{
+    totalFiles: number;
+    totalChunks: number;
+    fileStatuses: Array<{
+      fileName: string;
+      totalChunks: number;
+      lastIndexedAt?: string;
+      fileHash?: string;
+    }>;
+  }> {
+    try {
+      const index = this.pinecone.index(this.INDEX_NAME);
+      
+      // Find all markdown files
+      const markdownFiles = await this.findMarkdownFiles();
+      
+      // Get metadata for all files
+      const metadataIds = markdownFiles.map(file => `metadata-${file}`);
+      const metadata = await index.fetch(metadataIds);
+      
+      const fileStatuses = markdownFiles.map(file => {
+        const metadataRecord = metadata.records[`metadata-${file}`];
+        return {
+          fileName: file,
+          totalChunks: metadataRecord?.metadata?.totalChunks as number || 0,
+          lastIndexedAt: metadataRecord?.metadata?.lastIndexedAt as string,
+          fileHash: metadataRecord?.metadata?.fileHash as string
+        };
+      });
+
+      const totalChunks = fileStatuses.reduce((sum, status) => sum + status.totalChunks, 0);
+      
+      return {
+        totalFiles: markdownFiles.length,
+        totalChunks,
+        fileStatuses
+      };
+    } catch (error) {
+      console.error('Error getting comprehensive index status:', error);
+      return {
+        totalFiles: 0,
+        totalChunks: 0,
+        fileStatuses: []
+      };
     }
   }
 }

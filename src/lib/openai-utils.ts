@@ -998,11 +998,25 @@ export async function callOpenAIResumeAnalysis(
     }
   }
 
-  return callOpenAI(userPrompt, {
+  const response = await callOpenAI(userPrompt, {
     ...options,
     tools: [resumeAnalysisTool],
     toolChoice: { type: 'function', function: { name: 'analyze_resume' } }
   })
+
+  // Validate and fix the analysis data to ensure all scores are within proper ranges
+  try {
+    const validatedData = validateAnalysisData(response.data)
+    console.log('✅ Analysis data validated and corrected')
+    
+    return {
+      ...response,
+      data: validatedData
+    }
+  } catch (validationError) {
+    console.error('❌ Analysis data validation failed:', validationError)
+    throw new Error('Invalid analysis data structure returned by AI')
+  }
 }
 
 /**
@@ -1282,4 +1296,64 @@ export async function callOpenAIPDFExtractionWithVision(
     tools,
     toolChoice: { type: 'function', function: { name: 'extract_resume_content' } }
   })
+}
+
+/**
+ * Validate and fix scoring breakdown to ensure all values are within proper ranges
+ */
+function validateScoringBreakdown(scoringBreakdown: any): any {
+  if (!scoringBreakdown || typeof scoringBreakdown !== 'object') {
+    return {
+      skills: 0,
+      experience: 0,
+      achievements: 0,
+      presentation: 0
+    }
+  }
+
+  const originalPresentation = Number(scoringBreakdown.presentation) || 0
+  const validatedPresentation = Math.max(0, Math.min(5, originalPresentation))
+  
+  // Log if we had to correct a negative presentation score
+  if (originalPresentation < 0) {
+    console.log(`🔧 Corrected negative presentation score: ${originalPresentation} → ${validatedPresentation}`)
+  }
+
+  return {
+    skills: Math.max(0, Math.min(40, Number(scoringBreakdown.skills) || 0)),
+    experience: Math.max(0, Math.min(35, Number(scoringBreakdown.experience) || 0)),
+    achievements: Math.max(0, Math.min(20, Number(scoringBreakdown.achievements) || 0)),
+    presentation: validatedPresentation
+  }
+}
+
+/**
+ * Validate and fix overall analysis data to ensure consistency
+ */
+function validateAnalysisData(analysisData: any): any {
+  if (!analysisData || typeof analysisData !== 'object') {
+    throw new Error('Invalid analysis data structure')
+  }
+
+  // Validate scoring breakdown
+  const validatedBreakdown = validateScoringBreakdown(analysisData.scoringBreakdown)
+  
+  // Calculate corrected overall score based on validated breakdown
+  const calculatedScore = validatedBreakdown.skills + validatedBreakdown.experience + 
+                         validatedBreakdown.achievements + validatedBreakdown.presentation
+  
+  // Ensure overall score is within 0-100 range
+  const overallScore = Math.max(0, Math.min(100, Number(analysisData.overallScore) || calculatedScore))
+
+  return {
+    ...analysisData,
+    overallScore,
+    scoringBreakdown: validatedBreakdown,
+    // Ensure other required fields have defaults
+    strengths: Array.isArray(analysisData.strengths) ? analysisData.strengths : [],
+    weaknesses: Array.isArray(analysisData.weaknesses) ? analysisData.weaknesses : [],
+    suggestions: Array.isArray(analysisData.suggestions) ? analysisData.suggestions : [],
+    keywordMatch: analysisData.keywordMatch || { matched: [], missing: [], matchPercentage: 0 },
+    atsIssues: Array.isArray(analysisData.atsIssues) ? analysisData.atsIssues : []
+  }
 } 

@@ -2926,11 +2926,13 @@ export namespace Prisma {
   export type UserAvgAggregateOutputType = {
     monthlyRoasts: number | null
     totalRoasts: number | null
+    bonusCredits: number | null
   }
 
   export type UserSumAggregateOutputType = {
     monthlyRoasts: number | null
     totalRoasts: number | null
+    bonusCredits: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -2946,6 +2948,7 @@ export namespace Prisma {
     subscriptionEndsAt: Date | null
     monthlyRoasts: number | null
     totalRoasts: number | null
+    bonusCredits: number | null
     lastRoastReset: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2964,6 +2967,7 @@ export namespace Prisma {
     subscriptionEndsAt: Date | null
     monthlyRoasts: number | null
     totalRoasts: number | null
+    bonusCredits: number | null
     lastRoastReset: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2982,6 +2986,7 @@ export namespace Prisma {
     subscriptionEndsAt: number
     monthlyRoasts: number
     totalRoasts: number
+    bonusCredits: number
     lastRoastReset: number
     createdAt: number
     updatedAt: number
@@ -2992,11 +2997,13 @@ export namespace Prisma {
   export type UserAvgAggregateInputType = {
     monthlyRoasts?: true
     totalRoasts?: true
+    bonusCredits?: true
   }
 
   export type UserSumAggregateInputType = {
     monthlyRoasts?: true
     totalRoasts?: true
+    bonusCredits?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -3012,6 +3019,7 @@ export namespace Prisma {
     subscriptionEndsAt?: true
     monthlyRoasts?: true
     totalRoasts?: true
+    bonusCredits?: true
     lastRoastReset?: true
     createdAt?: true
     updatedAt?: true
@@ -3030,6 +3038,7 @@ export namespace Prisma {
     subscriptionEndsAt?: true
     monthlyRoasts?: true
     totalRoasts?: true
+    bonusCredits?: true
     lastRoastReset?: true
     createdAt?: true
     updatedAt?: true
@@ -3048,6 +3057,7 @@ export namespace Prisma {
     subscriptionEndsAt?: true
     monthlyRoasts?: true
     totalRoasts?: true
+    bonusCredits?: true
     lastRoastReset?: true
     createdAt?: true
     updatedAt?: true
@@ -3153,6 +3163,7 @@ export namespace Prisma {
     subscriptionEndsAt: Date | null
     monthlyRoasts: number
     totalRoasts: number
+    bonusCredits: number
     lastRoastReset: Date
     createdAt: Date
     updatedAt: Date
@@ -3190,6 +3201,7 @@ export namespace Prisma {
     subscriptionEndsAt?: boolean
     monthlyRoasts?: boolean
     totalRoasts?: boolean
+    bonusCredits?: boolean
     lastRoastReset?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3219,6 +3231,7 @@ export namespace Prisma {
     subscriptionEndsAt?: boolean
     monthlyRoasts?: boolean
     totalRoasts?: boolean
+    bonusCredits?: boolean
     lastRoastReset?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3237,6 +3250,7 @@ export namespace Prisma {
     subscriptionEndsAt?: boolean
     monthlyRoasts?: boolean
     totalRoasts?: boolean
+    bonusCredits?: boolean
     lastRoastReset?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3255,12 +3269,13 @@ export namespace Prisma {
     subscriptionEndsAt?: boolean
     monthlyRoasts?: boolean
     totalRoasts?: boolean
+    bonusCredits?: boolean
     lastRoastReset?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "emailVerified" | "image" | "hashedPassword" | "subscriptionTier" | "subscriptionId" | "customerId" | "subscriptionEndsAt" | "monthlyRoasts" | "totalRoasts" | "lastRoastReset" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "emailVerified" | "image" | "hashedPassword" | "subscriptionTier" | "subscriptionId" | "customerId" | "subscriptionEndsAt" | "monthlyRoasts" | "totalRoasts" | "bonusCredits" | "lastRoastReset" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     resumes?: boolean | User$resumesArgs<ExtArgs>
@@ -3304,6 +3319,7 @@ export namespace Prisma {
       subscriptionEndsAt: Date | null
       monthlyRoasts: number
       totalRoasts: number
+      bonusCredits: number
       lastRoastReset: Date
       createdAt: Date
       updatedAt: Date
@@ -3752,6 +3768,7 @@ export namespace Prisma {
     readonly subscriptionEndsAt: FieldRef<"User", 'DateTime'>
     readonly monthlyRoasts: FieldRef<"User", 'Int'>
     readonly totalRoasts: FieldRef<"User", 'Int'>
+    readonly bonusCredits: FieldRef<"User", 'Int'>
     readonly lastRoastReset: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -23828,6 +23845,7 @@ export namespace Prisma {
     subscriptionEndsAt: 'subscriptionEndsAt',
     monthlyRoasts: 'monthlyRoasts',
     totalRoasts: 'totalRoasts',
+    bonusCredits: 'bonusCredits',
     lastRoastReset: 'lastRoastReset',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -24318,6 +24336,7 @@ export namespace Prisma {
     subscriptionEndsAt?: DateTimeNullableFilter<"User"> | Date | string | null
     monthlyRoasts?: IntFilter<"User"> | number
     totalRoasts?: IntFilter<"User"> | number
+    bonusCredits?: IntFilter<"User"> | number
     lastRoastReset?: DateTimeFilter<"User"> | Date | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -24346,6 +24365,7 @@ export namespace Prisma {
     subscriptionEndsAt?: SortOrderInput | SortOrder
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
     lastRoastReset?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24377,6 +24397,7 @@ export namespace Prisma {
     subscriptionEndsAt?: DateTimeNullableFilter<"User"> | Date | string | null
     monthlyRoasts?: IntFilter<"User"> | number
     totalRoasts?: IntFilter<"User"> | number
+    bonusCredits?: IntFilter<"User"> | number
     lastRoastReset?: DateTimeFilter<"User"> | Date | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -24405,6 +24426,7 @@ export namespace Prisma {
     subscriptionEndsAt?: SortOrderInput | SortOrder
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
     lastRoastReset?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24431,6 +24453,7 @@ export namespace Prisma {
     subscriptionEndsAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     monthlyRoasts?: IntWithAggregatesFilter<"User"> | number
     totalRoasts?: IntWithAggregatesFilter<"User"> | number
+    bonusCredits?: IntWithAggregatesFilter<"User"> | number
     lastRoastReset?: DateTimeWithAggregatesFilter<"User"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -25841,6 +25864,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25869,6 +25893,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25897,6 +25922,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25925,6 +25951,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25953,6 +25980,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25971,6 +25999,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25989,6 +26018,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27654,6 +27684,7 @@ export namespace Prisma {
     subscriptionEndsAt?: SortOrder
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
     lastRoastReset?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -27662,6 +27693,7 @@ export namespace Prisma {
   export type UserAvgOrderByAggregateInput = {
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -27677,6 +27709,7 @@ export namespace Prisma {
     subscriptionEndsAt?: SortOrder
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
     lastRoastReset?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -27695,6 +27728,7 @@ export namespace Prisma {
     subscriptionEndsAt?: SortOrder
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
     lastRoastReset?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -27703,6 +27737,7 @@ export namespace Prisma {
   export type UserSumOrderByAggregateInput = {
     monthlyRoasts?: SortOrder
     totalRoasts?: SortOrder
+    bonusCredits?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -32058,6 +32093,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32085,6 +32121,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32128,6 +32165,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32155,6 +32193,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32182,6 +32221,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32209,6 +32249,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32527,6 +32568,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32554,6 +32596,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33003,6 +33046,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33030,6 +33074,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33319,6 +33364,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33346,6 +33392,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34378,6 +34425,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34405,6 +34453,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34633,6 +34682,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34660,6 +34710,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34836,6 +34887,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34863,6 +34915,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35063,6 +35116,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35090,6 +35144,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35250,6 +35305,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35277,6 +35333,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35477,6 +35534,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35504,6 +35562,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35664,6 +35723,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35691,6 +35751,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35921,6 +35982,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35948,6 +36010,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36124,6 +36187,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36151,6 +36215,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36229,6 +36294,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36256,6 +36322,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36324,6 +36391,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36351,6 +36419,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36425,6 +36494,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36452,6 +36522,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36516,6 +36587,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36543,6 +36615,7 @@ export namespace Prisma {
     subscriptionEndsAt?: Date | string | null
     monthlyRoasts?: number
     totalRoasts?: number
+    bonusCredits?: number
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36586,6 +36659,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36613,6 +36687,7 @@ export namespace Prisma {
     subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     monthlyRoasts?: IntFieldUpdateOperationsInput | number
     totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

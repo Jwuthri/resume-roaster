@@ -133,6 +133,7 @@ exports.Prisma.UserScalarFieldEnum = {
   subscriptionEndsAt: 'subscriptionEndsAt',
   monthlyRoasts: 'monthlyRoasts',
   totalRoasts: 'totalRoasts',
+  bonusCredits: 'bonusCredits',
   lastRoastReset: 'lastRoastReset',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -43,7 +43,7 @@ Respond in a friendly, professional tone that builds confidence while providing 
 async function generateAIResponse(userMessage: string, conversationHistory: ChatMessage[] = []): Promise<string> {
   try {
     // Search for relevant documentation
-    const relevantDocs = await documentationIndexer.searchDocumentation(userMessage, 10);
+    const relevantDocs = await documentationIndexer.searchDocumentation(userMessage, 50);
     
     // Prepare conversation history for context
     let contextPrompt = userMessage;
@@ -58,7 +58,7 @@ async function generateAIResponse(userMessage: string, conversationHistory: Chat
     }
     
     // Add recent conversation history (last 10 messages for context)
-    const recentHistory = conversationHistory.slice(-10);
+    const recentHistory = conversationHistory.slice(-6);
     if (recentHistory.length > 0) {
       const historyText = recentHistory.map(msg => 
         `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.content}`

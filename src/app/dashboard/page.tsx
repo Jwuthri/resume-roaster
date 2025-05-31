@@ -15,6 +15,7 @@ import { FeatureAnnouncementBanner } from "@/components/ui/feature-announcement-
 import { CoverLetterModal } from "@/components/ui/cover-letter-modal"
 import { InterviewPrepModal } from "@/components/ui/interview-prep-modal"
 import { ResumeOptimizationModal } from "@/components/ui/resume-optimization-modal"
+import { CreditPurchase } from "@/components/CreditPurchase"
 import { toast } from 'sonner'
 import { useAlertDialog } from "@/components/ui/alert-dialog"
 
@@ -79,6 +80,8 @@ function DashboardContent() {
     const success = searchParams.get('success')
     const tier = searchParams.get('tier')
     const sessionId = searchParams.get('session_id')
+    const creditSuccess = searchParams.get('credit_success')
+    const creditCanceled = searchParams.get('credit_canceled')
     
     if (success === 'true' && tier) {
       toast.success(`🎉 Welcome to ${tier} plan! Your subscription is now active.`, {
@@ -90,6 +93,29 @@ function DashboardContent() {
       url.searchParams.delete('success')
       url.searchParams.delete('tier')
       url.searchParams.delete('session_id')
+      window.history.replaceState({}, '', url.toString())
+    }
+
+    if (creditSuccess === 'true') {
+      toast.success(`🎉 Credit purchase successful! 200 bonus credits have been added to your account.`, {
+        duration: 5000,
+      })
+      
+      // Clean up URL parameters
+      const url = new URL(window.location.href)
+      url.searchParams.delete('credit_success')
+      url.searchParams.delete('session_id')
+      window.history.replaceState({}, '', url.toString())
+    }
+
+    if (creditCanceled === 'true') {
+      toast.info('Credit purchase was canceled.', {
+        duration: 3000,
+      })
+      
+      // Clean up URL parameters
+      const url = new URL(window.location.href)
+      url.searchParams.delete('credit_canceled')
       window.history.replaceState({}, '', url.toString())
     }
   }, [searchParams])
@@ -553,6 +579,9 @@ function DashboardContent() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Credit Purchase Component for PLUS users */}
+              <CreditPurchase className="mb-4" />
 
               {analyses.map((analysis) => {
                 const isExpanded = expandedCards.has(analysis.id)

@@ -60,6 +60,13 @@ function generateReportContent(analysisData: any, resumeData?: any, jobDescripti
     atsIssues 
   } = analysisData
 
+  // Helper function to safely calculate presentation percentage
+  const getPresentationPercentage = (presentationScore: number) => {
+    // Ensure the score is within valid range (0-5)
+    const validScore = Math.max(0, Math.min(5, Number(presentationScore) || 0))
+    return Math.round((validScore / 5) * 100)
+  }
+
   const report = `
 RESUME ANALYSIS REPORT
 Generated on: ${new Date().toLocaleDateString('en-US', { 
@@ -85,7 +92,7 @@ DETAILED SCORING BREAKDOWN:
 • Skills Match: ${Math.round((scoringBreakdown.skills / 40) * 100)}/100 (${scoringBreakdown.skills}/40 points)
 • Experience Relevance: ${Math.round((scoringBreakdown.experience / 35) * 100)}/100 (${scoringBreakdown.experience}/35 points)
 • Achievement Quality: ${Math.round((scoringBreakdown.achievements / 20) * 100)}/100 (${scoringBreakdown.achievements}/20 points)
-• Presentation & Format: ${Math.round((scoringBreakdown.presentation / 5) * 100)}/100 (${scoringBreakdown.presentation}/5 points)
+• Presentation & Format: ${getPresentationPercentage(scoringBreakdown.presentation)}/100 (${Math.max(0, Math.min(5, Number(scoringBreakdown.presentation) || 0))}/5 points)
 
 SCORING METHODOLOGY:
 - Skills Match: Up to 40 points (40% of total score)

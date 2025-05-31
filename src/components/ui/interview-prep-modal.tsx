@@ -60,6 +60,7 @@ interface InterviewPrepModalProps {
   jobDescription?: string
   analysisData?: any
   analysisId?: string
+  onInterviewPrepGenerated?: (cached: boolean) => void
 }
 
 export function InterviewPrepModal({
@@ -68,7 +69,8 @@ export function InterviewPrepModal({
   resumeData,
   jobDescription,
   analysisData,
-  analysisId
+  analysisId,
+  onInterviewPrepGenerated
 }: InterviewPrepModalProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedLLM, setSelectedLLM] = useState<string>(OPENAI_MODELS.MINI)
@@ -176,6 +178,9 @@ export function InterviewPrepModal({
       setInterviewData(data.interviewPrep)
       toast.success('Interview prep generated successfully!')
       
+      if (onInterviewPrepGenerated) {
+        onInterviewPrepGenerated(data.cached)
+      }
     } catch (error) {
       console.error('Error generating interview prep:', error)
       toast.error(error instanceof Error ? error.message : 'Failed to generate interview prep')

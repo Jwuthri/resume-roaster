@@ -345,26 +345,6 @@ export class UserService {
     }
   }
 
-  // Deduct credits for a specific model usage
-  static async deductModelCredits(userId: string, model: string) {
-    const creditCost = this.getModelCreditCost(model)
-    
-    // Check if user can afford this
-    const affordability = await this.checkModelAffordability(userId, model)
-    if (!affordability.canAfford) {
-      throw new Error(`Insufficient credits. Need ${creditCost} credits, have ${affordability.remaining}`)
-    }
-
-    // Deduct credits by incrementing roast count by the credit cost
-    return await db.user.update({
-      where: { id: userId },
-      data: {
-        monthlyRoasts: { increment: creditCost },
-        totalRoasts: { increment: creditCost }
-      }
-    })
-  }
-
   // Check user's remaining roasts
   static async checkRoastLimit(userId: string) {
     const user = await db.user.findUnique({
@@ -397,17 +377,84 @@ export class UserService {
       PREMIUM: -1 // Unlimited
     } as const
 
-    const limit = MONTHLY_LIMITS[user.subscriptionTier]
-    const canRoast = limit === -1 || user.monthlyRoasts < limit
-    const remaining = limit === -1 ? -1 : Math.max(0, limit - user.monthlyRoasts)
+    const monthlyLimit = MONTHLY_LIMITS[user.subscriptionTier]
+    const monthlyRemaining = monthlyLimit === -1 ? -1 : Math.max(0, monthlyLimit - user.monthlyRoasts)
+    
+    // Total available credits = monthly remaining + bonus credits
+    const totalAvailable = monthlyLimit === -1 ? -1 : monthlyRemaining + user.bonusCredits
+    const canRoast = monthlyLimit === -1 || totalAvailable > 0
 
     return {
       canRoast,
-      remaining,
+      remaining: totalAvailable,
+      monthlyRemaining,
+      bonusCredits: user.bonusCredits,
       used: user.monthlyRoasts,
-      limit,
+      limit: monthlyLimit,
       tier: user.subscriptionTier
     }
+  }
+
+  // Deduct credits for a specific model usage
+  static async deductModelCredits(userId: string, model: string) {
+    const creditCost = this.getModelCreditCost(model)
+    
+    // Check if user can afford this
+    const affordability = await this.checkModelAffordability(userId, model)
+    if (!affordability.canAfford) {
+      throw new Error(`Insufficient credits. Need ${creditCost} credits, have ${affordability.remaining}`)
+    }
+
+    // Get current user state
+    const user = await db.user.findUnique({
+      where: { id: userId }
+    })
+
+    if (!user) throw new Error('User not found')
+
+    // Determine how to deduct credits
+    let monthlyIncrement = 0
+    let bonusDecrement = 0
+
+    // First use monthly allowance, then bonus credits
+    const monthlyLimit = user.subscriptionTier === 'FREE' ? 5 : 
+                        user.subscriptionTier === 'PLUS' ? 100 : -1
+    
+    if (monthlyLimit === -1) {
+      // Premium users have unlimited monthly credits
+      monthlyIncrement = creditCost
+    } else {
+      const monthlyRemaining = Math.max(0, monthlyLimit - user.monthlyRoasts)
+      
+      if (monthlyRemaining >= creditCost) {
+        // Use monthly credits
+        monthlyIncrement = creditCost
+      } else {
+        // Use remaining monthly + bonus credits
+        monthlyIncrement = monthlyRemaining
+        bonusDecrement = creditCost - monthlyRemaining
+      }
+    }
+
+    // Update user credits
+    return await db.user.update({
+      where: { id: userId },
+      data: {
+        monthlyRoasts: { increment: monthlyIncrement },
+        totalRoasts: { increment: creditCost },
+        bonusCredits: { decrement: bonusDecrement }
+      }
+    })
+  }
+
+  // Add bonus credits to user account
+  static async addBonusCredits(userId: string, credits: number) {
+    return await db.user.update({
+      where: { id: userId },
+      data: {
+        bonusCredits: { increment: credits }
+      }
+    })
   }
 
   // Increment roast count (legacy method for backward compatibility)

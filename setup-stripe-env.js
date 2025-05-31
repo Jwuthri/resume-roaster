@@ -17,6 +17,7 @@ STRIPE_PRO_MONTHLY_PRICE_ID="price_your_pro_monthly_price_id"
 STRIPE_PRO_YEARLY_PRICE_ID="price_your_pro_yearly_price_id"
 STRIPE_ENTERPRISE_MONTHLY_PRICE_ID="price_your_enterprise_monthly_price_id"
 STRIPE_ENTERPRISE_YEARLY_PRICE_ID="price_your_enterprise_yearly_price_id"
+STRIPE_CREDIT_PACK_200_PRICE_ID="..."
 
 # Public Stripe Price IDs (for frontend - same as above)
 NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID="price_your_pro_monthly_price_id"
@@ -57,6 +58,7 @@ try {
   console.log('4. Create products and prices in Stripe Dashboard:')
   console.log('   - Pro Plan: $9.99/month and $99.99/year')
   console.log('   - Enterprise Plan: $49.99/month and $499.99/year')
+  console.log('   - Credit Pack: $5.99 one-time for 200 credits (PLUS users only)')
   console.log('5. Copy the price IDs and update them in .env.local\n')
   console.log('6. Restart your development server: npm run dev\n')
   console.log('📖 For detailed setup instructions, see STRIPE_SETUP.md')

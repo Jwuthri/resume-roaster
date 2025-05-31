@@ -219,6 +219,20 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
+                    {subscription?.bonusCredits && subscription.bonusCredits > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">Bonus Credits</span>
+                          <span className="text-sm text-gray-600 font-medium text-orange-600">
+                            {subscription.bonusCredits}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Extra credits that don't reset monthly
+                        </p>
+                      </div>
+                    )}
+
                     {remainingUsage !== -1 && remainingUsage <= 1 && subscription?.tier === 'FREE' && (
                       <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                         <div className="flex items-center space-x-2">

@@ -83,6 +83,7 @@ export default function AnalysisPage() {
   const [isGeneratingOptimized, setIsGeneratingOptimized] = useState(false)
   const [hasOptimizedResume, setHasOptimizedResume] = useState(false)
   const [hasCoverLetter, setHasCoverLetter] = useState(false)
+  const [hasInterviewPrep, setHasInterviewPrep] = useState(false)
   const [isDebugExpanded, setIsDebugExpanded] = useState(false)
   const [pdfImages, setPdfImages] = useState<string[]>([])
   const [showImageModal, setShowImageModal] = useState(false)
@@ -114,6 +115,13 @@ export default function AnalysisPage() {
         if (coverLetterResponse.ok) {
           const coverLetterResult = await coverLetterResponse.json()
           setHasCoverLetter(coverLetterResult.exists)
+        }
+
+        // Check for existing interview prep
+        const interviewPrepResponse = await fetch(`/api/check-generated-content?analysisId=${analysisId}&type=interview-prep`)
+        if (interviewPrepResponse.ok) {
+          const interviewPrepResult = await interviewPrepResponse.json()
+          setHasInterviewPrep(interviewPrepResult.exists)
         }
       } catch (error) {
         console.error('Error checking existing content:', error)
@@ -334,6 +342,11 @@ Note: Original resume text was not available, using analysis data for optimizati
       // If a new cover letter was generated, it means there's now a cached version
       setHasCoverLetter(false)
     }
+  }
+
+  const handleInterviewPrepGenerated = (cached: boolean) => {
+    // Update the interview prep status when it's generated
+    setHasInterviewPrep(true)
   }
 
   useEffect(() => {
@@ -591,6 +604,13 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
       case "medium": return <AlertTriangle className="h-4 w-4 text-yellow-500" />
       default: return <AlertTriangle className="h-4 w-4 text-blue-500" />
     }
+  }
+
+  // Helper function to safely calculate presentation percentage
+  const getPresentationPercentage = (presentationScore: number) => {
+    // Ensure the score is within valid range (0-5)
+    const validScore = Math.max(0, Math.min(5, Number(presentationScore) || 0))
+    return Math.round((validScore / 5) * 100)
   }
 
   if (isLoading) {
@@ -858,8 +878,8 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
                     </div>
                     <p className="text-sm font-medium text-pink-700 mb-2">Presentation</p>
                     <div className="relative">
-                      <div className="text-3xl font-bold text-pink-800 mb-2">{Math.round((analysisData.scoringBreakdown.presentation / 5) * 100)}%</div>
-                      <Progress value={Math.round((analysisData.scoringBreakdown.presentation / 5) * 100)} className="h-2" />
+                      <div className="text-3xl font-bold text-pink-800 mb-2">{getPresentationPercentage(analysisData.scoringBreakdown.presentation)}%</div>
+                      <Progress value={getPresentationPercentage(analysisData.scoringBreakdown.presentation)} className="h-2" />
                     </div>
                   </div>
                 </CardContent>
@@ -1113,12 +1133,12 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
                         <span>Cache Status</span>
                         <div className="flex items-center space-x-1">
                           <div className={`w-2 h-2 rounded-full ${
-                            hasOptimizedResume && hasCoverLetter ? 'bg-green-500' : 
-                            hasOptimizedResume || hasCoverLetter ? 'bg-yellow-500' : 'bg-gray-300'
+                            hasOptimizedResume && hasCoverLetter && hasInterviewPrep ? 'bg-green-500' : 
+                            hasOptimizedResume || hasCoverLetter || hasInterviewPrep ? 'bg-yellow-500' : 'bg-gray-300'
                           }`}></div>
                           <span className="text-xs text-gray-600">
-                            {hasOptimizedResume && hasCoverLetter ? 'Fully Available' :
-                             hasOptimizedResume || hasCoverLetter ? 'Partially Available' : 'Not Generated'}
+                            {hasOptimizedResume && hasCoverLetter && hasInterviewPrep ? 'Fully Available' :
+                             hasOptimizedResume || hasCoverLetter || hasInterviewPrep ? 'Partially Available' : 'Not Generated'}
                           </span>
                         </div>
                       </div>
@@ -1149,19 +1169,25 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
                             <div className="flex items-center justify-between">
                               <span className="text-gray-600">Job Desc</span>
                               <span className={`font-medium ${jobDescription ? 'text-green-600' : 'text-gray-400'}`}>
-                                {jobDescription ? '✓' : '○'}
+                                {jobDescription ? '✓' : '✗'}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-gray-600">Optimized Resume</span>
                               <span className={`font-medium ${hasOptimizedResume ? 'text-blue-600' : 'text-gray-400'}`}>
-                                {hasOptimizedResume ? '⚡' : '○'}
+                                {hasOptimizedResume ? '✓' : '✗'}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-gray-600">Cover Letter</span>
                               <span className={`font-medium ${hasCoverLetter ? 'text-purple-600' : 'text-gray-400'}`}>
-                                {hasCoverLetter ? '💾' : '○'}
+                                {hasCoverLetter ? '✓' : '✗'}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600">Interview Prep</span>
+                              <span className={`font-medium ${hasInterviewPrep ? 'text-blue-600' : 'text-gray-400'}`}>
+                                {hasInterviewPrep ? '✓' : '✗'}
                               </span>
                             </div>
                           </div>
@@ -1339,6 +1365,7 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
         jobDescription={jobDescription}
         analysisData={analysisData}
         analysisId={analysisId}
+        onInterviewPrepGenerated={handleInterviewPrepGenerated}
       />
 
       {/* PDF Images Modal */}

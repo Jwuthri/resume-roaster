@@ -47,12 +47,12 @@ Start with 0 and add:
 - Maximum 20 points
 
 ### Presentation Quality (5 points max)
-Start with 5 and deduct:
+Start with 5 and deduct (NEVER GO BELOW 0 - MINIMUM IS ALWAYS 0):
 - Poor formatting: -2
 - Typos/grammar errors: -1 per error
 - Missing key sections: -1 each
 - Wall of text/poor readability: -2
-**IMPORTANT: Minimum score is 0 points (never negative)**
+**CRITICAL: Minimum score is 0 points (NEVER NEGATIVE). If deductions would result in negative, set to 0.**
 
 **SCORE CALIBRATION EXAMPLES**:
 - 95: Fortune 500 exec applying to similar role, perfect match

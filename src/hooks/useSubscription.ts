@@ -11,6 +11,7 @@ export interface SubscriptionData {
   subscriptionEndsAt?: Date
   monthlyRoasts: number
   totalRoasts: number
+  bonusCredits: number
   lastRoastReset: Date
 }
 
@@ -151,7 +152,8 @@ export function useSubscription() {
       case 'FREE':
         return Math.max(0, 5 - subscription.monthlyRoasts)
       case 'PLUS':
-        return Math.max(0, 100 - subscription.monthlyRoasts)
+        const monthlyRemaining = Math.max(0, 100 - subscription.monthlyRoasts)
+        return monthlyRemaining + (subscription.bonusCredits || 0)
       case 'PREMIUM':
         return -1 // Unlimited
       default:

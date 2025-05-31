@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
         subscriptionEndsAt: true,
         monthlyRoasts: true,
         totalRoasts: true,
+        bonusCredits: true,
         lastRoastReset: true,
         updatedAt: true,
       }
@@ -70,6 +71,7 @@ export async function GET(request: NextRequest) {
           subscriptionEndsAt: true,
           monthlyRoasts: true,
           totalRoasts: true,
+          bonusCredits: true,
           lastRoastReset: true,
           updatedAt: true,
         }
@@ -83,6 +85,7 @@ export async function GET(request: NextRequest) {
       subscriptionEndsAt: updatedUser.subscriptionEndsAt,
       monthlyRoasts: updatedUser.monthlyRoasts,
       totalRoasts: updatedUser.totalRoasts,
+      bonusCredits: updatedUser.bonusCredits,
       lastRoastReset: updatedUser.lastRoastReset,
     }
 

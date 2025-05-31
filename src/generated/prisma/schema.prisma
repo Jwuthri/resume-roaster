@@ -33,6 +33,7 @@ model User {
   // Usage tracking
   monthlyRoasts  Int      @default(0) @map("monthly_roasts")
   totalRoasts    Int      @default(0) @map("total_roasts")
+  bonusCredits   Int      @default(0) @map("bonus_credits") // One-time purchased credits that don't reset
   lastRoastReset DateTime @default(now()) @map("last_roast_reset")
 
   createdAt DateTime @default(now()) @map("created_at")

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const analysisId = searchParams.get('analysisId')
-    const type = searchParams.get('type') // 'resume' or 'cover-letter'
+    const type = searchParams.get('type') // 'resume', 'cover-letter', or 'interview-prep'
 
     if (!analysisId || !type) {
       return NextResponse.json(
@@ -62,6 +62,19 @@ export async function GET(request: NextRequest) {
       })
       exists = !!existingCoverLetter
       contentId = existingCoverLetter?.id
+    } else if (type === 'interview-prep') {
+      // Check for existing interview prep for this analysis
+      const existingInterviewPrep = await db.interviewPrep.findFirst({
+        where: {
+          userId: session.user.id,
+          analysisId: analysisId
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
+      exists = !!existingInterviewPrep
+      contentId = existingInterviewPrep?.id
     }
 
     return NextResponse.json({

@@ -27,11 +27,13 @@ export const STRIPE_PRICE_IDS = typeof window === 'undefined' ? {
   PRO_YEARLY: process.env.STRIPE_PRO_YEARLY_PRICE_ID || '',
   ENTERPRISE_MONTHLY: process.env.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID || '',
   ENTERPRISE_YEARLY: process.env.STRIPE_ENTERPRISE_YEARLY_PRICE_ID || '',
+  CREDIT_PACK_200: process.env.STRIPE_CREDIT_PACK_200_PRICE_ID || '', // 200 credits for $5.99
 } as const : {
   PRO_MONTHLY: '',
   PRO_YEARLY: '',
   ENTERPRISE_MONTHLY: '',
   ENTERPRISE_YEARLY: '',
+  CREDIT_PACK_200: '',
 } as const
 
 // Subscription tier mapping
