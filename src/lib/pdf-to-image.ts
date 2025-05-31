@@ -6,20 +6,27 @@ import { promisify } from 'util'
 
 const execAsync = promisify(exec)
 
-// Serverless-compatible PDF to image conversion using pdfjs-dist
-async function convertPDFToImagesServerless(pdfBuffer: Buffer): Promise<string[]> {
+// Modern serverless-compatible PDF to image conversion using @napi-rs/canvas + pdfjs-dist
+async function convertPDFToImagesModern(pdfBuffer: Buffer): Promise<string[]> {
   try {
-    console.log('Converting PDF to images using pdfjs-dist (serverless)...')
+    console.log('Converting PDF to images using @napi-rs/canvas + pdfjs-dist...')
     
-    // Dynamic import to avoid bundling issues - use legacy build for Node.js
+    // Dynamic imports to avoid bundling issues
     const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
-    const { createCanvas } = await import('canvas')
+    const { createCanvas } = await import('@napi-rs/canvas')
     
-    // Load the PDF document
+    // Configure PDF.js for serverless environment
+    ;(pdfjsLib as any).GlobalWorkerOptions.workerSrc = ''
+    
+    // Load the PDF document with serverless-friendly options
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(pdfBuffer),
-      useSystemFonts: true,
-      disableFontFace: false,
+      useSystemFonts: false,
+      disableFontFace: true,
+      isEvalSupported: false,
+      useWorkerFetch: false,
+      disableAutoFetch: true,
+      disableStream: true,
     })
     
     const pdf = await loadingTask.promise
@@ -33,20 +40,25 @@ async function convertPDFToImagesServerless(pdfBuffer: Buffer): Promise<string[]
         const page = await pdf.getPage(pageNum)
         const viewport = page.getViewport({ scale: 1.5 }) // Higher scale for better quality
         
-        // Create canvas
-        const canvas = createCanvas(viewport.width, viewport.height)
+        // Create canvas using @napi-rs/canvas (serverless-compatible)
+        const canvas = createCanvas(Math.floor(viewport.width), Math.floor(viewport.height))
         const context = canvas.getContext('2d')
+        
+        if (!context) {
+          throw new Error('Failed to get canvas 2D context')
+        }
         
         // Render page to canvas
         const renderContext = {
-          canvasContext: context as any, // Type assertion for compatibility
+          canvasContext: context as any,
           viewport: viewport,
+          enableWebGL: false,
         }
         
         await page.render(renderContext).promise
         
-        // Convert canvas to base64 PNG
-        const imageBuffer = canvas.toBuffer('image/png')
+        // Convert canvas to base64 PNG using @napi-rs/canvas
+        const imageBuffer = await canvas.encode('png')
         const base64Data = imageBuffer.toString('base64')
         images.push(base64Data)
         
@@ -55,21 +67,23 @@ async function convertPDFToImagesServerless(pdfBuffer: Buffer): Promise<string[]
         // Clean up
         page.cleanup()
       } catch (pageError) {
-        console.warn(`Failed to convert page ${pageNum}:`, pageError)
+        const errorMessage = pageError instanceof Error ? pageError.message : 'Unknown error'
+        console.warn(`Failed to convert page ${pageNum}:`, errorMessage)
         // Continue with other pages
       }
     }
     
-    console.log(`🎉 Successfully converted ${images.length} pages to images using pdfjs-dist`)
+    console.log(`🎉 Successfully converted ${images.length} pages to images using @napi-rs/canvas`)
     return images
     
   } catch (error) {
-    console.error('❌ Error converting PDF to images with pdfjs-dist:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('❌ Error converting PDF to images with @napi-rs/canvas:', errorMessage)
     throw error
   }
 }
 
-// Legacy system-based conversion (for local development)
+// Legacy system-based conversion (for local development with system tools)
 async function convertPDFToImagesSystem(pdfBuffer: Buffer): Promise<string[]> {
   try {
     console.log('Converting PDF to images using system tools...')
@@ -158,36 +172,30 @@ async function convertPDFToImagesSystem(pdfBuffer: Buffer): Promise<string[]> {
 }
 
 export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
-  // Detect if we're in a serverless environment (Vercel)
-  const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY
-  
-  if (isServerless) {
-    console.log('🚀 Detected serverless environment, using pdfjs-dist for PDF conversion')
-    try {
-      return await convertPDFToImagesServerless(pdfBuffer)
-    } catch (error) {
-      console.error('Serverless PDF conversion failed:', error)
-      console.log('Falling back to no images...')
-      return []
-    }
-  } else {
-    console.log('🖥️ Detected local environment, trying system tools first')
-    try {
-      // Try system tools first in local environment
-      const systemImages = await convertPDFToImagesSystem(pdfBuffer)
-      if (systemImages.length > 0) {
-        return systemImages
+  // Always try the modern serverless-compatible method first
+  console.log('🚀 Using modern serverless-compatible PDF to image conversion')
+  try {
+    return await convertPDFToImagesModern(pdfBuffer)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Modern PDF conversion failed:', errorMessage)
+    
+    // Detect if we're in a local environment and try system tools as fallback
+    const isLocal = !process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME && !process.env.NETLIFY
+    
+    if (isLocal) {
+      console.log('🖥️ Detected local environment, trying system tools as fallback...')
+      try {
+        const systemImages = await convertPDFToImagesSystem(pdfBuffer)
+        if (systemImages.length > 0) {
+          return systemImages
+        }
+      } catch (systemError) {
+        console.log('System tools also failed, continuing without images...')
       }
-    } catch (error) {
-      console.log('System tools failed, falling back to pdfjs-dist...')
     }
     
-    // Fallback to serverless method even in local environment
-    try {
-      return await convertPDFToImagesServerless(pdfBuffer)
-    } catch (error) {
-      console.error('All PDF conversion methods failed:', error)
-      return []
-    }
+    console.log('PDF image conversion not available, continuing with text-only extraction...')
+    return []
   }
 } 
