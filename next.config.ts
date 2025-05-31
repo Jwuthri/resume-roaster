@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     // Ignore TypeScript errors during build for now
     ignoreBuildErrors: false,
   },
-  serverExternalPackages: ['@prisma/client', '@napi-rs/canvas', 'pdfjs-dist', 'puppeteer-core', '@sparticuz/chromium'],
+  serverExternalPackages: ['@prisma/client', 'node-fetch', 'form-data'],
   // Optimize for production
   experimental: {
     // Enable optimizations
