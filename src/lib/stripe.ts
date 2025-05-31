@@ -83,7 +83,7 @@ export const SUBSCRIPTION_TIERS = {
   }
 } as const
 
-// Validation function for server-side use only
+// Enhanced validation function for server-side use only
 export function validateStripeConfig() {
   if (typeof window !== 'undefined') {
     // Client-side validation
@@ -101,14 +101,31 @@ export function validateStripeConfig() {
   }
   
   const missingVars = Object.entries(requiredServerVars)
-    .filter(([key, value]) => !value)
+    .filter(([key, value]) => !value || value.trim() === '')
     .map(([key]) => key)
   
   if (missingVars.length > 0) {
-    console.error('Missing required Stripe environment variables:', missingVars)
-    console.error('Please add these to your .env.local file')
+    console.error('❌ Missing required Stripe environment variables:', missingVars)
+    console.error('Please add these to your environment variables')
     return false
   }
+
+  // Validate that we have at least some price IDs configured
+  const configuredPriceIds = Object.values(STRIPE_PRICE_IDS).filter(id => id && id.trim() !== '')
+  
+  if (configuredPriceIds.length === 0) {
+    console.error('❌ No Stripe price IDs configured')
+    console.error('Available price ID environment variables:', Object.keys(STRIPE_PRICE_IDS).map(key => `STRIPE_${key}_PRICE_ID`))
+    console.error('Current price ID values:', STRIPE_PRICE_IDS)
+    return false
+  }
+
+  console.log('✅ Stripe configuration validated:', {
+    hasSecretKey: !!process.env.STRIPE_SECRET_KEY,
+    hasPublishableKey: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    configuredPriceIds: configuredPriceIds.length,
+    priceIds: STRIPE_PRICE_IDS
+  })
   
   return true
 } 

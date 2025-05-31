@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 *.zip
+
+# Debug and test files
+test-*.js
+debug-*.js
+src/app/api/debug/
