@@ -23,6 +23,12 @@ async function testPDFToImageConversion() {
       console.log('❌ pdfjs-dist: Not found in dependencies');
     }
     
+    if (deps['pdf2pic']) {
+      console.log('✅ pdf2pic:', deps['pdf2pic']);
+    } else {
+      console.log('❌ pdf2pic: Not found in dependencies');
+    }
+    
     if (deps['@napi-rs/canvas']) {
       console.log('✅ @napi-rs/canvas:', deps['@napi-rs/canvas']);
     } else {
@@ -83,6 +89,14 @@ async function testPDFToImageConversion() {
     }
     
     try {
+      const pdf2pic = await import('pdf2pic');
+      console.log('✅ pdf2pic module can be imported');
+      console.log('- Available methods:', Object.keys(pdf2pic).join(', '));
+    } catch (error) {
+      console.log('❌ Failed to import pdf2pic:', error.message);
+    }
+    
+    try {
       const { createCanvas } = await import('@napi-rs/canvas');
       console.log('✅ @napi-rs/canvas module can be imported');
       
@@ -103,7 +117,7 @@ async function testPDFToImageConversion() {
     }
     
     console.log('\n🎉 PDF to image conversion test completed!');
-    console.log('The new @napi-rs/canvas approach should work in both local and serverless environments.');
+    console.log('The new pdf2pic + fallback approach should work in both local and serverless environments.');
     
     // Summary
     console.log('\n📊 Test Results:');
@@ -115,14 +129,14 @@ async function testPDFToImageConversion() {
       console.log('💡 Next steps:');
       console.log('1. Deploy to production: npm run build && vercel --prod');
       console.log('2. Test with a real PDF upload');
-      console.log('3. Check logs for: "Successfully converted X pages to images using @napi-rs/canvas"');
+      console.log('3. Check logs for: "Successfully converted X pages to images using pdf2pic"');
     } else {
       console.log('\n⚠️ Some modules have issues. Check the logs above.');
       console.log('💡 To fix issues:');
-      console.log('1. Make sure @napi-rs/canvas and pdfjs-dist are properly installed');
+      console.log('1. Make sure pdf2pic, @napi-rs/canvas and pdfjs-dist are properly installed');
       console.log('2. Check that Next.js configuration includes these as external packages');
       console.log('3. Verify the modules work in your deployment environment');
-      console.log('4. Run: npm install @napi-rs/canvas pdfjs-dist');
+      console.log('4. Run: npm install pdf2pic @napi-rs/canvas pdfjs-dist');
     }
     
   } catch (error) {
