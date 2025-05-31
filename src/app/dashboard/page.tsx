@@ -353,13 +353,46 @@ function DashboardContent() {
     
     try {
       setIsGeneratingOptimized(true)
-      // Here you would implement the resume optimization logic
-      // For now, we'll just close the modal
-      toast.success('Resume optimization started!')
+      
+      // Call the optimize-resume API
+      const response = await fetch('/api/optimize-resume', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resumeData: selectedAnalysis.data.resumeData,
+          jobDescription: selectedAnalysis.data.jobDescription,
+          analysisData: selectedAnalysis.data.analysis,
+          analysisId: selectedAnalysis.id,
+          llm: selectedLLM
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to optimize resume')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        const message = result.data.cached 
+          ? 'Resume optimization retrieved from cache!'
+          : 'Resume optimization generated successfully!'
+        toast.success(message)
+        
+        // You could store the optimized resume data or navigate to a results page
+        // For now, we'll just show success
+      } else {
+        throw new Error(result.error || 'Failed to optimize resume')
+      }
+      
       setShowResumeOptimizationModal(false)
     } catch (error) {
       console.error('Error generating optimized resume:', error)
-      toast.error('Failed to generate optimized resume')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate optimized resume'
+      toast.error(errorMessage)
     } finally {
       setIsGeneratingOptimized(false)
     }

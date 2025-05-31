@@ -14,19 +14,34 @@
 - ✅ `/api/extract-resume-data` - Resume data extraction and structuring
 - ✅ `/api/evaluate-answer` - Individual interview answer evaluation
 - ✅ `/api/evaluate-session` - Complete interview session evaluation
+- ✅ `/api/generate-interview-prep` - Interview preparation questions and tips
 - ❌ `/api/summarized_resumes` - **FREE** (preparatory step for better analysis)
 - ❌ `/api/summarize-job-description` - **FREE** (preparatory step for better analysis)
 - ❌ `/api/chatbot` - **FREE** (customer support)
 
-### 2. **Credit Cost Inconsistency**
+### 2. **Dashboard Quick Actions Not Working**
+**Problem**: The dashboard quick actions (Generate Cover Letter, Interview Prep, Optimize Resume) were not properly calling the API routes or were calling placeholder functions.
+
+**Solution**: 
+- ✅ **Cover Letter Generation**: Already working correctly via `/api/generate-cover-letter`
+- ✅ **Interview Prep**: Fixed to properly call `/api/generate-interview-prep` with credit checking
+- ✅ **Resume Optimization**: Updated dashboard to call `/api/optimize-resume` instead of placeholder function
+- ✅ **Model Selection**: Fixed `/api/optimize-resume` to properly use the selected LLM model instead of hardcoded models
+
+### 3. **Credit Cost Inconsistency**
 **Problem**: The `UserService.getModelCreditCost()` method had hardcoded credit costs that differed from the constants file.
 
 **Solution**: Updated the method to use the centralized `MODEL_CREDIT_COSTS` from `/src/lib/constants.ts`.
 
-### 3. **Missing Credit Validation**
+### 4. **Missing Credit Validation**
 **Problem**: API routes didn't check if users had sufficient credits before making expensive AI calls.
 
 **Solution**: Added `UserService.checkModelAffordability()` checks before all AI operations that should cost credits.
+
+### 5. **Subscription Tier Limits**
+**Problem**: PLUS tier was set to 100 credits instead of 200 credits.
+
+**Solution**: Updated `MONTHLY_LIMITS` in database service to reflect correct PLUS tier limit of 200 credits.
 
 ## Implementation Details
 
@@ -156,9 +171,11 @@ Credits are consumed in this order:
 - `src/app/api/extract-resume-data/route.ts`
 - `src/app/api/evaluate-answer/route.ts`
 - `src/app/api/evaluate-session/route.ts`
+- `src/app/api/generate-interview-prep/route.ts` (added credit checking)
 - `src/app/api/summarized_resumes/route.ts` (made FREE)
 - `src/app/api/summarize-job-description/route.ts` (made FREE)
-- `src/lib/database.ts` (fixed getModelCreditCost method)
+- `src/app/dashboard/page.tsx` (fixed resume optimization to call actual API)
+- `src/lib/database.ts` (fixed getModelCreditCost method and PLUS tier limits)
 
 ## Next Steps
 1. **Test the fixes** with different models and credit scenarios
