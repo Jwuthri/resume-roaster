@@ -30,21 +30,40 @@ export async function GET(request: NextRequest) {
     let contentId = null
 
     if (type === 'resume') {
-      // Check for existing optimized resume for this specific analysis
-      // Since we now include analysisId in the hash, we need to check if any content hash contains this analysis
-      const existingResume = await db.generatedResume.findFirst({
-        where: {
-          userId: session.user.id,
-          contentHash: {
-            contains: analysisId // The hash now includes the analysis ID
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
+      // First, get the analysis to find the linked extractedResumeId and extractedJobId
+      const analysis = await db.generatedRoast.findUnique({
+        where: { 
+          id: analysisId,
+          userId: session.user.id // Ensure user owns this analysis
         }
       })
-      exists = !!existingResume
-      contentId = existingResume?.id
+
+      if (analysis && analysis.extractedResumeId) {
+        // Check for existing optimized resume linked to this analysis's extracted data
+        const existingResume = await db.generatedResume.findFirst({
+          where: {
+            userId: session.user.id,
+            extractedResumeId: analysis.extractedResumeId,
+            // Also check extractedJobId if it exists to ensure it's for the same job
+            ...(analysis.extractedJobId && { extractedJobId: analysis.extractedJobId })
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        })
+        exists = !!existingResume
+        contentId = existingResume?.id
+        
+        console.log('Checked for existing optimized resume:', {
+          analysisId,
+          extractedResumeId: analysis.extractedResumeId,
+          extractedJobId: analysis.extractedJobId,
+          exists,
+          contentId
+        })
+      } else {
+        console.log('No analysis found or no extractedResumeId for analysis:', analysisId)
+      }
     } else if (type === 'cover-letter') {
       // For cover letters, we need to check with different tones and job summary combinations
       // This is more complex since we don't know the exact parameters used

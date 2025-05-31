@@ -392,7 +392,12 @@ Please use the optimize_resume_data function to return the structured optimizati
 
       generatedResumeId = generatedResume.id
 
-      console.log('Resume optimization saved to database')
+      console.log('✅ Resume optimization saved to database with links:')
+      console.log('   - Generated Resume ID:', generatedResumeId)
+      console.log('   - Analysis ID:', analysisId)
+      console.log('   - Extracted Resume ID:', analysis.extractedResumeId)
+      console.log('   - Extracted Job ID:', analysis.extractedJobId)
+      console.log('   - Content Hash:', contentHash)
     } catch (dbError) {
       console.error('Failed to store resume optimization:', dbError)
       // Continue without failing the request

@@ -104,10 +104,14 @@ export default function AnalysisPage() {
 
       try {
         // Check for existing optimized resume
+        console.log('🔍 Checking for existing optimized resume for analysis:', analysisId)
         const optimizedResponse = await fetch(`/api/check-generated-content?analysisId=${analysisId}&type=resume`)
         if (optimizedResponse.ok) {
           const optimizedResult = await optimizedResponse.json()
+          console.log('✅ Optimized resume check result:', optimizedResult)
           setHasOptimizedResume(optimizedResult.exists)
+        } else {
+          console.error('❌ Failed to check optimized resume:', optimizedResponse.status)
         }
 
         // Check for existing cover letter
@@ -1306,12 +1310,11 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
                         <li>• AI-powered rewriting</li>
                         <li>• ATS optimization</li>
                         <li>• Cover letter generation</li>
+                        <li>• LinkedIn optimization</li>
+                        <li>• Interview prep</li>
                       </>
                     ) : (
                       <>
-                        <li>• Team collaboration tools</li>
-                        <li>• API access</li>
-                        <li>• Custom branding</li>
                         <li>• Bulk processing</li>
                         <li>• Advanced analytics</li>
                         <li>• Dedicated account manager</li>
