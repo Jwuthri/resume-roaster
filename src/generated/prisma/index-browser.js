@@ -147,6 +147,16 @@ exports.Prisma.SessionScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  type: 'type',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  usedAt: 'usedAt'
+};
+
 exports.Prisma.LlmCallScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -377,6 +387,11 @@ exports.SubscriptionTier = exports.$Enums.SubscriptionTier = {
   PREMIUM: 'PREMIUM'
 };
 
+exports.VerificationTokenType = exports.$Enums.VerificationTokenType = {
+  EMAIL_VERIFICATION: 'EMAIL_VERIFICATION',
+  PASSWORD_RESET: 'PASSWORD_RESET'
+};
+
 exports.LlmCallStatus = exports.$Enums.LlmCallStatus = {
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',
@@ -408,6 +423,7 @@ exports.AnnouncementType = exports.$Enums.AnnouncementType = {
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
+  VerificationToken: 'VerificationToken',
   LlmCall: 'LlmCall',
   LlmMessage: 'LlmMessage',
   Resume: 'Resume',

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { useAlertDialog } from "@/components/ui/alert-dialog"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function SignInPage() {
   const [formData, setFormData] = useState({
@@ -61,7 +62,14 @@ export default function SignInPage() {
       })
 
       if (result?.error) {
-        setErrors({ general: 'Invalid email or password. Please try again.' })
+        if (result.error.includes('verify your email')) {
+          setErrors({ 
+            general: result.error,
+            needsVerification: 'true'
+          })
+        } else {
+          setErrors({ general: 'Invalid email or password. Please try again.' })
+        }
         return
       }
 
@@ -158,6 +166,25 @@ export default function SignInPage() {
               {errors.general && (
                 <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                   {errors.general}
+                  {errors.needsVerification && (
+                    <div className="mt-3 pt-3 border-t border-red-200">
+                      <p className="text-sm text-gray-600 mb-2">Need help?</p>
+                      <div className="flex flex-col gap-2">
+                        <a 
+                          href="/auth/resend-verification" 
+                          className="text-orange-500 hover:underline text-sm font-medium"
+                        >
+                          → Resend verification email
+                        </a>
+                        <a 
+                          href="/auth/verify-email" 
+                          className="text-orange-500 hover:underline text-sm font-medium"
+                        >
+                          → Already have a verification link?
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -184,9 +211,9 @@ export default function SignInPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <a href="#" className="text-sm text-orange-500 hover:underline">
+                  <Link href="/auth/forgot-password" className="text-sm text-orange-500 hover:underline">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Flame, Mail, Lock, User, ArrowRight, Github } from "lucide-react"
+import { Flame, Mail, Lock, User, ArrowRight, Github, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { useAlertDialog } from "@/components/ui/alert-dialog"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ export default function SignUpPage() {
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const router = useRouter()
   const { showAlert, AlertDialog } = useAlertDialog()
 
@@ -81,24 +84,20 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setErrors({ general: data.error || 'Failed to create account' })
+        if (data.needsVerification) {
+          // User exists but needs verification
+          setErrors({ 
+            general: data.error + ' You can also request a new verification email below.' 
+          })
+        } else {
+          setErrors({ general: data.error || 'Failed to create account' })
+        }
         return
       }
 
-      // Registration successful, now sign in
-      const signInResult = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false
-      })
-
-      if (signInResult?.error) {
-        setErrors({ general: 'Account created but failed to sign in. Please try signing in manually.' })
-        return
-      }
-
-      // Redirect to home page
-      router.push('/')
+      // Registration successful - show verification message
+      setRegistrationSuccess(true)
+      setUserEmail(formData.email)
       
     } catch (error) {
       setErrors({ general: 'Failed to create account. Please try again.' })
@@ -123,6 +122,89 @@ export default function SignUpPage() {
       type: "warning",
       confirmText: "Got it"
     })
+  }
+
+  const resendVerification = () => {
+    router.push(`/auth/resend-verification?email=${encodeURIComponent(userEmail)}`)
+  }
+
+  // Show success message after registration
+  if (registrationSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <Flame className="h-10 w-10 text-orange-500" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                Resume Roaster
+              </h1>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+              </div>
+              <CardTitle className="text-xl">Account Created!</CardTitle>
+              <CardDescription className="text-green-600">
+                Please verify your email to complete registration
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-start space-x-2">
+                  <Mail className="h-5 w-5 text-green-500 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-green-900">Check Your Email</h4>
+                    <p className="text-xs text-green-700 mt-1">
+                      We've sent a verification link to <strong>{userEmail}</strong>. Click the link to activate your account.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Didn't receive the email?</p>
+                <ul className="text-xs text-gray-500 space-y-1">
+                  <li>• Check your spam/junk folder</li>
+                  <li>• Make sure the email address is correct</li>
+                  <li>• Wait a few minutes for delivery</li>
+                </ul>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2">
+                <Button 
+                  onClick={resendVerification}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Resend Verification Email
+                </Button>
+                
+                <Link href="/auth/signin">
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600">
+                    Back to Sign In
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Back to home */}
+          <div className="text-center mt-6">
+            <Link href="/" className="text-sm text-gray-600 hover:text-orange-500 transition-colors">
+              ← Back to home
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -190,6 +272,13 @@ export default function SignUpPage() {
               {errors.general && (
                 <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                   {errors.general}
+                  {errors.general.includes('not verified') && (
+                    <div className="mt-2">
+                      <Link href="/auth/resend-verification" className="text-orange-500 hover:underline text-sm">
+                        Request new verification email →
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -317,7 +406,7 @@ export default function SignUpPage() {
                 <div>
                   <h4 className="text-sm font-medium text-orange-900">Start with 3 free roasts</h4>
                   <p className="text-xs text-orange-700">
-                    No credit card required. Upgrade anytime for unlimited roasts and premium features.
+                    Verify your email to activate your account. No credit card required.
                   </p>
                 </div>
               </div>

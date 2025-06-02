@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
             
             <div style="text-align: center; padding: 20px 0; color: #666; font-size: 12px;">
               <p>Resume Roaster - Making resumes that get noticed</p>
-              <p>1717 Webster St, Oakland, CA 94612</p>
+              <p>600 California St, San Francisco, CA 94108</p>
             </div>
           </div>
         `,

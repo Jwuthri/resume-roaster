@@ -347,8 +347,8 @@ export default function TermsPage() {
               
               <div className="space-y-2 text-orange-700">
                 <p><strong>Email:</strong> support@resume-roaster.com</p>
-                <p><strong>Address:</strong> 1717 webster st, Oakland, CA 94612</p>
-                <p><strong>Phone:</strong> +1 (415) 430-8779</p>
+                <p><strong>Address:</strong> 600 California St, San Francisco, CA 94108</p>
+                <p><strong>Phone:</strong> +1 (415) 430-****</p>
               </div>
 
               <div className="mt-6">

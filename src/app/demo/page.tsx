@@ -17,7 +17,7 @@ import {
   Sparkles
 } from "lucide-react"
 import { yourResumeTemplate } from "@/lib/resume-templates"
-import { julienWuthrichSampleData } from "@/lib/sample-resume-data"
+import { sampleResumeData } from "@/lib/sample-resume-data"
 import { generatePDF, generateDOCX, downloadBlob } from "@/lib/document-generators"
 import Link from "next/link"
 
@@ -25,11 +25,11 @@ export default function DemoPage() {
   const [activeView, setActiveView] = useState<'html' | 'markdown'>('html')
 
   const generateHTML = () => {
-    return yourResumeTemplate.generateHTML(julienWuthrichSampleData)
+    return yourResumeTemplate.generateHTML(sampleResumeData)
   }
 
   const generateMarkdown = () => {
-    return yourResumeTemplate.generateMarkdown(julienWuthrichSampleData)
+    return yourResumeTemplate.generateMarkdown(sampleResumeData)
   }
 
   const downloadHTML = () => {
@@ -38,7 +38,7 @@ export default function DemoPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'julien-wuthrich-resume.html'
+    a.download = 'alex-johnson-resume.html'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -51,7 +51,7 @@ export default function DemoPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'julien-wuthrich-resume.md'
+    a.download = 'alex-johnson-resume.md'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -60,8 +60,8 @@ export default function DemoPage() {
 
   const downloadPDF = async () => {
     try {
-      const pdfBlob = await generatePDF(julienWuthrichSampleData, generateHTML())
-      downloadBlob(pdfBlob, 'julien-wuthrich-resume.pdf')
+      const pdfBlob = await generatePDF(sampleResumeData, generateHTML())
+      downloadBlob(pdfBlob, 'alex-johnson-resume.pdf')
     } catch (error) {
       console.error('Error generating PDF:', error)
       alert('Failed to generate PDF. Please try again.')
@@ -70,8 +70,8 @@ export default function DemoPage() {
 
   const downloadDOCX = async () => {
     try {
-      const docxBlob = await generateDOCX(julienWuthrichSampleData)
-      downloadBlob(docxBlob, 'julien-wuthrich-resume.docx')
+      const docxBlob = await generateDOCX(sampleResumeData)
+      downloadBlob(docxBlob, 'alex-johnson-resume.docx')
     } catch (error) {
       console.error('Error generating DOCX:', error)
       alert('Failed to generate DOCX. Please try again.')
@@ -261,7 +261,7 @@ export default function DemoPage() {
               <CardContent>
                 <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto max-h-96 text-xs">
                   <pre className="whitespace-pre-wrap">
-                    <code>{JSON.stringify(julienWuthrichSampleData, null, 2)}</code>
+                    <code>{JSON.stringify(sampleResumeData, null, 2)}</code>
                   </pre>
                 </div>
               </CardContent>

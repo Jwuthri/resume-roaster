@@ -14,7 +14,12 @@ declare module "next-auth" {
       name?: string | null
       email?: string | null
       image?: string | null
+      emailVerified?: Date | null
     }
+  }
+  
+  interface User {
+    emailVerified?: Date | null
   }
 }
 
@@ -42,6 +47,11 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        // Check if email is verified
+        if (!user.emailVerified) {
+          throw new Error("Please verify your email address before signing in. Check your email for the verification link.")
+        }
+
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
@@ -55,6 +65,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          emailVerified: user.emailVerified,
         }
       }
     }),
@@ -74,12 +85,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.emailVerified = user.emailVerified
       }
       return token
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string
+        session.user.emailVerified = token.emailVerified as Date | null
       }
       return session
     },
@@ -96,18 +109,24 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (!existingUser) {
-            // Create new user for OAuth
+            // Create new user for OAuth (automatically verified since OAuth providers verify emails)
             await db.user.create({
               data: {
                 email: user.email!,
                 name: user.name,
                 image: user.image,
-                emailVerified: new Date(),
+                emailVerified: new Date(), // OAuth users are automatically verified
                 subscriptionTier: "FREE",
                 monthlyRoasts: 0,
                 totalRoasts: 0,
                 lastRoastReset: new Date()
               }
+            })
+          } else if (!existingUser.emailVerified) {
+            // If user exists but email not verified, verify it now (OAuth providers verify emails)
+            await db.user.update({
+              where: { id: existingUser.id },
+              data: { emailVerified: new Date() }
             })
           }
           return true

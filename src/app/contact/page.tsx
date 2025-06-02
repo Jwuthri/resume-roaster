@@ -235,7 +235,7 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-orange-500 mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-gray-600">+1 (415) 430-8779</p>
+                    <p className="text-sm text-gray-600">+1 (415) 430-****</p>
                   </div>
                 </div>
 
@@ -244,8 +244,8 @@ export default function ContactPage() {
                   <div>
                     <p className="font-medium">Address</p>
                     <p className="text-sm text-gray-600">
-                      1717 webster st<br />
-                      Oakland, CA 94612<br />
+                      600 California St, <br />
+                      San Francisco, CA 94108<br />
                       United States
                     </p>
                   </div>
