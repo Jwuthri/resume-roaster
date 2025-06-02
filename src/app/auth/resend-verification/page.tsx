@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { Flame, Mail, ArrowRight, CheckCircle } from "lucide-react"
+import { Flame, Mail, ArrowRight, CheckCircle, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 
-export default function ResendVerificationPage() {
+function ResendVerificationContent() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -231,5 +231,34 @@ export default function ResendVerificationPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ResendVerificationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <Flame className="h-10 w-10 text-orange-500" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                Resume Roaster
+              </h1>
+            </div>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-center space-x-2">
+                <RefreshCw className="h-4 w-4 text-orange-500 animate-spin" />
+                <p className="text-sm text-orange-700">Loading...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <ResendVerificationContent />
+    </Suspense>
   )
 } 
