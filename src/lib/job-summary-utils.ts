@@ -48,10 +48,23 @@ export async function getOrCreateJobSummary(jobDescription: string) {
     jobDescription.substring(0, 500) + '...' : 
     jobDescription
 
-  // Save the summary to database
+  // First create the ExtractedJobDescription record
+  const extractedJob = await db.extractedJobDescription.create({
+    data: {
+      contentHash: contentHash + '_extracted', // Different hash for extracted vs summary
+      originalText: jobDescription,
+      data: {
+        originalText: jobDescription,
+        extractedAt: new Date().toISOString(),
+        basicExtraction: true
+      }
+    }
+  })
+
+  // Now create the summary linked to the extracted job
   const savedSummary = await db.summarizedJobDescription.create({
     data: {
-      extractedJobId: crypto.randomUUID(), // Generate a temporary ID
+      extractedJobId: extractedJob.id,
       contentHash,
       summary: basicSummary
     }

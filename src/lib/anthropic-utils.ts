@@ -1,10 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { parseJSONResponse } from '@/lib/json-utils'
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+// Initialize Anthropic client with error handling
+let anthropic: Anthropic
+
+try {
+  anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  })
+} catch (error) {
+  console.error('Failed to initialize Anthropic client:', error)
+  throw new Error('Anthropic client initialization failed')
+}
 
 // Default model constants
 export const ANTHROPIC_MODELS = {

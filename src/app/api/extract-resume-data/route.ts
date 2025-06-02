@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       resumeText, 
       analysisData, 
       jobDescription, 
-      analysisId,
+      roastId,
       bypassCache = false
     } = await request.json()
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     console.log('Resume text length:', resumeText?.length || 0)
     console.log('Has analysis data:', !!analysisData)
     console.log('Job description length:', jobDescription?.length || 0)
-    console.log('Analysis ID:', analysisId)
+    console.log('Roast ID:', roastId)
     console.log('Bypass cache:', bypassCache)
 
     if (!resumeText) {
@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
     const templateId = 'modern-professional'
     const llmModel = ANTHROPIC_MODELS.SONNET // This route uses Claude Sonnet
 
-    // Generate content hash for deduplication - include analysis ID and LLM to ensure uniqueness per analysis and model
+    // Generate content hash for deduplication - include roast ID and LLM to ensure uniqueness per analysis and model
     const contentHash = crypto.createHash('sha256')
-      .update(truncatedResumeText + (jobDescription || '') + templateId + (analysisId || '') + llmModel)
+      .update(truncatedResumeText + (jobDescription || '') + templateId + (roastId || '') + llmModel)
       .digest('hex')
 
     // Check for existing optimized resume (unless bypassing)
@@ -143,9 +143,19 @@ IMPORTANT INSTRUCTIONS:
 4. Match keywords from the job description naturally
 5. Ensure all dates are in MM/YYYY format
 6. If information is missing, use null or empty arrays as appropriate
-7. Make sure you don't omit any information from the resume text, this is the most important part of the process.
+7. Make sure you don't omit any information from the resume text, this is the most important part of the process
+8. MANDATORY: Extract or infer relevant soft skills (Leadership, Communication, Problem-solving, Team Collaboration, etc.)
+9. MANDATORY: Include both "achievements" and "description" arrays for each experience entry
+10. MANDATORY: Include "technical", "soft", and "languages" arrays in the skills section
 
-Please use the optimize_resume_data function to return the structured data.`
+REQUIRED FIELDS TO EXTRACT:
+- skills.soft: Array of relevant soft skills (infer from experience descriptions if not explicitly listed)
+- skills.technical: Array of technical skills and technologies
+- skills.languages: Array of languages spoken
+- experience[].achievements: Array of quantified accomplishments for each role
+- experience[].description: Array of job responsibilities and duties
+
+Please use the optimize_resume_data function to return the structured data with ALL required fields.`
 
     console.log('Final prompt length:', prompt.length)
     console.log('Estimated tokens (rough):', Math.ceil(prompt.length / 4))
@@ -156,7 +166,7 @@ Please use the optimize_resume_data function to return the structured data.`
       model: ANTHROPIC_MODELS.SONNET,
       maxTokens: 4000,
       temperature: 0.3,
-      systemPrompt: 'You are an expert resume parser and career coach. Extract resume data into structured JSON format that is optimized for ATS systems and tailored for the target job. Use the provided tool to return structured data.'
+      systemPrompt: 'You are an expert resume parser and career coach. Extract resume data into structured JSON format that is optimized for ATS systems and tailored for the target job. ALWAYS include soft skills (infer from experience if not explicitly listed) and separate achievements from job descriptions. Use the provided tool to return structured data with ALL required fields including soft skills and achievements.'
     })
 
     const extractedData = response.data
@@ -236,7 +246,8 @@ Please use the optimize_resume_data function to return the structured data.`
           content: optimizedContent,
           data: extractedData,
           atsScore: atsScore,
-          keywordsMatched: keywordsMatched
+          keywordsMatched: keywordsMatched,
+          roastId: roastId || null // Add the roastId to link to the analysis
         }
       })
 

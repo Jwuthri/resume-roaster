@@ -46,7 +46,7 @@ model User {
   generatedRoasts   GeneratedRoast[]
   generatedCoverLetters GeneratedCoverLetter[]
   generatedResumes  GeneratedResume[]
-  interviewPreps    InterviewPrep[]
+  generatedInterviewPreps GeneratedInterviewPrep[]
   interviewEvaluations InterviewEvaluation[]
   sharedAnalyses    SharedAnalysis[]
   invoices          Invoice[]
@@ -98,7 +98,7 @@ model LlmCall {
   generatedRoastId      String? @map("generated_roast_id")
   generatedCoverLetterId String? @map("generated_cover_letter_id")
   generatedResumeId     String? @map("generated_resume_id")
-  interviewPrepId       String? @map("interview_prep_id")
+  generatedInterviewPrepId String? @map("generated_interview_prep_id")
   
   createdAt       DateTime @default(now()) @map("created_at")
   completedAt     DateTime? @map("completed_at")
@@ -111,7 +111,7 @@ model LlmCall {
   generatedRoast        GeneratedRoast?       @relation(fields: [generatedRoastId], references: [id], onDelete: SetNull)
   generatedCoverLetter  GeneratedCoverLetter? @relation(fields: [generatedCoverLetterId], references: [id], onDelete: SetNull)
   generatedResume       GeneratedResume?      @relation(fields: [generatedResumeId], references: [id], onDelete: SetNull)
-  interviewPrep         InterviewPrep?        @relation(fields: [interviewPrepId], references: [id], onDelete: SetNull)
+  generatedInterviewPrep GeneratedInterviewPrep? @relation(fields: [generatedInterviewPrepId], references: [id], onDelete: SetNull)
   messages              LlmMessage[]
 
   @@index([userId])
@@ -183,8 +183,6 @@ model Resume {
   extractedResumes      ExtractedResume[]
   generatedRoasts       GeneratedRoast[]
   generatedCoverLetters GeneratedCoverLetter[]
-  generatedResumes      GeneratedResume[]
-  interviewPreps        InterviewPrep[]
 
   @@index([userId])
   @@index([fileHash])
@@ -206,7 +204,7 @@ model ExtractedResume {
   generatedRoasts       GeneratedRoast[]
   generatedCoverLetters GeneratedCoverLetter[]
   generatedResumes      GeneratedResume[]
-  interviewPreps        InterviewPrep[]
+  generatedInterviewPreps GeneratedInterviewPrep[]
 
   @@index([contentHash])
   @@map("extracted_resumes")
@@ -225,7 +223,7 @@ model ExtractedJobDescription {
   generatedRoasts             GeneratedRoast[]
   generatedCoverLetters       GeneratedCoverLetter[]
   generatedResumes            GeneratedResume[]
-  interviewPreps              InterviewPrep[]
+  generatedInterviewPreps     GeneratedInterviewPrep[]
 
   @@index([contentHash])
   @@map("extracted_job_descriptions")
@@ -279,6 +277,9 @@ model GeneratedRoast {
   extractedJob    ExtractedJobDescription? @relation(fields: [extractedJobId], references: [id], onDelete: SetNull)
   llmCalls        LlmCall[]
   sharedAnalyses  SharedAnalysis[]
+  generatedCoverLetters GeneratedCoverLetter[]
+  generatedResumes GeneratedResume[]
+  generatedInterviewPreps GeneratedInterviewPrep[]
 
   @@index([userId])
   @@index([contentHash])
@@ -290,22 +291,26 @@ model GeneratedCoverLetter {
   id                String   @id @default(cuid())
   userId            String?  @map("user_id")
   resumeId          String?  @map("resume_id")
+  roastId           String?  @map("roast_id") // Links to the roast/analysis this cover letter is for
   extractedResumeId String?  @map("extracted_resume_id")
   extractedJobId    String?  @map("extracted_job_id")
   contentHash       String   @unique @map("content_hash")
   content           String   @db.Text // The actual cover letter text
   tone              String   @default("professional")
+  modelName         String?  @map("model_name") // The AI model used to generate this
   metadata          Json?    // Additional metadata (word count, etc.)
   createdAt         DateTime @default(now()) @map("created_at")
 
   // Relations
   user            User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
   resume          Resume?                  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  roast           GeneratedRoast?          @relation(fields: [roastId], references: [id], onDelete: SetNull)
   extractedResume ExtractedResume?         @relation(fields: [extractedResumeId], references: [id], onDelete: SetNull)
   extractedJob    ExtractedJobDescription? @relation(fields: [extractedJobId], references: [id], onDelete: SetNull)
   llmCalls        LlmCall[]
 
   @@index([userId])
+  @@index([roastId])
   @@index([contentHash])
   @@map("generated_cover_letters")
 }
@@ -313,7 +318,7 @@ model GeneratedCoverLetter {
 model GeneratedResume {
   id                String   @id @default(cuid())
   userId            String?  @map("user_id")
-  resumeId          String?  @map("resume_id")
+  roastId           String?  @map("roast_id") // Optional link to the roast/analysis this resume is for
   extractedResumeId String?  @map("extracted_resume_id")
   extractedJobId    String?  @map("extracted_job_id")
   templateId        String   @map("template_id")
@@ -326,50 +331,51 @@ model GeneratedResume {
 
   // Relations
   user            User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  resume          Resume?                  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  roast           GeneratedRoast?          @relation(fields: [roastId], references: [id], onDelete: SetNull)
   extractedResume ExtractedResume?         @relation(fields: [extractedResumeId], references: [id], onDelete: SetNull)
   extractedJob    ExtractedJobDescription? @relation(fields: [extractedJobId], references: [id], onDelete: SetNull)
   llmCalls        LlmCall[]
 
   @@index([userId])
+  @@index([roastId])
   @@index([contentHash])
   @@index([atsScore])
   @@map("generated_resumes")
 }
 
 // Interview Prep
-model InterviewPrep {
+model GeneratedInterviewPrep {
   id                String   @id @default(cuid())
   userId            String?  @map("user_id")
-  analysisId        String   @map("analysis_id") // Links to the analysis this prep is for
-  resumeId          String?  @map("resume_id")
+  roastId           String?  @map("roast_id") // Links to the roast/analysis this prep is for
   extractedResumeId String?  @map("extracted_resume_id")
   extractedJobId    String?  @map("extracted_job_id")
   contentHash       String   @unique @map("content_hash") // For deduplication
   data              Json     // Interview questions and answers
   difficulty        String   @default("medium") // easy, medium, hard
   category          String   @default("general") // general, technical, behavioral, situational
+  modelName         String?  @map("model_name") // The AI model used to generate this
   createdAt         DateTime @default(now()) @map("created_at")
 
   // Relations
   user            User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  resume          Resume?                  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  roast           GeneratedRoast?          @relation(fields: [roastId], references: [id], onDelete: SetNull)
   extractedResume ExtractedResume?         @relation(fields: [extractedResumeId], references: [id], onDelete: SetNull)
   extractedJob    ExtractedJobDescription? @relation(fields: [extractedJobId], references: [id], onDelete: SetNull)
   llmCalls        LlmCall[]
   evaluations     InterviewEvaluation[]
 
   @@index([userId])
-  @@index([analysisId])
+  @@index([roastId])
   @@index([contentHash])
   @@index([difficulty])
   @@index([category])
-  @@map("interview_prep")
+  @@map("generated_interview_prep")
 }
 
 model InterviewEvaluation {
   id              String   @id @default(cuid())
-  interviewPrepId String   @map("interview_prep_id") // Links to InterviewPrep
+  interviewPrepId String   @map("interview_prep_id") // Links to GeneratedInterviewPrep
   userId          String?  @map("user_id")
   evaluationType  String   @map("evaluation_type") // 'session' or 'individual'
   data            Json     // Evaluation results
@@ -378,8 +384,8 @@ model InterviewEvaluation {
   createdAt       DateTime @default(now()) @map("created_at")
 
   // Relations
-  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-  interviewPrep   InterviewPrep @relation(fields: [interviewPrepId], references: [id], onDelete: Cascade)
+  user            User?                     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  interviewPrep   GeneratedInterviewPrep    @relation(fields: [interviewPrepId], references: [id], onDelete: Cascade)
 
   @@index([interviewPrepId])
   @@index([userId])

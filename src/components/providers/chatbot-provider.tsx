@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface Message {
   id: string;
@@ -57,6 +58,55 @@ const WELCOME_MESSAGE: Message = {
   timestamp: new Date(),
 };
 
+// Helper function to generate UUID in browser
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for browsers that don't support crypto.randomUUID
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Helper function to get or create session token for anonymous users
+function getSessionToken(): string {
+  if (typeof window === 'undefined') return '';
+  
+  let sessionToken = localStorage.getItem('chatbot-session-token');
+  if (!sessionToken) {
+    sessionToken = generateUUID();
+    localStorage.setItem('chatbot-session-token', sessionToken);
+  }
+  return sessionToken;
+}
+
+// Helper function to clear session token (when user logs in)
+function clearSessionToken(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('chatbot-session-token');
+  }
+}
+
+// Helper function to create headers with session token
+function createApiHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  // Add session token for anonymous users
+  if (typeof window !== 'undefined') {
+    const sessionToken = getSessionToken();
+    if (sessionToken) {
+      headers['x-session-token'] = sessionToken;
+    }
+  }
+  
+  return headers;
+}
+
 export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
@@ -64,10 +114,20 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showConversationList, setShowConversationList] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session, status } = useSession();
 
   const currentMessages = currentConversationId 
     ? conversations.find(c => c.id === currentConversationId)?.messages || []
     : [WELCOME_MESSAGE];
+
+  // Clear anonymous session token when user logs in
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      clearSessionToken();
+      // Refresh conversations to load user's actual conversations
+      refreshConversations();
+    }
+  }, [status, session?.user]);
 
   // Load conversations on mount
   useEffect(() => {
@@ -77,9 +137,18 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const refreshConversations = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/chatbot');
+      const response = await fetch('/api/chatbot', {
+        headers: createApiHeaders()
+      });
       if (response.ok) {
         const data = await response.json();
+        
+        // Update session token if provided in response (for anonymous users)
+        const newSessionToken = response.headers.get('x-session-token');
+        if (newSessionToken && typeof window !== 'undefined' && !session?.user) {
+          localStorage.setItem('chatbot-session-token', newSessionToken);
+        }
+        
         setConversations(data.conversations.map((conv: any) => ({
           ...conv,
           createdAt: new Date(conv.createdAt),
@@ -103,9 +172,7 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
       try {
         const response = await fetch('/api/chatbot', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: createApiHeaders(),
           body: JSON.stringify({ 
             message: message.content,
             conversationId: currentConversationId 
@@ -114,6 +181,12 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
 
         if (response.ok) {
           const data = await response.json();
+          
+          // Update session token if provided in response (for anonymous users)
+          const newSessionToken = response.headers.get('x-session-token');
+          if (newSessionToken && typeof window !== 'undefined' && !session?.user) {
+            localStorage.setItem('chatbot-session-token', newSessionToken);
+          }
           
           // If this was a new conversation, update the current conversation ID
           if (!currentConversationId) {

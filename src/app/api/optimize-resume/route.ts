@@ -20,20 +20,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { 
-      analysisId,
+      roastId,
       bypassCache = false,
       llm = OPENAI_MODELS.MINI // Default to MINI if not specified
     } = await request.json()
 
-    if (!analysisId) {
+    if (!roastId) {
       return NextResponse.json(
-        { error: 'Analysis ID is required' },
+        { error: 'Roast ID is required' },
         { status: 400 }
       )
     }
 
     console.log('=== OPTIMIZE RESUME DEBUG ===')
-    console.log('Analysis ID:', analysisId)
+    console.log('Roast ID:', roastId)
     console.log('Selected LLM:', llm)
     console.log('Bypass cache:', bypassCache)
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Fetch the analysis with all related data
     const analysis = await db.generatedRoast.findUnique({
       where: { 
-        id: analysisId,
+        id: roastId,
         userId: user.id // Ensure user owns this analysis
       },
       include: {
@@ -197,12 +197,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate content hash for deduplication - include analysis ID and LLM to ensure uniqueness per analysis and model
+    // Generate content hash for deduplication - include roast ID and LLM to ensure uniqueness per analysis and model
     const contentHash = crypto.createHash('sha256')
-      .update(resumeContent + jobContent + analysisId + llm)
+      .update(resumeContent + jobContent + roastId + llm)
       .digest('hex')
 
-    console.log('Content hash for analysis:', analysisId, 'with LLM:', llm, 'is:', contentHash)
+    console.log('Content hash for analysis:', roastId, 'with LLM:', llm, 'is:', contentHash)
 
     // Check for existing optimized resume (unless bypassing)
     if (!bypassCache) {
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (existingResume) {
-        console.log('Returning existing optimized resume from database for analysis:', analysisId)
+        console.log('Returning existing optimized resume from database for analysis:', roastId)
         
         return NextResponse.json({
           success: true,
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
             keywordsMatched: existingResume.keywordsMatched || [],
             optimizationSuggestions: ['Resume retrieved from cache'],
             fromDatabase: true,
-            analysisId: analysisId
+            analysisId: roastId
           }
         })
       }
@@ -253,24 +253,31 @@ ${jobContent}
 CRITICAL REQUIREMENTS - FOLLOW STRICTLY:
 1. BE EXTREMELY CONCISE - Each bullet point should be 1 line maximum
 2. Use QUANTIFIED achievements with specific numbers/percentages when possible
-3. Limit job descriptions to 2 bullets point per role
-4. Professional summary should be 1 sentence maximum
-5. Skills section should list only the most relevant 4-8 skills
-6. Focus on IMPACT and RESULTS, not job duties
-7. Use strong action verbs (Led, Increased, Reduced, Implemented, etc.)
-8. Match job keywords naturally but don't stuff them
-9. Prioritize recent and relevant experience
-10. Remove fluff words and unnecessary details
-11. Maximum achievements per role should be 2
-12. Maximum description per role should be 1
+3. Limit job descriptions to 2 bullet points per role
+4. Professional summary should be 1-2 sentences maximum
+5. Skills section should list only the most relevant 4-8 technical skills
+6. ALWAYS include 3-5 relevant soft skills (Leadership, Communication, Problem-solving, etc.)
+7. Focus on IMPACT and RESULTS, not job duties
+8. Use strong action verbs (Led, Increased, Reduced, Implemented, etc.)
+9. Match job keywords naturally but don't stuff them
+10. Prioritize recent and relevant experience
+11. Remove fluff words and unnecessary details
+12. MANDATORY: Include both "achievements" and "description" arrays for each experience entry
+13. MANDATORY: Include "soft" skills array in the skills section
 
 STRUCTURE GUIDELINES:
 - Summary: 2-3 sentences highlighting key value proposition
-- Experience: Focus on achievements that demonstrate impact
-- Skills: Only include skills mentioned in job description or highly relevant
+- Experience: Each role MUST have both "description" (1-2 bullets) AND "achievements" (1-2 bullets with quantified results)
+- Skills: MUST include "technical", "soft", and "languages" arrays
+- Soft skills: Include relevant interpersonal skills like Leadership, Communication, Problem-solving, Team Collaboration, etc.
 - Keep total content suitable for 1-2 pages resume
 
-Please use the optimize_resume_data function to return the structured optimization result with CONCISE, impactful content.`
+MANDATORY FIELDS TO INCLUDE:
+- skills.soft: Array of 3-5 relevant soft skills
+- experience[].achievements: Array of quantified accomplishments for each role
+- experience[].description: Array of concise job responsibilities
+
+Please use the optimize_resume_data function to return the structured optimization result with CONCISE, impactful content that includes ALL required fields.`
 
     console.log('Optimization prompt length:', prompt.length)
 
@@ -385,6 +392,7 @@ Please use the optimize_resume_data function to return the structured optimizati
           data: optimizedData,
           atsScore: atsScore,
           keywordsMatched: keywordsMatched,
+          roastId: roastId,
           extractedResumeId: analysis.extractedResumeId,
           extractedJobId: analysis.extractedJobId
         }
@@ -394,7 +402,7 @@ Please use the optimize_resume_data function to return the structured optimizati
 
       console.log('✅ Resume optimization saved to database with links:')
       console.log('   - Generated Resume ID:', generatedResumeId)
-      console.log('   - Analysis ID:', analysisId)
+      console.log('   - Roast ID:', roastId)
       console.log('   - Extracted Resume ID:', analysis.extractedResumeId)
       console.log('   - Extracted Job ID:', analysis.extractedJobId)
       console.log('   - Content Hash:', contentHash)

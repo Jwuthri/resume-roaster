@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { resumeData, jobDescription, analysisData, tone = 'professional', analysisId, llm = OPENAI_MODELS.MINI } = await request.json()
+    const { resumeData, jobDescription, analysisData, tone = 'professional', roastId, llm = OPENAI_MODELS.MINI } = await request.json()
 
     if (!resumeData || !jobDescription) {
       return NextResponse.json(
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     console.log('Resume text length:', resumeText.length)
     console.log('Truncated resume text length:', truncatedResumeText.length)
     console.log('Job description length:', jobDescription.length)
-    console.log('Analysis ID:', analysisId)
+    console.log('Roast ID:', roastId)
     console.log('Document ID:', resumeData.documentId)
     console.log('Resume data keys:', Object.keys(resumeData))
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       truncatedResumeText,
       jobSummaryData?.id || null,
       tone,
-      analysisId,
+      roastId,
       llm
     )
 
@@ -258,7 +258,7 @@ Generate only the cover letter content without any additional formatting or expl
       tone,
       coverLetter,
       user.id,
-      analysisId,
+      roastId,
       llm
     )
 

@@ -8,20 +8,20 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Authentication required' },
         { status: 401 }
       )
     }
 
     const { searchParams } = new URL(request.url)
-    const analysisId = searchParams.get('analysisId')
+    const roastId = searchParams.get('analysisId') || searchParams.get('roastId')
     const type = searchParams.get('type') // 'resume', 'cover-letter', or 'interview-prep'
 
-    if (!analysisId || !type) {
+    if (!roastId || !type) {
       return NextResponse.json(
-        { error: 'analysisId and type are required' },
+        { error: 'roastId and type are required' },
         { status: 400 }
       )
     }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       // First, get the analysis to find the linked extractedResumeId and extractedJobId
       const analysis = await db.generatedRoast.findUnique({
         where: { 
-          id: analysisId,
+          id: roastId,
           userId: session.user.id // Ensure user owns this analysis
         }
       })
@@ -55,14 +55,14 @@ export async function GET(request: NextRequest) {
         contentId = existingResume?.id
         
         console.log('Checked for existing optimized resume:', {
-          analysisId,
+          roastId,
           extractedResumeId: analysis.extractedResumeId,
           extractedJobId: analysis.extractedJobId,
           exists,
           contentId
         })
       } else {
-        console.log('No analysis found or no extractedResumeId for analysis:', analysisId)
+        console.log('No analysis found or no extractedResumeId for analysis:', roastId)
       }
     } else if (type === 'cover-letter') {
       // For cover letters, we need to check with different tones and job summary combinations
@@ -83,13 +83,10 @@ export async function GET(request: NextRequest) {
       contentId = existingCoverLetter?.id
     } else if (type === 'interview-prep') {
       // Check for existing interview prep for this analysis
-      const existingInterviewPrep = await db.interviewPrep.findFirst({
+      const existingInterviewPrep = await db.generatedInterviewPrep.findFirst({
         where: {
-          userId: session.user.id,
-          analysisId: analysisId
-        },
-        orderBy: {
-          createdAt: 'desc'
+          roastId: roastId,
+          ...(session?.user?.id ? { userId: session.user.id } : {})
         }
       })
       exists = !!existingInterviewPrep
@@ -99,7 +96,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       exists,
       contentId,
-      analysisId,
+      roastId,
       type
     })
 

@@ -166,7 +166,7 @@ exports.Prisma.LlmCallScalarFieldEnum = {
   generatedRoastId: 'generatedRoastId',
   generatedCoverLetterId: 'generatedCoverLetterId',
   generatedResumeId: 'generatedResumeId',
-  interviewPrepId: 'interviewPrepId',
+  generatedInterviewPrepId: 'generatedInterviewPrepId',
   createdAt: 'createdAt',
   completedAt: 'completedAt'
 };
@@ -248,11 +248,13 @@ exports.Prisma.GeneratedCoverLetterScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   resumeId: 'resumeId',
+  roastId: 'roastId',
   extractedResumeId: 'extractedResumeId',
   extractedJobId: 'extractedJobId',
   contentHash: 'contentHash',
   content: 'content',
   tone: 'tone',
+  modelName: 'modelName',
   metadata: 'metadata',
   createdAt: 'createdAt'
 };
@@ -260,7 +262,7 @@ exports.Prisma.GeneratedCoverLetterScalarFieldEnum = {
 exports.Prisma.GeneratedResumeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  resumeId: 'resumeId',
+  roastId: 'roastId',
   extractedResumeId: 'extractedResumeId',
   extractedJobId: 'extractedJobId',
   templateId: 'templateId',
@@ -272,17 +274,17 @@ exports.Prisma.GeneratedResumeScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.InterviewPrepScalarFieldEnum = {
+exports.Prisma.GeneratedInterviewPrepScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  analysisId: 'analysisId',
-  resumeId: 'resumeId',
+  roastId: 'roastId',
   extractedResumeId: 'extractedResumeId',
   extractedJobId: 'extractedJobId',
   contentHash: 'contentHash',
   data: 'data',
   difficulty: 'difficulty',
   category: 'category',
+  modelName: 'modelName',
   createdAt: 'createdAt'
 };
 
@@ -416,7 +418,7 @@ exports.Prisma.ModelName = {
   GeneratedRoast: 'GeneratedRoast',
   GeneratedCoverLetter: 'GeneratedCoverLetter',
   GeneratedResume: 'GeneratedResume',
-  InterviewPrep: 'InterviewPrep',
+  GeneratedInterviewPrep: 'GeneratedInterviewPrep',
   InterviewEvaluation: 'InterviewEvaluation',
   SharedAnalysis: 'SharedAnalysis',
   Invoice: 'Invoice',

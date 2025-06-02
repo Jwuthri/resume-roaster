@@ -81,8 +81,11 @@ export async function saveCoverLetterToCache(
   return await db.generatedCoverLetter.create({
     data: {
       userId: userId || null,
+      roastId: analysisId || null,
       contentHash,
       content,
+      tone,
+      modelName: llm || OPENAI_MODELS.MINI,
       metadata: { tone, summary: resumeText.substring(0, 100) + '...', llm: llm || OPENAI_MODELS.MINI } // Include LLM in metadata
     }
   })
@@ -103,6 +106,7 @@ export async function saveOptimizedResumeToCache(
   return await db.generatedResume.create({
     data: {
       userId: userId || null,
+      roastId: analysisId || null,
       templateId,
       contentHash,
       content,

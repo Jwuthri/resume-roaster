@@ -92,7 +92,7 @@ export function useAnalysisActions() {
         resumeData,
         jobDescription,
         pdfImages: pdfImages || [],
-        roastId: analysisId // Include the analysis ID for the foreign key
+        roastId: analysisId // Include the roast ID for the foreign key
       }
 
       const response = await fetch('/api/share-analysis', {

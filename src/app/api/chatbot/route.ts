@@ -8,6 +8,7 @@ import {
   getChatbotConversation 
 } from '@/lib/chatbot-db';
 import { documentationIndexer } from '@/lib/documentation-indexer';
+import crypto from 'crypto';
 
 interface ChatMessage {
   content: string;
@@ -104,6 +105,21 @@ function generateConversationTitle(message: string): string {
   return words.join(' ') + (message.split(' ').length > 6 ? '...' : '');
 }
 
+// Helper function to generate anonymous user identifier
+function generateAnonymousUserId(request: NextRequest): string {
+  // Get IP address
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown';
+  
+  // Get or generate session token from headers
+  const sessionToken = request.headers.get('x-session-token') || crypto.randomUUID();
+  
+  // Create a unique identifier combining IP and session token
+  const anonymousId = `anon_${crypto.createHash('sha256').update(`${ip}_${sessionToken}`).digest('hex').substring(0, 16)}`;
+  
+  return anonymousId;
+}
+
 // POST - Send a message
 export async function POST(request: NextRequest) {
   try {
@@ -126,7 +142,12 @@ export async function POST(request: NextRequest) {
 
     // Get user session (for authenticated users)
     const session = await getServerSession();
-    const userId = session?.user?.id || null;
+    let userId = session?.user?.id || null;
+    
+    // For anonymous users, generate a unique identifier
+    if (!userId) {
+      userId = generateAnonymousUserId(request);
+    }
 
     let currentConversationId = conversationId;
     let conversationHistory: ChatMessage[] = [];
@@ -156,14 +177,23 @@ export async function POST(request: NextRequest) {
     // Add bot response to conversation
     const botMessage = await addMessageToConversation(currentConversationId, response, 'assistant');
     
+    // Generate session token for anonymous users to include in response
+    const responseHeaders: Record<string, string> = {};
+    if (!session?.user?.id) {
+      const sessionToken = request.headers.get('x-session-token') || crypto.randomUUID();
+      responseHeaders['x-session-token'] = sessionToken;
+    }
+    
     return NextResponse.json({
       response: botMessage.content,
       conversationId: currentConversationId,
       timestamp: botMessage.timestamp.toISOString(),
+    }, {
+      headers: responseHeaders
     });
     
   } catch (error) {
-    console.error('Chatbot API error:', error);
+    console.error('Chatbot POST API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -179,7 +209,12 @@ export async function GET(request: NextRequest) {
 
     // Get user session
     const session = await getServerSession();
-    const userId = session?.user?.id || null;
+    let userId = session?.user?.id || null;
+    
+    // For anonymous users, generate the same unique identifier
+    if (!userId) {
+      userId = generateAnonymousUserId(request);
+    }
 
     if (conversationId) {
       // Get specific conversation
@@ -196,7 +231,17 @@ export async function GET(request: NextRequest) {
     } else {
       // Get all conversations for user
       const conversations = await getChatbotConversations(userId);
-      return NextResponse.json({ conversations });
+      
+      // Generate session token for anonymous users to include in response
+      const responseHeaders: Record<string, string> = {};
+      if (!session?.user?.id) {
+        const sessionToken = request.headers.get('x-session-token') || crypto.randomUUID();
+        responseHeaders['x-session-token'] = sessionToken;
+      }
+      
+      return NextResponse.json({ conversations }, {
+        headers: responseHeaders
+      });
     }
     
   } catch (error) {

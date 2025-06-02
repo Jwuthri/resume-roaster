@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { resumeData, jobDescription, analysisData, analysisId, llm = OPENAI_MODELS.MINI } = await request.json()
+    const { resumeData, jobDescription, analysisData, roastId, llm = OPENAI_MODELS.MINI } = await request.json()
 
     if (!resumeData) {
       return NextResponse.json(
@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
     })
     const contentHash = createHash('sha256').update(contentString).digest('hex')
 
-    // Check if we already have interview prep for this content
-    const existingInterviewPrep = await db.interviewPrep.findUnique({
+    // Check for existing interview prep with the same content hash
+    const existingInterviewPrep = await db.generatedInterviewPrep.findUnique({
       where: { contentHash }
     })
 
@@ -59,14 +59,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         interviewPrep: existingInterviewPrep.data,
         cached: true,
-        metadata: {
-          fromCache: true,
-          creditsDeducted: 0
-        }
+        id: existingInterviewPrep.id,
+        usageCount: 1
       })
     }
 
-    // Generate new interview prep using AI
+    console.log('No existing interview prep found, generating new one...')
+
+    // Generate interview prep using the LLM utility
     const interviewPrepData = await generateInterviewQuestions({
       resumeData,
       jobDescription,
@@ -74,24 +74,16 @@ export async function POST(request: NextRequest) {
       llm
     })
 
-    // Deduct credits after successful generation
-    try {
-      await UserService.deductModelCredits(userId, llm)
-      console.log(`Successfully deducted ${affordability.creditCost} credits for interview prep generation`)
-    } catch (creditError) {
-      console.error('Failed to deduct credits:', creditError)
-      // Log error but don't fail the request since AI call succeeded
-    }
+    console.log('Interview prep generated successfully')
 
     // Save to database
-    const savedInterviewPrep = await db.interviewPrep.create({
+    const savedInterviewPrep = await db.generatedInterviewPrep.create({
       data: {
-        userId: session?.user?.id || null,
-        analysisId: analysisId || 'general', // Use analysisId if provided, otherwise use 'general'
+        userId: userId,
+        roastId: roastId,
         contentHash,
         data: interviewPrepData as any,
-        difficulty: 'medium', // Default difficulty
-        category: 'general'   // Default category
+        modelName: llm
       }
     })
 
@@ -99,10 +91,7 @@ export async function POST(request: NextRequest) {
       interviewPrep: interviewPrepData,
       cached: false,
       id: savedInterviewPrep.id,
-      metadata: {
-        fromCache: false,
-        creditsDeducted: affordability.creditCost
-      }
+      usageCount: 1
     })
 
   } catch (error) {

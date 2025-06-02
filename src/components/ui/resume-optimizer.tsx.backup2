@@ -727,9 +727,9 @@ export default function ResumeOptimizer() {
     setIsOptimizing(true)
     
     try {
-      // Get stored document and analysis IDs from session storage
+      // Get stored document and roast IDs from session storage
       const storedDocumentId = sessionStorage.getItem('documentId')
-      const storedAnalysisId = sessionStorage.getItem('analysisId')
+      const storedRoastId = sessionStorage.getItem('roastId')
       const storedExtractedResumeId = sessionStorage.getItem('extractedResumeId')
       
       let extractedResumeId = storedExtractedResumeId

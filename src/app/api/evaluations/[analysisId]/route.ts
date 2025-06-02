@@ -13,16 +13,16 @@ export async function GET(
 
     if (!analysisId) {
       return NextResponse.json(
-        { error: 'Analysis ID is required' },
+        { error: 'Roast ID is required' },
         { status: 400 }
       )
     }
 
-    // Load evaluations for this analysis through the InterviewPrep relationship
+    // Load evaluations for this analysis through the GeneratedInterviewPrep relationship
     const evaluations = await db.interviewEvaluation.findMany({
       where: {
         interviewPrep: {
-          analysisId: analysisId
+          roastId: analysisId
         },
         // Only show user's own evaluations if logged in
         ...(session?.user?.id ? { userId: session.user.id } : {})

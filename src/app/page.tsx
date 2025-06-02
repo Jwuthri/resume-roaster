@@ -324,9 +324,9 @@ export default function Home() {
       sessionStorage.setItem('resumeData', JSON.stringify(resumeData))
       sessionStorage.setItem('jobDescription', jobDescription)
       
-      // Store analysis ID and document ID for proper caching
-      if (result.analysisId) {
-        sessionStorage.setItem('analysisId', result.analysisId)
+      // Store roast ID and document ID for proper caching
+      if (result.roastId) {
+        sessionStorage.setItem('roastId', result.roastId)
       }
       if (resumeData.documentId) {
         sessionStorage.setItem('documentId', resumeData.documentId)

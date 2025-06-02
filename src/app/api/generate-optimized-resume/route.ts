@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
           await db.generatedResume.create({
             data: {
               userId: user.id,
-              resumeId: documentId || null,
+              roastId: analysisId || null,
               templateId: templateId || 'default',
               contentHash: crypto.randomUUID(), // Generate a unique hash
               content: generatedResume,

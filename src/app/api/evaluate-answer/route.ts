@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    const { userAnswer, question, suggestedAnswer, tips, category, difficulty, analysisId, questionId } = await request.json()
+    const { userAnswer, question, suggestedAnswer, tips, category, difficulty, roastId, questionId } = await request.json()
 
     if (!userAnswer || !question || !suggestedAnswer) {
       return NextResponse.json(
@@ -85,12 +85,12 @@ Focus on the most impactful feedback that will help the user improve their inter
 
     // Save individual evaluation to database if analysisId is provided
     let savedEvaluationId = null
-    if (analysisId && questionId) {
+    if (roastId && questionId) {
       try {
-        // First find the InterviewPrep record for this analysisId
-        const interviewPrep = await db.interviewPrep.findFirst({
+        // First find the GeneratedInterviewPrep record for this roastId
+        const interviewPrep = await db.generatedInterviewPrep.findFirst({
           where: {
-            analysisId: analysisId,
+            roastId: roastId,
             ...(session?.user?.id ? { userId: session.user.id } : {})
           }
         })

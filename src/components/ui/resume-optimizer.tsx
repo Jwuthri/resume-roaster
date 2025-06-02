@@ -739,9 +739,9 @@ export default function ResumeOptimizer() {
     setIsOptimizing(true)
     
     try {
-      // Get stored IDs from session storage
+      // Get stored document and roast IDs from session storage
       const storedDocumentId = sessionStorage.getItem('documentId')
-      const storedAnalysisId = sessionStorage.getItem('analysisId')
+      const storedRoastId = sessionStorage.getItem('roastId')
       
       console.log('Generating resume with template (no optimization):', selectedTemplate)
       
@@ -756,7 +756,7 @@ export default function ResumeOptimizer() {
           templateId: selectedTemplate,
           format: 'html',
           documentId: storedDocumentId || null,
-          analysisId: storedAnalysisId || null,
+          roastId: storedRoastId || null,
           skipOptimization: true, // This tells the API to skip LLM optimization
           isPreview: false
         }),
@@ -827,9 +827,9 @@ export default function ResumeOptimizer() {
     setIsOptimizing(true)
     
     try {
-      // Get stored document and analysis IDs from session storage
+      // Get stored document and roast IDs from session storage
       const storedDocumentId = sessionStorage.getItem('documentId')
-      const storedAnalysisId = sessionStorage.getItem('analysisId')
+      const storedRoastId = sessionStorage.getItem('roastId')
       const storedExtractedResumeId = sessionStorage.getItem('extractedResumeId')
       
       let extractedResumeId = storedExtractedResumeId
@@ -890,7 +890,7 @@ Link: ${proj.link}
           body: JSON.stringify({
             resumeText,
             documentId: storedDocumentId || null,
-            analysisId: storedAnalysisId || null,
+            roastId: storedRoastId || null,
             bypassCache: false
           }),
         })

@@ -34,7 +34,7 @@ interface CoverLetterModalProps {
   resumeData: any
   jobDescription?: string
   analysisData?: any
-  analysisId?: string
+  roastId?: string
   onCoverLetterGenerated?: (cached: boolean, usageCount: number) => void
 }
 
@@ -44,7 +44,7 @@ export function CoverLetterModal({
   resumeData, 
   jobDescription, 
   analysisData, 
-  analysisId,
+  roastId,
   onCoverLetterGenerated
 }: CoverLetterModalProps) {
   const [selectedTone, setSelectedTone] = useState('professional')
@@ -128,7 +128,7 @@ export function CoverLetterModal({
       return
     }
 
-    const result = await generateCoverLetter(resumeData, jobDescription, analysisData, selectedTone, analysisId, selectedLLM)
+    const result = await generateCoverLetter(resumeData, jobDescription, analysisData, selectedTone, roastId, selectedLLM)
     if (result) {
       setGeneratedLetter(result.coverLetter)
       setLetterMetadata({

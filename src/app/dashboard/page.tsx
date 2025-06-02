@@ -369,7 +369,7 @@ function DashboardContent() {
       }
       
       if (analysis.id) {
-        sessionStorage.setItem('analysisId', analysis.id)
+        sessionStorage.setItem('roastId', analysis.id)
       }
       
       // Navigate to resume optimizer with prefilled flag
@@ -393,7 +393,7 @@ function DashboardContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          analysisId: selectedAnalysis.id,
+          roastId: selectedAnalysis.id,
           llm: selectedLLM
         }),
       })
@@ -771,7 +771,7 @@ function DashboardContent() {
                                 sessionStorage.setItem('analysisResults', JSON.stringify(analysis.data.analysis))
                                 sessionStorage.setItem('resumeData', JSON.stringify(analysis.data.resumeData))
                                 sessionStorage.setItem('jobDescription', analysis.data.jobDescription || '')
-                                sessionStorage.setItem('analysisId', analysis.id)
+                                sessionStorage.setItem('roastId', analysis.id)
                                 
                                 if (analysis.documentId) {
                                   sessionStorage.setItem('documentId', analysis.documentId)
@@ -786,7 +786,7 @@ function DashboardContent() {
                                 }
                                 
                                 sessionStorage.setItem('isFromDashboard', 'true')
-                                sessionStorage.setItem('dashboardAnalysisId', analysis.id)
+                                sessionStorage.setItem('dashboardRoastId', analysis.id)
                                 
                                 router.push('/analysis')
                               }}
@@ -881,7 +881,7 @@ function DashboardContent() {
                               variant="outline" 
                               className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300" 
                               size="sm"
-                              onClick={() => openResumeOptimizationModal(analysis)}
+                              onClick={() => routeToResumeOptimizer(analysis)}
                             >
                               <Sparkles className="h-4 w-4 mr-2" />
                               Optimize Resume
@@ -1036,7 +1036,7 @@ function DashboardContent() {
         resumeData={selectedAnalysis?.data.resumeData}
         jobDescription={selectedAnalysis?.data.jobDescription}
         analysisData={selectedAnalysis?.data.analysis}
-        analysisId={selectedAnalysis?.id}
+        roastId={selectedAnalysis?.id}
         onCoverLetterGenerated={handleCoverLetterGenerated}
       />
 
@@ -1047,7 +1047,7 @@ function DashboardContent() {
         resumeData={selectedAnalysis?.data.resumeData}
         jobDescription={selectedAnalysis?.data.jobDescription}
         analysisData={selectedAnalysis?.data.analysis}
-        analysisId={selectedAnalysis?.id}
+        roastId={selectedAnalysis?.id}
       />
 
       {/* Resume Optimization Modal */}

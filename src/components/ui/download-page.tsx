@@ -80,7 +80,7 @@ export default function DownloadPage() {
     
     try {
       // If we don't have proper resume data, try to generate PDF from HTML content
-      if (!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
+      if (!resumeData || !resumeData.personalInfo || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
         // Use the HTML content directly for PDF generation
         const response = await fetch('/api/generate-pdf-from-html', {
           method: 'POST',
@@ -120,7 +120,7 @@ export default function DownloadPage() {
     
     try {
       // DOCX generation requires proper resume data structure
-      if (!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
+      if (!resumeData || !resumeData.personalInfo || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') {
         showAlert({
           title: "DOCX Generation Not Available",
           description: "DOCX download requires complete resume data. Please use PDF download instead.",
@@ -198,7 +198,7 @@ export default function DownloadPage() {
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
         <CardContent className="p-8">
           {/* Show notice if we have limited resume data */}
-          {(!resumeData || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') && (
+          {(!resumeData || !resumeData.personalInfo || !resumeData.personalInfo.name || resumeData.personalInfo.name === 'Your Name') && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800 flex items-center">
                 <FileText className="h-4 w-4 mr-2" />
@@ -206,7 +206,7 @@ export default function DownloadPage() {
               </p>
             </div>
           )}
-          
+
           <div className="flex flex-wrap gap-4 mb-8 justify-center">
             <Button 
               onClick={handleDownloadPDF} 
@@ -244,7 +244,7 @@ export default function DownloadPage() {
               Back to Optimizer
             </Button>
           </div>
-          
+
           {/* Optimization suggestions */}
           {optimizedResult.optimizations.suggestions.length > 0 && (
             <div className="mb-8 p-6 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200">

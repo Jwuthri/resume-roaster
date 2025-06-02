@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    const { questions, userAnswers, analysisId } = await request.json()
+    const { questions, userAnswers, roastId } = await request.json()
 
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return NextResponse.json(
@@ -103,18 +103,19 @@ Focus on patterns across all answers and provide insights that help the candidat
 
     // Save evaluation to database if analysisId is provided
     let savedEvaluationId = null
-    if (analysisId) {
+    if (roastId) {
       try {
-        // First find the InterviewPrep record for this analysisId
-        const interviewPrep = await db.interviewPrep.findFirst({
+        // First find the GeneratedInterviewPrep record for this roastId
+        const interviewPrep = await db.generatedInterviewPrep.findFirst({
           where: {
-            analysisId: analysisId,
+            roastId: roastId,
             ...(session?.user?.id ? { userId: session.user.id } : {})
           }
         })
 
         if (interviewPrep) {
-          const savedEvaluation = await db.interviewEvaluation.create({
+          // Create evaluation record
+          const evaluation = await db.interviewEvaluation.create({
             data: {
               interviewPrepId: interviewPrep.id,
               userId: session?.user?.id || null,
@@ -124,7 +125,7 @@ Focus on patterns across all answers and provide insights that help the candidat
               overallScore: response.data.overallScore || 0
             }
           })
-          savedEvaluationId = savedEvaluation.id
+          savedEvaluationId = evaluation.id
         }
       } catch (dbError) {
         console.error('Error saving evaluation to database:', dbError)

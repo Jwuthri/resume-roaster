@@ -78,7 +78,7 @@ export default function AnalysisPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [resumeData, setResumeData] = useState<any>(null)
   const [jobDescription, setJobDescription] = useState<string | undefined>(undefined)
-  const [analysisId, setAnalysisId] = useState<string | undefined>(undefined)
+  const [roastId, setRoastId] = useState<string | undefined>(undefined)
   const [documentId, setDocumentId] = useState<string | undefined>(undefined)
   const [isGeneratingOptimized, setIsGeneratingOptimized] = useState(false)
   const [hasOptimizedResume, setHasOptimizedResume] = useState(false)
@@ -100,12 +100,12 @@ export default function AnalysisPage() {
   // Check for existing optimized resume and cover letter in database
   useEffect(() => {
     const checkExistingContent = async () => {
-      if (!analysisId) return
+      if (!roastId) return
 
       try {
         // Check for existing optimized resume
-        console.log('🔍 Checking for existing optimized resume for analysis:', analysisId)
-        const optimizedResponse = await fetch(`/api/check-generated-content?analysisId=${analysisId}&type=resume`)
+        console.log('🔍 Checking for existing optimized resume for analysis:', roastId)
+        const optimizedResponse = await fetch(`/api/check-generated-content?analysisId=${roastId}&type=resume`)
         if (optimizedResponse.ok) {
           const optimizedResult = await optimizedResponse.json()
           console.log('✅ Optimized resume check result:', optimizedResult)
@@ -115,14 +115,14 @@ export default function AnalysisPage() {
         }
 
         // Check for existing cover letter
-        const coverLetterResponse = await fetch(`/api/check-generated-content?analysisId=${analysisId}&type=cover-letter`)
+        const coverLetterResponse = await fetch(`/api/check-generated-content?analysisId=${roastId}&type=cover-letter`)
         if (coverLetterResponse.ok) {
           const coverLetterResult = await coverLetterResponse.json()
           setHasCoverLetter(coverLetterResult.exists)
         }
 
         // Check for existing interview prep
-        const interviewPrepResponse = await fetch(`/api/check-generated-content?analysisId=${analysisId}&type=interview-prep`)
+        const interviewPrepResponse = await fetch(`/api/check-generated-content?analysisId=${roastId}&type=interview-prep`)
         if (interviewPrepResponse.ok) {
           const interviewPrepResult = await interviewPrepResponse.json()
           setHasInterviewPrep(interviewPrepResult.exists)
@@ -133,7 +133,7 @@ export default function AnalysisPage() {
     }
 
     checkExistingContent()
-  }, [analysisId])
+  }, [roastId])
 
   // Handle generating optimized version - shows LLM selection modal
   const handleGenerateOptimized = async () => {
@@ -147,6 +147,49 @@ export default function AnalysisPage() {
         onConfirm: () => router.push('/')
       })
       return
+    }
+
+    // Check if we have roastId - this is critical for the API call
+    if (!roastId) {
+      console.error('❌ Roast ID missing when trying to optimize resume')
+      console.log('Current roastId:', roastId)
+      console.log('Checking sessionStorage for roastId...')
+      
+      // Try to get it from sessionStorage again
+      const storedRoastId = sessionStorage.getItem('roastId')
+      const dashboardRoastId = sessionStorage.getItem('dashboardRoastId')
+      
+      console.log('Stored roastId:', storedRoastId)
+      console.log('Dashboard roastId:', dashboardRoastId)
+      
+      if (storedRoastId) {
+        setRoastId(storedRoastId)
+        console.log('✅ Found roastId in sessionStorage, retrying...')
+        // Retry the function after setting the ID
+        setTimeout(() => handleGenerateOptimized(), 100)
+        return
+      } else if (dashboardRoastId) {
+        setRoastId(dashboardRoastId)
+        console.log('✅ Found dashboard roastId in sessionStorage, retrying...')
+        // Retry the function after setting the ID
+        setTimeout(() => handleGenerateOptimized(), 100)
+        return
+      } else {
+        showAlert({
+          title: "Roast ID Missing",
+          description: "Roast ID is required for resume optimization. Would you like to go to Resume Optimizer to enter your details manually instead?",
+          type: "warning",
+          confirmText: "Go to Resume Optimizer",
+          cancelText: "Try Again",
+          showCancel: true,
+          onConfirm: () => router.push('/resume-optimizer'),
+          onCancel: () => {
+            // Try to reload the page data
+            window.location.reload()
+          }
+        })
+        return
+      }
     }
 
     // Check if we have resume data, if not, provide options
@@ -254,7 +297,7 @@ Note: Original resume text was not available, using analysis data for optimizati
   // Helper function to proceed with existing data
   const proceedWithExistingData = () => {
     // Store the analysis data for the resume optimizer
-    sessionStorage.setItem('analysisId', analysisId || '')
+    sessionStorage.setItem('roastId', roastId || '')
     sessionStorage.setItem('isFromAnalysis', 'true')
     if (jobDescription) {
       sessionStorage.setItem('analysisJobDescription', jobDescription)
@@ -272,14 +315,14 @@ Note: Original resume text was not available, using analysis data for optimizati
       console.log('No existing data found - running AI optimization...')
     }
     
-    // Call the optimization API with analysisId instead of raw text
+    // Call the optimization API with roastId instead of raw text
     const response = await fetch('/api/optimize-resume', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        analysisId: analysisId,
+        roastId: roastId,
         bypassCache: bypassCache,
         llm: selectedLLM
       }),
@@ -309,7 +352,7 @@ Note: Original resume text was not available, using analysis data for optimizati
     sessionStorage.setItem('optimizedResumeData', JSON.stringify(optimizedData))
     sessionStorage.setItem('optimizedDataTimestamp', Date.now().toString())
     sessionStorage.setItem('isFromAnalysis', 'true')
-    sessionStorage.setItem('analysisId', analysisId || '')
+    sessionStorage.setItem('roastId', roastId || '')
     if (jobDescription) {
       sessionStorage.setItem('analysisJobDescription', jobDescription)
     }
@@ -358,23 +401,23 @@ Note: Original resume text was not available, using analysis data for optimizati
     const storedAnalysis = sessionStorage.getItem('analysisResults')
     const storedResumeData = sessionStorage.getItem('resumeData')
     const storedJobDescription = sessionStorage.getItem('jobDescription')
-    const storedAnalysisId = sessionStorage.getItem('analysisId')
+    const storedRoastId = sessionStorage.getItem('roastId')
     const storedPdfImages = sessionStorage.getItem('pdfImages')
     const storedDocumentId = sessionStorage.getItem('documentId')
     const storedExtractedResumeId = sessionStorage.getItem('extractedResumeId')
     const isFromDashboard = sessionStorage.getItem('isFromDashboard') === 'true'
-    const dashboardAnalysisId = sessionStorage.getItem('dashboardAnalysisId')
+    const dashboardRoastId = sessionStorage.getItem('dashboardRoastId')
     
     console.log('=== ANALYSIS PAGE LOAD DEBUG ===')
     console.log('Stored analysis:', !!storedAnalysis)
     console.log('Stored resume data:', !!storedResumeData)
     console.log('Stored job description:', !!storedJobDescription)
-    console.log('Stored analysis ID:', storedAnalysisId)
+    console.log('Stored roast ID:', storedRoastId)
     console.log('Stored document ID:', storedDocumentId)
     console.log('Stored extracted resume ID:', storedExtractedResumeId)
     console.log('Stored PDF images:', !!storedPdfImages)
     console.log('Is from dashboard:', isFromDashboard)
-    console.log('Dashboard analysis ID:', dashboardAnalysisId)
+    console.log('Dashboard roast ID:', dashboardRoastId)
     
     // Load resume data first
     if (storedResumeData) {
@@ -389,16 +432,16 @@ Note: Original resume text was not available, using analysis data for optimizati
           parsedResumeData.extractedResumeId = storedExtractedResumeId
         }
         setResumeData(parsedResumeData)
-        console.log('Resume data loaded successfully')
+        console.log('✅ Resume data loaded successfully')
       } catch (error) {
-        console.error('Failed to parse resume data:', error)
+        console.error('❌ Failed to parse resume data:', error)
       }
     }
     
     // Load job description
     if (storedJobDescription) {
       setJobDescription(storedJobDescription)
-      console.log('Job description loaded successfully:', storedJobDescription.length, 'characters')
+      console.log('✅ Job description loaded successfully:', storedJobDescription.length, 'characters')
     } else {
       // Fallback: check if job description is stored in analysis data
       if (storedAnalysis) {
@@ -406,17 +449,35 @@ Note: Original resume text was not available, using analysis data for optimizati
           const analysis = JSON.parse(storedAnalysis)
           if (analysis.jobDescription) {
             setJobDescription(analysis.jobDescription)
-            console.log('Job description loaded from analysis data:', analysis.jobDescription.length, 'characters')
+            console.log('✅ Job description loaded from analysis data:', analysis.jobDescription.length, 'characters')
           }
         } catch (error) {
-          console.error('Failed to parse analysis for job description fallback:', error)
+          console.error('❌ Failed to parse analysis for job description fallback:', error)
         }
       }
     }
 
-    // Load analysis ID
-    if (storedAnalysisId) {
-      setAnalysisId(storedAnalysisId)
+    // Load roast ID - prioritize dashboard roast ID if available
+    let finalRoastId = null
+    if (dashboardRoastId) {
+      finalRoastId = dashboardRoastId
+      setRoastId(dashboardRoastId)
+      console.log('✅ Using dashboard roast ID:', dashboardRoastId)
+    } else if (storedRoastId) {
+      finalRoastId = storedRoastId
+      setRoastId(storedRoastId)
+      console.log('✅ Using stored roast ID:', storedRoastId)
+    } else {
+      console.warn('⚠️ No roast ID found in sessionStorage')
+      console.log('🔍 All sessionStorage keys:', Object.keys(sessionStorage))
+      console.log('🔍 SessionStorage contents:')
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i)
+        if (key) {
+          const value = sessionStorage.getItem(key)
+          console.log(`  ${key}: ${value ? (value.length > 100 ? value.substring(0, 100) + '...' : value) : 'null'}`)
+        }
+      }
     }
     
     // Load extracted resume ID
@@ -430,9 +491,9 @@ Note: Original resume text was not available, using analysis data for optimizati
       try {
         const parsedImages = JSON.parse(storedPdfImages)
         setPdfImages(parsedImages)
-        console.log('PDF images loaded successfully:', parsedImages.length, 'images')
+        console.log('✅ PDF images loaded successfully:', parsedImages.length, 'images')
       } catch (error) {
-        console.error('Failed to parse PDF images:', error)
+        console.error('❌ Failed to parse PDF images:', error)
       }
     }
     
@@ -446,11 +507,12 @@ Note: Original resume text was not available, using analysis data for optimizati
       try {
         const analysis = JSON.parse(storedAnalysis)
         setAnalysisData(analysis)
-        console.log('Analysis data loaded successfully')
+        console.log('✅ Analysis data loaded successfully')
       } catch (error) {
-        console.error('Failed to parse analysis results:', error)
+        console.error('❌ Failed to parse analysis results:', error)
         // Only fall back to mock data if we don't have real data from dashboard
         if (!isFromDashboard) {
+          console.log('📝 Using mock data as fallback')
           setAnalysisData(getMockData())
           // Only set mock resume data if we don't have real resume data
           if (!storedResumeData) {
@@ -461,14 +523,14 @@ Note: Original resume text was not available, using analysis data for optimizati
     } else {
       // Only use mock data if we're not coming from dashboard and have no real data
       if (!isFromDashboard) {
-        console.log('No stored analysis found, using mock data')
+        console.log('📝 No stored analysis found, using mock data')
         setAnalysisData(getMockData())
         // Only set mock resume data if we don't have real resume data
         if (!storedResumeData) {
           setResumeData(getMockResumeData())
         }
       } else {
-        console.log('Coming from dashboard but no analysis data found - this might be an issue')
+        console.log('⚠️ Coming from dashboard but no analysis data found - this might be an issue')
         // Still set mock data but preserve real resume/job data
         setAnalysisData(getMockData())
       }
@@ -477,14 +539,18 @@ Note: Original resume text was not available, using analysis data for optimizati
     // Clean up dashboard flags after loading
     if (isFromDashboard) {
       sessionStorage.removeItem('isFromDashboard')
-      sessionStorage.removeItem('dashboardAnalysisId')
-      console.log('Cleaned up dashboard navigation flags')
+      sessionStorage.removeItem('dashboardRoastId')
+      console.log('🧹 Cleaned up dashboard navigation flags')
     }
     
     setIsLoading(false)
     console.log('=== ANALYSIS PAGE LOAD COMPLETE ===')
-    console.log('Final state - PDF images:', pdfImages.length)
-    console.log('Final state - Job description:', !!jobDescription)
+    console.log('📊 Final state summary:')
+    console.log('  - Roast ID:', finalRoastId)
+    console.log('  - PDF images:', pdfImages.length)
+    console.log('  - Job description:', !!jobDescription)
+    console.log('  - Analysis data:', !!analysisData)
+    console.log('  - Resume data:', !!resumeData)
   }, [])
 
   // Debug effect to log state changes
@@ -494,13 +560,14 @@ Note: Original resume text was not available, using analysis data for optimizati
     console.log('Job description length:', jobDescription?.length || 0)
     console.log('Analysis data exists:', !!analysisData)
     console.log('Resume data exists:', !!resumeData)
+    console.log('Roast ID:', roastId)
     if (pdfImages.length > 0) {
       console.log('First PDF image preview:', pdfImages[0].substring(0, 50) + '...')
     }
     if (jobDescription) {
       console.log('Job description preview:', jobDescription.substring(0, 100) + '...')
     }
-  }, [pdfImages, jobDescription, analysisData, resumeData])
+  }, [pdfImages, jobDescription, analysisData, resumeData, roastId])
 
   const getMockResumeData = () => ({
     text: `John Doe
@@ -661,7 +728,7 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => shareAnalysis(analysisData, undefined, resumeData, jobDescription, pdfImages, analysisId)}
+              onClick={() => shareAnalysis(analysisData, undefined, resumeData, jobDescription, pdfImages, roastId)}
               disabled={isSharing || !analysisData}
             >
               <Share2 className="h-4 w-4 mr-2" />
@@ -1348,7 +1415,7 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
         resumeData={resumeData}
         jobDescription={jobDescription}
         analysisData={analysisData}
-        analysisId={analysisId}
+        roastId={roastId}
         onCoverLetterGenerated={handleCoverLetterGenerated}
       />
 
@@ -1367,7 +1434,7 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
         resumeData={resumeData}
         jobDescription={jobDescription}
         analysisData={analysisData}
-        analysisId={analysisId}
+        roastId={roastId}
         onInterviewPrepGenerated={handleInterviewPrepGenerated}
       />
 

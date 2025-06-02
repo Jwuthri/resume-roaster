@@ -56,10 +56,10 @@ interface InterviewPrepData {
 interface InterviewPrepModalProps {
   isOpen: boolean
   onClose: () => void
-  resumeData?: any
+  resumeData: any
   jobDescription?: string
   analysisData?: any
-  analysisId?: string
+  roastId?: string
   onInterviewPrepGenerated?: (cached: boolean) => void
 }
 
@@ -69,7 +69,7 @@ export function InterviewPrepModal({
   resumeData,
   jobDescription,
   analysisData,
-  analysisId,
+  roastId,
   onInterviewPrepGenerated
 }: InterviewPrepModalProps) {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -164,7 +164,7 @@ export function InterviewPrepModal({
           resumeData,
           jobDescription,
           analysisData,
-          analysisId,
+          roastId,
           llm: selectedLLM
         }),
       })
@@ -281,7 +281,7 @@ export function InterviewPrepModal({
           tips: question.tips,
           category: question.category,
           difficulty: question.difficulty,
-          analysisId,
+          roastId,
           questionId
         }),
       })
@@ -333,7 +333,7 @@ export function InterviewPrepModal({
         body: JSON.stringify({
           questions: interviewData.questions,
           userAnswers,
-          analysisId
+          roastId
         }),
       })
 
@@ -367,11 +367,11 @@ export function InterviewPrepModal({
   }
 
   const loadSavedEvaluations = async () => {
-    if (!analysisId) return
+    if (!roastId) return
 
     setIsLoadingEvaluations(true)
     try {
-      const response = await fetch(`/api/evaluations/${analysisId}`)
+      const response = await fetch(`/api/evaluations/${roastId}`)
       if (response.ok) {
         const data = await response.json()
         setSavedEvaluations(data.evaluations || [])
@@ -385,10 +385,10 @@ export function InterviewPrepModal({
 
   // Load saved evaluations when modal opens
   useEffect(() => {
-    if (isOpen && analysisId) {
+    if (isOpen && roastId) {
       loadSavedEvaluations()
     }
-  }, [isOpen, analysisId])
+  }, [isOpen, roastId])
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
