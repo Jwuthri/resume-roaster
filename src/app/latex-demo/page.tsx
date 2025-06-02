@@ -17,7 +17,7 @@ import {
   Sparkles
 } from "lucide-react"
 import { latexTemplates } from "@/lib/latex-templates"
-import { julienWuthrichSampleData } from "@/lib/sample-resume-data"
+import { sampleResumeData } from "@/lib/sample-resume-data"
 import { downloadLatexSource, compileLatexToPDF } from "@/lib/latex-compiler"
 import { downloadBlob } from "@/lib/document-generators"
 import Link from "next/link"
@@ -32,12 +32,12 @@ export default function LaTeXDemoPage() {
 
   const generateLatexSource = () => {
     const template = getCurrentTemplate()
-    return template.generateLaTeX(julienWuthrichSampleData)
+    return template.generateLaTeX(sampleResumeData)
   }
 
   const downloadSource = () => {
     try {
-      downloadLatexSource(selectedTemplate, julienWuthrichSampleData)
+      downloadLatexSource(selectedTemplate, sampleResumeData)
     } catch (error) {
       console.error('Error downloading LaTeX source:', error)
       alert('Failed to download LaTeX source. Please try again.')
@@ -46,11 +46,11 @@ export default function LaTeXDemoPage() {
 
   const downloadPDF = async () => {
     try {
-      const result = await compileLatexToPDF(selectedTemplate, julienWuthrichSampleData)
+      const result = await compileLatexToPDF(selectedTemplate, sampleResumeData)
       
       if (result.success && result.pdfBuffer) {
         const blob = new Blob([result.pdfBuffer], { type: 'application/pdf' })
-        downloadBlob(blob, 'julien-wuthrich-resume-latex.pdf')
+        downloadBlob(blob, 'alex-johnson-resume-latex.pdf')
       } else {
         alert(`PDF compilation failed: ${result.error || 'Unknown error'}. You can download the LaTeX source and compile it manually.`)
       }
@@ -225,7 +225,7 @@ export default function LaTeXDemoPage() {
               <CardContent>
                 <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto max-h-96 text-xs">
                   <pre className="whitespace-pre-wrap">
-                    <code>{JSON.stringify(julienWuthrichSampleData, null, 2)}</code>
+                    <code>{JSON.stringify(sampleResumeData, null, 2)}</code>
                   </pre>
                 </div>
               </CardContent>
