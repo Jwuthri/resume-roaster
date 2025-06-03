@@ -40,17 +40,18 @@ model User {
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relations
-  sessions          Session[]
-  resumes           Resume[]
-  llmCalls          LlmCall[]
-  generatedRoasts   GeneratedRoast[]
-  generatedCoverLetters GeneratedCoverLetter[]
-  generatedResumes  GeneratedResume[]
+  sessions                Session[]
+  llmCalls                LlmCall[]
+  resumes                 Resume[]
+  generatedRoasts         GeneratedRoast[]
+  generatedCoverLetters   GeneratedCoverLetter[]
+  generatedResumes        GeneratedResume[]
   generatedInterviewPreps GeneratedInterviewPrep[]
-  interviewEvaluations InterviewEvaluation[]
-  sharedAnalyses    SharedAnalysis[]
-  invoices          Invoice[]
-  verificationTokens VerificationToken[]
+  interviewEvaluations    InterviewEvaluation[]
+  sharedAnalyses          SharedAnalysis[]
+  invoices                Invoice[]
+  chatbot                 Chatbot[]
+  verificationTokens      VerificationToken[]
 
   @@map("users")
 }
@@ -475,6 +476,27 @@ model Announcement {
   @@index([isActive])
   @@index([startDate, endDate])
   @@map("announcements")
+}
+
+// Chatbot Support
+model Chatbot {
+  id              String   @id @default(cuid())
+  userId          String?  @map("user_id") // NULL for anonymous users
+  anonymousId     String?  @map("anonymous_id") // For non-registered users
+  conversationId  String   @map("conversation_id") // Groups messages into conversations
+  message         String   @db.Text
+  role            String   // 'user' or 'assistant'
+  llmMessageId    String?  @map("llm_message_id") // Optional link to LlmMessage for tracking
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([anonymousId])
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("chatbot")
 }
 
 // Enums

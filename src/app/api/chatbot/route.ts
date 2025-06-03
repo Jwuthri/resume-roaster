@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { callOpenAIText, OPENAI_MODELS, CONTEXT_SIZES, TEMPERATURES } from '@/lib/openai-utils';
 import { 
   createChatbotConversation, 
@@ -141,12 +142,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user session (for authenticated users)
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     let userId = session?.user?.id || null;
+    
+    console.log('=== CHATBOT SESSION DEBUG ===');
+    console.log('Session exists:', !!session);
+    console.log('Session user:', session?.user);
+    console.log('User ID from session:', userId);
+    console.log('Is authenticated:', !!userId);
     
     // For anonymous users, generate a unique identifier
     if (!userId) {
       userId = generateAnonymousUserId(request);
+      console.log('Generated anonymous user ID:', userId);
     }
 
     let currentConversationId = conversationId;
@@ -207,13 +215,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const conversationId = searchParams.get('conversationId');
 
-    // Get user session
-    const session = await getServerSession();
+    // Get user session - FIXED: Added authOptions
+    const session = await getServerSession(authOptions);
     let userId = session?.user?.id || null;
+    
+    console.log('=== CHATBOT GET SESSION DEBUG ===');
+    console.log('Session exists:', !!session);
+    console.log('Session user:', session?.user);
+    console.log('User ID from session:', userId);
+    console.log('Is authenticated:', !!userId);
     
     // For anonymous users, generate the same unique identifier
     if (!userId) {
       userId = generateAnonymousUserId(request);
+      console.log('Generated anonymous user ID:', userId);
     }
 
     if (conversationId) {

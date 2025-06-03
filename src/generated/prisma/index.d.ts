@@ -103,6 +103,11 @@ export type Invoice = $Result.DefaultSelection<Prisma.$InvoicePayload>
  * 
  */
 export type Announcement = $Result.DefaultSelection<Prisma.$AnnouncementPayload>
+/**
+ * Model Chatbot
+ * 
+ */
+export type Chatbot = $Result.DefaultSelection<Prisma.$ChatbotPayload>
 
 /**
  * Enums
@@ -494,6 +499,16 @@ export class PrismaClient<
     * ```
     */
   get announcement(): Prisma.AnnouncementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.chatbot`: Exposes CRUD operations for the **Chatbot** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Chatbots
+    * const chatbots = await prisma.chatbot.findMany()
+    * ```
+    */
+  get chatbot(): Prisma.ChatbotDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -951,7 +966,8 @@ export namespace Prisma {
     InterviewEvaluation: 'InterviewEvaluation',
     SharedAnalysis: 'SharedAnalysis',
     Invoice: 'Invoice',
-    Announcement: 'Announcement'
+    Announcement: 'Announcement',
+    Chatbot: 'Chatbot'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -970,7 +986,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "verificationToken" | "llmCall" | "llmMessage" | "resume" | "extractedResume" | "extractedJobDescription" | "summarizedResume" | "summarizedJobDescription" | "generatedRoast" | "generatedCoverLetter" | "generatedResume" | "generatedInterviewPrep" | "interviewEvaluation" | "sharedAnalysis" | "invoice" | "announcement"
+      modelProps: "user" | "session" | "verificationToken" | "llmCall" | "llmMessage" | "resume" | "extractedResume" | "extractedJobDescription" | "summarizedResume" | "summarizedJobDescription" | "generatedRoast" | "generatedCoverLetter" | "generatedResume" | "generatedInterviewPrep" | "interviewEvaluation" | "sharedAnalysis" | "invoice" | "announcement" | "chatbot"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2306,6 +2322,80 @@ export namespace Prisma {
           }
         }
       }
+      Chatbot: {
+        payload: Prisma.$ChatbotPayload<ExtArgs>
+        fields: Prisma.ChatbotFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ChatbotFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ChatbotFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          findFirst: {
+            args: Prisma.ChatbotFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ChatbotFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          findMany: {
+            args: Prisma.ChatbotFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>[]
+          }
+          create: {
+            args: Prisma.ChatbotCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          createMany: {
+            args: Prisma.ChatbotCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ChatbotCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>[]
+          }
+          delete: {
+            args: Prisma.ChatbotDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          update: {
+            args: Prisma.ChatbotUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          deleteMany: {
+            args: Prisma.ChatbotDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ChatbotUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ChatbotUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>[]
+          }
+          upsert: {
+            args: Prisma.ChatbotUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatbotPayload>
+          }
+          aggregate: {
+            args: Prisma.ChatbotAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateChatbot>
+          }
+          groupBy: {
+            args: Prisma.ChatbotGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ChatbotGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ChatbotCountArgs<ExtArgs>
+            result: $Utils.Optional<ChatbotCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2408,6 +2498,7 @@ export namespace Prisma {
     sharedAnalysis?: SharedAnalysisOmit
     invoice?: InvoiceOmit
     announcement?: AnnouncementOmit
+    chatbot?: ChatbotOmit
   }
 
   /* Types for Logging */
@@ -2503,8 +2594,8 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     sessions: number
-    resumes: number
     llmCalls: number
+    resumes: number
     generatedRoasts: number
     generatedCoverLetters: number
     generatedResumes: number
@@ -2512,13 +2603,14 @@ export namespace Prisma {
     interviewEvaluations: number
     sharedAnalyses: number
     invoices: number
+    chatbot: number
     verificationTokens: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
-    resumes?: boolean | UserCountOutputTypeCountResumesArgs
     llmCalls?: boolean | UserCountOutputTypeCountLlmCallsArgs
+    resumes?: boolean | UserCountOutputTypeCountResumesArgs
     generatedRoasts?: boolean | UserCountOutputTypeCountGeneratedRoastsArgs
     generatedCoverLetters?: boolean | UserCountOutputTypeCountGeneratedCoverLettersArgs
     generatedResumes?: boolean | UserCountOutputTypeCountGeneratedResumesArgs
@@ -2526,6 +2618,7 @@ export namespace Prisma {
     interviewEvaluations?: boolean | UserCountOutputTypeCountInterviewEvaluationsArgs
     sharedAnalyses?: boolean | UserCountOutputTypeCountSharedAnalysesArgs
     invoices?: boolean | UserCountOutputTypeCountInvoicesArgs
+    chatbot?: boolean | UserCountOutputTypeCountChatbotArgs
     verificationTokens?: boolean | UserCountOutputTypeCountVerificationTokensArgs
   }
 
@@ -2550,15 +2643,15 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountResumesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ResumeWhereInput
+  export type UserCountOutputTypeCountLlmCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LlmCallWhereInput
   }
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountLlmCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: LlmCallWhereInput
+  export type UserCountOutputTypeCountResumesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ResumeWhereInput
   }
 
   /**
@@ -2608,6 +2701,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountInvoicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvoiceWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountChatbotArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChatbotWhereInput
   }
 
   /**
@@ -3327,8 +3427,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
-    resumes?: boolean | User$resumesArgs<ExtArgs>
     llmCalls?: boolean | User$llmCallsArgs<ExtArgs>
+    resumes?: boolean | User$resumesArgs<ExtArgs>
     generatedRoasts?: boolean | User$generatedRoastsArgs<ExtArgs>
     generatedCoverLetters?: boolean | User$generatedCoverLettersArgs<ExtArgs>
     generatedResumes?: boolean | User$generatedResumesArgs<ExtArgs>
@@ -3336,6 +3436,7 @@ export namespace Prisma {
     interviewEvaluations?: boolean | User$interviewEvaluationsArgs<ExtArgs>
     sharedAnalyses?: boolean | User$sharedAnalysesArgs<ExtArgs>
     invoices?: boolean | User$invoicesArgs<ExtArgs>
+    chatbot?: boolean | User$chatbotArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -3400,8 +3501,8 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "emailVerified" | "image" | "hashedPassword" | "subscriptionTier" | "subscriptionId" | "customerId" | "subscriptionEndsAt" | "monthlyRoasts" | "totalRoasts" | "bonusCredits" | "lastRoastReset" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
-    resumes?: boolean | User$resumesArgs<ExtArgs>
     llmCalls?: boolean | User$llmCallsArgs<ExtArgs>
+    resumes?: boolean | User$resumesArgs<ExtArgs>
     generatedRoasts?: boolean | User$generatedRoastsArgs<ExtArgs>
     generatedCoverLetters?: boolean | User$generatedCoverLettersArgs<ExtArgs>
     generatedResumes?: boolean | User$generatedResumesArgs<ExtArgs>
@@ -3409,6 +3510,7 @@ export namespace Prisma {
     interviewEvaluations?: boolean | User$interviewEvaluationsArgs<ExtArgs>
     sharedAnalyses?: boolean | User$sharedAnalysesArgs<ExtArgs>
     invoices?: boolean | User$invoicesArgs<ExtArgs>
+    chatbot?: boolean | User$chatbotArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -3419,8 +3521,8 @@ export namespace Prisma {
     name: "User"
     objects: {
       sessions: Prisma.$SessionPayload<ExtArgs>[]
-      resumes: Prisma.$ResumePayload<ExtArgs>[]
       llmCalls: Prisma.$LlmCallPayload<ExtArgs>[]
+      resumes: Prisma.$ResumePayload<ExtArgs>[]
       generatedRoasts: Prisma.$GeneratedRoastPayload<ExtArgs>[]
       generatedCoverLetters: Prisma.$GeneratedCoverLetterPayload<ExtArgs>[]
       generatedResumes: Prisma.$GeneratedResumePayload<ExtArgs>[]
@@ -3428,6 +3530,7 @@ export namespace Prisma {
       interviewEvaluations: Prisma.$InterviewEvaluationPayload<ExtArgs>[]
       sharedAnalyses: Prisma.$SharedAnalysisPayload<ExtArgs>[]
       invoices: Prisma.$InvoicePayload<ExtArgs>[]
+      chatbot: Prisma.$ChatbotPayload<ExtArgs>[]
       verificationTokens: Prisma.$VerificationTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3842,8 +3945,8 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    resumes<T extends User$resumesArgs<ExtArgs> = {}>(args?: Subset<T, User$resumesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResumePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     llmCalls<T extends User$llmCallsArgs<ExtArgs> = {}>(args?: Subset<T, User$llmCallsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LlmCallPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    resumes<T extends User$resumesArgs<ExtArgs> = {}>(args?: Subset<T, User$resumesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResumePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     generatedRoasts<T extends User$generatedRoastsArgs<ExtArgs> = {}>(args?: Subset<T, User$generatedRoastsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GeneratedRoastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     generatedCoverLetters<T extends User$generatedCoverLettersArgs<ExtArgs> = {}>(args?: Subset<T, User$generatedCoverLettersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GeneratedCoverLetterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     generatedResumes<T extends User$generatedResumesArgs<ExtArgs> = {}>(args?: Subset<T, User$generatedResumesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GeneratedResumePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3851,6 +3954,7 @@ export namespace Prisma {
     interviewEvaluations<T extends User$interviewEvaluationsArgs<ExtArgs> = {}>(args?: Subset<T, User$interviewEvaluationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InterviewEvaluationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sharedAnalyses<T extends User$sharedAnalysesArgs<ExtArgs> = {}>(args?: Subset<T, User$sharedAnalysesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedAnalysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invoices<T extends User$invoicesArgs<ExtArgs> = {}>(args?: Subset<T, User$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    chatbot<T extends User$chatbotArgs<ExtArgs> = {}>(args?: Subset<T, User$chatbotArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     verificationTokens<T extends User$verificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4309,30 +4413,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.resumes
-   */
-  export type User$resumesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Resume
-     */
-    select?: ResumeSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Resume
-     */
-    omit?: ResumeOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ResumeInclude<ExtArgs> | null
-    where?: ResumeWhereInput
-    orderBy?: ResumeOrderByWithRelationInput | ResumeOrderByWithRelationInput[]
-    cursor?: ResumeWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ResumeScalarFieldEnum | ResumeScalarFieldEnum[]
-  }
-
-  /**
    * User.llmCalls
    */
   export type User$llmCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4354,6 +4434,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LlmCallScalarFieldEnum | LlmCallScalarFieldEnum[]
+  }
+
+  /**
+   * User.resumes
+   */
+  export type User$resumesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Resume
+     */
+    select?: ResumeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Resume
+     */
+    omit?: ResumeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResumeInclude<ExtArgs> | null
+    where?: ResumeWhereInput
+    orderBy?: ResumeOrderByWithRelationInput | ResumeOrderByWithRelationInput[]
+    cursor?: ResumeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ResumeScalarFieldEnum | ResumeScalarFieldEnum[]
   }
 
   /**
@@ -4522,6 +4626,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvoiceScalarFieldEnum | InvoiceScalarFieldEnum[]
+  }
+
+  /**
+   * User.chatbot
+   */
+  export type User$chatbotArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    where?: ChatbotWhereInput
+    orderBy?: ChatbotOrderByWithRelationInput | ChatbotOrderByWithRelationInput[]
+    cursor?: ChatbotWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ChatbotScalarFieldEnum | ChatbotScalarFieldEnum[]
   }
 
   /**
@@ -25133,6 +25261,1122 @@ export namespace Prisma {
 
 
   /**
+   * Model Chatbot
+   */
+
+  export type AggregateChatbot = {
+    _count: ChatbotCountAggregateOutputType | null
+    _min: ChatbotMinAggregateOutputType | null
+    _max: ChatbotMaxAggregateOutputType | null
+  }
+
+  export type ChatbotMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    anonymousId: string | null
+    conversationId: string | null
+    message: string | null
+    role: string | null
+    llmMessageId: string | null
+    createdAt: Date | null
+  }
+
+  export type ChatbotMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    anonymousId: string | null
+    conversationId: string | null
+    message: string | null
+    role: string | null
+    llmMessageId: string | null
+    createdAt: Date | null
+  }
+
+  export type ChatbotCountAggregateOutputType = {
+    id: number
+    userId: number
+    anonymousId: number
+    conversationId: number
+    message: number
+    role: number
+    llmMessageId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ChatbotMinAggregateInputType = {
+    id?: true
+    userId?: true
+    anonymousId?: true
+    conversationId?: true
+    message?: true
+    role?: true
+    llmMessageId?: true
+    createdAt?: true
+  }
+
+  export type ChatbotMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    anonymousId?: true
+    conversationId?: true
+    message?: true
+    role?: true
+    llmMessageId?: true
+    createdAt?: true
+  }
+
+  export type ChatbotCountAggregateInputType = {
+    id?: true
+    userId?: true
+    anonymousId?: true
+    conversationId?: true
+    message?: true
+    role?: true
+    llmMessageId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ChatbotAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Chatbot to aggregate.
+     */
+    where?: ChatbotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Chatbots to fetch.
+     */
+    orderBy?: ChatbotOrderByWithRelationInput | ChatbotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ChatbotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Chatbots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Chatbots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Chatbots
+    **/
+    _count?: true | ChatbotCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ChatbotMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ChatbotMaxAggregateInputType
+  }
+
+  export type GetChatbotAggregateType<T extends ChatbotAggregateArgs> = {
+        [P in keyof T & keyof AggregateChatbot]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateChatbot[P]>
+      : GetScalarType<T[P], AggregateChatbot[P]>
+  }
+
+
+
+
+  export type ChatbotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChatbotWhereInput
+    orderBy?: ChatbotOrderByWithAggregationInput | ChatbotOrderByWithAggregationInput[]
+    by: ChatbotScalarFieldEnum[] | ChatbotScalarFieldEnum
+    having?: ChatbotScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ChatbotCountAggregateInputType | true
+    _min?: ChatbotMinAggregateInputType
+    _max?: ChatbotMaxAggregateInputType
+  }
+
+  export type ChatbotGroupByOutputType = {
+    id: string
+    userId: string | null
+    anonymousId: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId: string | null
+    createdAt: Date
+    _count: ChatbotCountAggregateOutputType | null
+    _min: ChatbotMinAggregateOutputType | null
+    _max: ChatbotMaxAggregateOutputType | null
+  }
+
+  type GetChatbotGroupByPayload<T extends ChatbotGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ChatbotGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ChatbotGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ChatbotGroupByOutputType[P]>
+            : GetScalarType<T[P], ChatbotGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ChatbotSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    anonymousId?: boolean
+    conversationId?: boolean
+    message?: boolean
+    role?: boolean
+    llmMessageId?: boolean
+    createdAt?: boolean
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }, ExtArgs["result"]["chatbot"]>
+
+  export type ChatbotSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    anonymousId?: boolean
+    conversationId?: boolean
+    message?: boolean
+    role?: boolean
+    llmMessageId?: boolean
+    createdAt?: boolean
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }, ExtArgs["result"]["chatbot"]>
+
+  export type ChatbotSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    anonymousId?: boolean
+    conversationId?: boolean
+    message?: boolean
+    role?: boolean
+    llmMessageId?: boolean
+    createdAt?: boolean
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }, ExtArgs["result"]["chatbot"]>
+
+  export type ChatbotSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    anonymousId?: boolean
+    conversationId?: boolean
+    message?: boolean
+    role?: boolean
+    llmMessageId?: boolean
+    createdAt?: boolean
+  }
+
+  export type ChatbotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "anonymousId" | "conversationId" | "message" | "role" | "llmMessageId" | "createdAt", ExtArgs["result"]["chatbot"]>
+  export type ChatbotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }
+  export type ChatbotIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }
+  export type ChatbotIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | Chatbot$userArgs<ExtArgs>
+  }
+
+  export type $ChatbotPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Chatbot"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string | null
+      anonymousId: string | null
+      conversationId: string
+      message: string
+      role: string
+      llmMessageId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["chatbot"]>
+    composites: {}
+  }
+
+  type ChatbotGetPayload<S extends boolean | null | undefined | ChatbotDefaultArgs> = $Result.GetResult<Prisma.$ChatbotPayload, S>
+
+  type ChatbotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ChatbotFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ChatbotCountAggregateInputType | true
+    }
+
+  export interface ChatbotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Chatbot'], meta: { name: 'Chatbot' } }
+    /**
+     * Find zero or one Chatbot that matches the filter.
+     * @param {ChatbotFindUniqueArgs} args - Arguments to find a Chatbot
+     * @example
+     * // Get one Chatbot
+     * const chatbot = await prisma.chatbot.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ChatbotFindUniqueArgs>(args: SelectSubset<T, ChatbotFindUniqueArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Chatbot that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ChatbotFindUniqueOrThrowArgs} args - Arguments to find a Chatbot
+     * @example
+     * // Get one Chatbot
+     * const chatbot = await prisma.chatbot.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ChatbotFindUniqueOrThrowArgs>(args: SelectSubset<T, ChatbotFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Chatbot that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotFindFirstArgs} args - Arguments to find a Chatbot
+     * @example
+     * // Get one Chatbot
+     * const chatbot = await prisma.chatbot.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ChatbotFindFirstArgs>(args?: SelectSubset<T, ChatbotFindFirstArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Chatbot that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotFindFirstOrThrowArgs} args - Arguments to find a Chatbot
+     * @example
+     * // Get one Chatbot
+     * const chatbot = await prisma.chatbot.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ChatbotFindFirstOrThrowArgs>(args?: SelectSubset<T, ChatbotFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Chatbots that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Chatbots
+     * const chatbots = await prisma.chatbot.findMany()
+     * 
+     * // Get first 10 Chatbots
+     * const chatbots = await prisma.chatbot.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const chatbotWithIdOnly = await prisma.chatbot.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ChatbotFindManyArgs>(args?: SelectSubset<T, ChatbotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Chatbot.
+     * @param {ChatbotCreateArgs} args - Arguments to create a Chatbot.
+     * @example
+     * // Create one Chatbot
+     * const Chatbot = await prisma.chatbot.create({
+     *   data: {
+     *     // ... data to create a Chatbot
+     *   }
+     * })
+     * 
+     */
+    create<T extends ChatbotCreateArgs>(args: SelectSubset<T, ChatbotCreateArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Chatbots.
+     * @param {ChatbotCreateManyArgs} args - Arguments to create many Chatbots.
+     * @example
+     * // Create many Chatbots
+     * const chatbot = await prisma.chatbot.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ChatbotCreateManyArgs>(args?: SelectSubset<T, ChatbotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Chatbots and returns the data saved in the database.
+     * @param {ChatbotCreateManyAndReturnArgs} args - Arguments to create many Chatbots.
+     * @example
+     * // Create many Chatbots
+     * const chatbot = await prisma.chatbot.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Chatbots and only return the `id`
+     * const chatbotWithIdOnly = await prisma.chatbot.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ChatbotCreateManyAndReturnArgs>(args?: SelectSubset<T, ChatbotCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Chatbot.
+     * @param {ChatbotDeleteArgs} args - Arguments to delete one Chatbot.
+     * @example
+     * // Delete one Chatbot
+     * const Chatbot = await prisma.chatbot.delete({
+     *   where: {
+     *     // ... filter to delete one Chatbot
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ChatbotDeleteArgs>(args: SelectSubset<T, ChatbotDeleteArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Chatbot.
+     * @param {ChatbotUpdateArgs} args - Arguments to update one Chatbot.
+     * @example
+     * // Update one Chatbot
+     * const chatbot = await prisma.chatbot.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ChatbotUpdateArgs>(args: SelectSubset<T, ChatbotUpdateArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Chatbots.
+     * @param {ChatbotDeleteManyArgs} args - Arguments to filter Chatbots to delete.
+     * @example
+     * // Delete a few Chatbots
+     * const { count } = await prisma.chatbot.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ChatbotDeleteManyArgs>(args?: SelectSubset<T, ChatbotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Chatbots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Chatbots
+     * const chatbot = await prisma.chatbot.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ChatbotUpdateManyArgs>(args: SelectSubset<T, ChatbotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Chatbots and returns the data updated in the database.
+     * @param {ChatbotUpdateManyAndReturnArgs} args - Arguments to update many Chatbots.
+     * @example
+     * // Update many Chatbots
+     * const chatbot = await prisma.chatbot.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Chatbots and only return the `id`
+     * const chatbotWithIdOnly = await prisma.chatbot.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ChatbotUpdateManyAndReturnArgs>(args: SelectSubset<T, ChatbotUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Chatbot.
+     * @param {ChatbotUpsertArgs} args - Arguments to update or create a Chatbot.
+     * @example
+     * // Update or create a Chatbot
+     * const chatbot = await prisma.chatbot.upsert({
+     *   create: {
+     *     // ... data to create a Chatbot
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Chatbot we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ChatbotUpsertArgs>(args: SelectSubset<T, ChatbotUpsertArgs<ExtArgs>>): Prisma__ChatbotClient<$Result.GetResult<Prisma.$ChatbotPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Chatbots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotCountArgs} args - Arguments to filter Chatbots to count.
+     * @example
+     * // Count the number of Chatbots
+     * const count = await prisma.chatbot.count({
+     *   where: {
+     *     // ... the filter for the Chatbots we want to count
+     *   }
+     * })
+    **/
+    count<T extends ChatbotCountArgs>(
+      args?: Subset<T, ChatbotCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ChatbotCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Chatbot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ChatbotAggregateArgs>(args: Subset<T, ChatbotAggregateArgs>): Prisma.PrismaPromise<GetChatbotAggregateType<T>>
+
+    /**
+     * Group by Chatbot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatbotGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ChatbotGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ChatbotGroupByArgs['orderBy'] }
+        : { orderBy?: ChatbotGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ChatbotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChatbotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Chatbot model
+   */
+  readonly fields: ChatbotFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Chatbot.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ChatbotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends Chatbot$userArgs<ExtArgs> = {}>(args?: Subset<T, Chatbot$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Chatbot model
+   */
+  interface ChatbotFieldRefs {
+    readonly id: FieldRef<"Chatbot", 'String'>
+    readonly userId: FieldRef<"Chatbot", 'String'>
+    readonly anonymousId: FieldRef<"Chatbot", 'String'>
+    readonly conversationId: FieldRef<"Chatbot", 'String'>
+    readonly message: FieldRef<"Chatbot", 'String'>
+    readonly role: FieldRef<"Chatbot", 'String'>
+    readonly llmMessageId: FieldRef<"Chatbot", 'String'>
+    readonly createdAt: FieldRef<"Chatbot", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Chatbot findUnique
+   */
+  export type ChatbotFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter, which Chatbot to fetch.
+     */
+    where: ChatbotWhereUniqueInput
+  }
+
+  /**
+   * Chatbot findUniqueOrThrow
+   */
+  export type ChatbotFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter, which Chatbot to fetch.
+     */
+    where: ChatbotWhereUniqueInput
+  }
+
+  /**
+   * Chatbot findFirst
+   */
+  export type ChatbotFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter, which Chatbot to fetch.
+     */
+    where?: ChatbotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Chatbots to fetch.
+     */
+    orderBy?: ChatbotOrderByWithRelationInput | ChatbotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Chatbots.
+     */
+    cursor?: ChatbotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Chatbots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Chatbots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Chatbots.
+     */
+    distinct?: ChatbotScalarFieldEnum | ChatbotScalarFieldEnum[]
+  }
+
+  /**
+   * Chatbot findFirstOrThrow
+   */
+  export type ChatbotFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter, which Chatbot to fetch.
+     */
+    where?: ChatbotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Chatbots to fetch.
+     */
+    orderBy?: ChatbotOrderByWithRelationInput | ChatbotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Chatbots.
+     */
+    cursor?: ChatbotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Chatbots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Chatbots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Chatbots.
+     */
+    distinct?: ChatbotScalarFieldEnum | ChatbotScalarFieldEnum[]
+  }
+
+  /**
+   * Chatbot findMany
+   */
+  export type ChatbotFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter, which Chatbots to fetch.
+     */
+    where?: ChatbotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Chatbots to fetch.
+     */
+    orderBy?: ChatbotOrderByWithRelationInput | ChatbotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Chatbots.
+     */
+    cursor?: ChatbotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Chatbots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Chatbots.
+     */
+    skip?: number
+    distinct?: ChatbotScalarFieldEnum | ChatbotScalarFieldEnum[]
+  }
+
+  /**
+   * Chatbot create
+   */
+  export type ChatbotCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Chatbot.
+     */
+    data: XOR<ChatbotCreateInput, ChatbotUncheckedCreateInput>
+  }
+
+  /**
+   * Chatbot createMany
+   */
+  export type ChatbotCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Chatbots.
+     */
+    data: ChatbotCreateManyInput | ChatbotCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Chatbot createManyAndReturn
+   */
+  export type ChatbotCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * The data used to create many Chatbots.
+     */
+    data: ChatbotCreateManyInput | ChatbotCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Chatbot update
+   */
+  export type ChatbotUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Chatbot.
+     */
+    data: XOR<ChatbotUpdateInput, ChatbotUncheckedUpdateInput>
+    /**
+     * Choose, which Chatbot to update.
+     */
+    where: ChatbotWhereUniqueInput
+  }
+
+  /**
+   * Chatbot updateMany
+   */
+  export type ChatbotUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Chatbots.
+     */
+    data: XOR<ChatbotUpdateManyMutationInput, ChatbotUncheckedUpdateManyInput>
+    /**
+     * Filter which Chatbots to update
+     */
+    where?: ChatbotWhereInput
+    /**
+     * Limit how many Chatbots to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Chatbot updateManyAndReturn
+   */
+  export type ChatbotUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * The data used to update Chatbots.
+     */
+    data: XOR<ChatbotUpdateManyMutationInput, ChatbotUncheckedUpdateManyInput>
+    /**
+     * Filter which Chatbots to update
+     */
+    where?: ChatbotWhereInput
+    /**
+     * Limit how many Chatbots to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Chatbot upsert
+   */
+  export type ChatbotUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Chatbot to update in case it exists.
+     */
+    where: ChatbotWhereUniqueInput
+    /**
+     * In case the Chatbot found by the `where` argument doesn't exist, create a new Chatbot with this data.
+     */
+    create: XOR<ChatbotCreateInput, ChatbotUncheckedCreateInput>
+    /**
+     * In case the Chatbot was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ChatbotUpdateInput, ChatbotUncheckedUpdateInput>
+  }
+
+  /**
+   * Chatbot delete
+   */
+  export type ChatbotDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+    /**
+     * Filter which Chatbot to delete.
+     */
+    where: ChatbotWhereUniqueInput
+  }
+
+  /**
+   * Chatbot deleteMany
+   */
+  export type ChatbotDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Chatbots to delete
+     */
+    where?: ChatbotWhereInput
+    /**
+     * Limit how many Chatbots to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Chatbot.user
+   */
+  export type Chatbot$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * Chatbot without action
+   */
+  export type ChatbotDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Chatbot
+     */
+    select?: ChatbotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Chatbot
+     */
+    omit?: ChatbotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -25432,6 +26676,20 @@ export namespace Prisma {
   export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
 
 
+  export const ChatbotScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    anonymousId: 'anonymousId',
+    conversationId: 'conversationId',
+    message: 'message',
+    role: 'role',
+    llmMessageId: 'llmMessageId',
+    createdAt: 'createdAt'
+  };
+
+  export type ChatbotScalarFieldEnum = (typeof ChatbotScalarFieldEnum)[keyof typeof ChatbotScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -25684,8 +26942,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionListRelationFilter
-    resumes?: ResumeListRelationFilter
     llmCalls?: LlmCallListRelationFilter
+    resumes?: ResumeListRelationFilter
     generatedRoasts?: GeneratedRoastListRelationFilter
     generatedCoverLetters?: GeneratedCoverLetterListRelationFilter
     generatedResumes?: GeneratedResumeListRelationFilter
@@ -25693,6 +26951,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationListRelationFilter
     sharedAnalyses?: SharedAnalysisListRelationFilter
     invoices?: InvoiceListRelationFilter
+    chatbot?: ChatbotListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
   }
 
@@ -25714,8 +26973,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sessions?: SessionOrderByRelationAggregateInput
-    resumes?: ResumeOrderByRelationAggregateInput
     llmCalls?: LlmCallOrderByRelationAggregateInput
+    resumes?: ResumeOrderByRelationAggregateInput
     generatedRoasts?: GeneratedRoastOrderByRelationAggregateInput
     generatedCoverLetters?: GeneratedCoverLetterOrderByRelationAggregateInput
     generatedResumes?: GeneratedResumeOrderByRelationAggregateInput
@@ -25723,6 +26982,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationOrderByRelationAggregateInput
     sharedAnalyses?: SharedAnalysisOrderByRelationAggregateInput
     invoices?: InvoiceOrderByRelationAggregateInput
+    chatbot?: ChatbotOrderByRelationAggregateInput
     verificationTokens?: VerificationTokenOrderByRelationAggregateInput
   }
 
@@ -25747,8 +27007,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionListRelationFilter
-    resumes?: ResumeListRelationFilter
     llmCalls?: LlmCallListRelationFilter
+    resumes?: ResumeListRelationFilter
     generatedRoasts?: GeneratedRoastListRelationFilter
     generatedCoverLetters?: GeneratedCoverLetterListRelationFilter
     generatedResumes?: GeneratedResumeListRelationFilter
@@ -25756,6 +27016,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationListRelationFilter
     sharedAnalyses?: SharedAnalysisListRelationFilter
     invoices?: InvoiceListRelationFilter
+    chatbot?: ChatbotListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
   }, "id" | "email">
 
@@ -27278,6 +28539,76 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Announcement"> | Date | string
   }
 
+  export type ChatbotWhereInput = {
+    AND?: ChatbotWhereInput | ChatbotWhereInput[]
+    OR?: ChatbotWhereInput[]
+    NOT?: ChatbotWhereInput | ChatbotWhereInput[]
+    id?: StringFilter<"Chatbot"> | string
+    userId?: StringNullableFilter<"Chatbot"> | string | null
+    anonymousId?: StringNullableFilter<"Chatbot"> | string | null
+    conversationId?: StringFilter<"Chatbot"> | string
+    message?: StringFilter<"Chatbot"> | string
+    role?: StringFilter<"Chatbot"> | string
+    llmMessageId?: StringNullableFilter<"Chatbot"> | string | null
+    createdAt?: DateTimeFilter<"Chatbot"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type ChatbotOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    anonymousId?: SortOrderInput | SortOrder
+    conversationId?: SortOrder
+    message?: SortOrder
+    role?: SortOrder
+    llmMessageId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ChatbotWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ChatbotWhereInput | ChatbotWhereInput[]
+    OR?: ChatbotWhereInput[]
+    NOT?: ChatbotWhereInput | ChatbotWhereInput[]
+    userId?: StringNullableFilter<"Chatbot"> | string | null
+    anonymousId?: StringNullableFilter<"Chatbot"> | string | null
+    conversationId?: StringFilter<"Chatbot"> | string
+    message?: StringFilter<"Chatbot"> | string
+    role?: StringFilter<"Chatbot"> | string
+    llmMessageId?: StringNullableFilter<"Chatbot"> | string | null
+    createdAt?: DateTimeFilter<"Chatbot"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type ChatbotOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    anonymousId?: SortOrderInput | SortOrder
+    conversationId?: SortOrder
+    message?: SortOrder
+    role?: SortOrder
+    llmMessageId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ChatbotCountOrderByAggregateInput
+    _max?: ChatbotMaxOrderByAggregateInput
+    _min?: ChatbotMinOrderByAggregateInput
+  }
+
+  export type ChatbotScalarWhereWithAggregatesInput = {
+    AND?: ChatbotScalarWhereWithAggregatesInput | ChatbotScalarWhereWithAggregatesInput[]
+    OR?: ChatbotScalarWhereWithAggregatesInput[]
+    NOT?: ChatbotScalarWhereWithAggregatesInput | ChatbotScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Chatbot"> | string
+    userId?: StringNullableWithAggregatesFilter<"Chatbot"> | string | null
+    anonymousId?: StringNullableWithAggregatesFilter<"Chatbot"> | string | null
+    conversationId?: StringWithAggregatesFilter<"Chatbot"> | string
+    message?: StringWithAggregatesFilter<"Chatbot"> | string
+    role?: StringWithAggregatesFilter<"Chatbot"> | string
+    llmMessageId?: StringNullableWithAggregatesFilter<"Chatbot"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Chatbot"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     email: string
@@ -27296,8 +28627,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
@@ -27305,6 +28636,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -27326,8 +28658,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
@@ -27335,6 +28667,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -27356,8 +28689,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
@@ -27365,6 +28698,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -27386,8 +28720,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
@@ -27395,6 +28729,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -29013,6 +30348,82 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ChatbotCreateInput = {
+    id?: string
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+    user?: UserCreateNestedOneWithoutChatbotInput
+  }
+
+  export type ChatbotUncheckedCreateInput = {
+    id?: string
+    userId?: string | null
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChatbotUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutChatbotNestedInput
+  }
+
+  export type ChatbotUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatbotCreateManyInput = {
+    id?: string
+    userId?: string | null
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChatbotUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatbotUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -29089,16 +30500,16 @@ export namespace Prisma {
     none?: SessionWhereInput
   }
 
-  export type ResumeListRelationFilter = {
-    every?: ResumeWhereInput
-    some?: ResumeWhereInput
-    none?: ResumeWhereInput
-  }
-
   export type LlmCallListRelationFilter = {
     every?: LlmCallWhereInput
     some?: LlmCallWhereInput
     none?: LlmCallWhereInput
+  }
+
+  export type ResumeListRelationFilter = {
+    every?: ResumeWhereInput
+    some?: ResumeWhereInput
+    none?: ResumeWhereInput
   }
 
   export type GeneratedRoastListRelationFilter = {
@@ -29143,6 +30554,12 @@ export namespace Prisma {
     none?: InvoiceWhereInput
   }
 
+  export type ChatbotListRelationFilter = {
+    every?: ChatbotWhereInput
+    some?: ChatbotWhereInput
+    none?: ChatbotWhereInput
+  }
+
   export type VerificationTokenListRelationFilter = {
     every?: VerificationTokenWhereInput
     some?: VerificationTokenWhereInput
@@ -29158,11 +30575,11 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type ResumeOrderByRelationAggregateInput = {
+  export type LlmCallOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type LlmCallOrderByRelationAggregateInput = {
+  export type ResumeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -29191,6 +30608,10 @@ export namespace Prisma {
   }
 
   export type InvoiceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ChatbotOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -30459,6 +31880,39 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type ChatbotCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    anonymousId?: SortOrder
+    conversationId?: SortOrder
+    message?: SortOrder
+    role?: SortOrder
+    llmMessageId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ChatbotMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    anonymousId?: SortOrder
+    conversationId?: SortOrder
+    message?: SortOrder
+    role?: SortOrder
+    llmMessageId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ChatbotMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    anonymousId?: SortOrder
+    conversationId?: SortOrder
+    message?: SortOrder
+    role?: SortOrder
+    llmMessageId?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -30466,18 +31920,18 @@ export namespace Prisma {
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
   }
 
-  export type ResumeCreateNestedManyWithoutUserInput = {
-    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
-    createMany?: ResumeCreateManyUserInputEnvelope
-    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-  }
-
   export type LlmCallCreateNestedManyWithoutUserInput = {
     create?: XOR<LlmCallCreateWithoutUserInput, LlmCallUncheckedCreateWithoutUserInput> | LlmCallCreateWithoutUserInput[] | LlmCallUncheckedCreateWithoutUserInput[]
     connectOrCreate?: LlmCallCreateOrConnectWithoutUserInput | LlmCallCreateOrConnectWithoutUserInput[]
     createMany?: LlmCallCreateManyUserInputEnvelope
     connect?: LlmCallWhereUniqueInput | LlmCallWhereUniqueInput[]
+  }
+
+  export type ResumeCreateNestedManyWithoutUserInput = {
+    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
+    createMany?: ResumeCreateManyUserInputEnvelope
+    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
   }
 
   export type GeneratedRoastCreateNestedManyWithoutUserInput = {
@@ -30529,6 +31983,13 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type ChatbotCreateNestedManyWithoutUserInput = {
+    create?: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput> | ChatbotCreateWithoutUserInput[] | ChatbotUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ChatbotCreateOrConnectWithoutUserInput | ChatbotCreateOrConnectWithoutUserInput[]
+    createMany?: ChatbotCreateManyUserInputEnvelope
+    connect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+  }
+
   export type VerificationTokenCreateNestedManyWithoutUserInput = {
     create?: XOR<VerificationTokenCreateWithoutUserInput, VerificationTokenUncheckedCreateWithoutUserInput> | VerificationTokenCreateWithoutUserInput[] | VerificationTokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VerificationTokenCreateOrConnectWithoutUserInput | VerificationTokenCreateOrConnectWithoutUserInput[]
@@ -30543,18 +32004,18 @@ export namespace Prisma {
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
   }
 
-  export type ResumeUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
-    createMany?: ResumeCreateManyUserInputEnvelope
-    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-  }
-
   export type LlmCallUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<LlmCallCreateWithoutUserInput, LlmCallUncheckedCreateWithoutUserInput> | LlmCallCreateWithoutUserInput[] | LlmCallUncheckedCreateWithoutUserInput[]
     connectOrCreate?: LlmCallCreateOrConnectWithoutUserInput | LlmCallCreateOrConnectWithoutUserInput[]
     createMany?: LlmCallCreateManyUserInputEnvelope
     connect?: LlmCallWhereUniqueInput | LlmCallWhereUniqueInput[]
+  }
+
+  export type ResumeUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
+    createMany?: ResumeCreateManyUserInputEnvelope
+    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
   }
 
   export type GeneratedRoastUncheckedCreateNestedManyWithoutUserInput = {
@@ -30606,6 +32067,13 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type ChatbotUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput> | ChatbotCreateWithoutUserInput[] | ChatbotUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ChatbotCreateOrConnectWithoutUserInput | ChatbotCreateOrConnectWithoutUserInput[]
+    createMany?: ChatbotCreateManyUserInputEnvelope
+    connect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+  }
+
   export type VerificationTokenUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<VerificationTokenCreateWithoutUserInput, VerificationTokenUncheckedCreateWithoutUserInput> | VerificationTokenCreateWithoutUserInput[] | VerificationTokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VerificationTokenCreateOrConnectWithoutUserInput | VerificationTokenCreateOrConnectWithoutUserInput[]
@@ -30655,20 +32123,6 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
-  export type ResumeUpdateManyWithoutUserNestedInput = {
-    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
-    upsert?: ResumeUpsertWithWhereUniqueWithoutUserInput | ResumeUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: ResumeCreateManyUserInputEnvelope
-    set?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    disconnect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    delete?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    update?: ResumeUpdateWithWhereUniqueWithoutUserInput | ResumeUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: ResumeUpdateManyWithWhereWithoutUserInput | ResumeUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
-  }
-
   export type LlmCallUpdateManyWithoutUserNestedInput = {
     create?: XOR<LlmCallCreateWithoutUserInput, LlmCallUncheckedCreateWithoutUserInput> | LlmCallCreateWithoutUserInput[] | LlmCallUncheckedCreateWithoutUserInput[]
     connectOrCreate?: LlmCallCreateOrConnectWithoutUserInput | LlmCallCreateOrConnectWithoutUserInput[]
@@ -30681,6 +32135,20 @@ export namespace Prisma {
     update?: LlmCallUpdateWithWhereUniqueWithoutUserInput | LlmCallUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: LlmCallUpdateManyWithWhereWithoutUserInput | LlmCallUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: LlmCallScalarWhereInput | LlmCallScalarWhereInput[]
+  }
+
+  export type ResumeUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
+    upsert?: ResumeUpsertWithWhereUniqueWithoutUserInput | ResumeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ResumeCreateManyUserInputEnvelope
+    set?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    disconnect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    delete?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    update?: ResumeUpdateWithWhereUniqueWithoutUserInput | ResumeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ResumeUpdateManyWithWhereWithoutUserInput | ResumeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
   }
 
   export type GeneratedRoastUpdateManyWithoutUserNestedInput = {
@@ -30781,6 +32249,20 @@ export namespace Prisma {
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
   }
 
+  export type ChatbotUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput> | ChatbotCreateWithoutUserInput[] | ChatbotUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ChatbotCreateOrConnectWithoutUserInput | ChatbotCreateOrConnectWithoutUserInput[]
+    upsert?: ChatbotUpsertWithWhereUniqueWithoutUserInput | ChatbotUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ChatbotCreateManyUserInputEnvelope
+    set?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    disconnect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    delete?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    connect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    update?: ChatbotUpdateWithWhereUniqueWithoutUserInput | ChatbotUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ChatbotUpdateManyWithWhereWithoutUserInput | ChatbotUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ChatbotScalarWhereInput | ChatbotScalarWhereInput[]
+  }
+
   export type VerificationTokenUpdateManyWithoutUserNestedInput = {
     create?: XOR<VerificationTokenCreateWithoutUserInput, VerificationTokenUncheckedCreateWithoutUserInput> | VerificationTokenCreateWithoutUserInput[] | VerificationTokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: VerificationTokenCreateOrConnectWithoutUserInput | VerificationTokenCreateOrConnectWithoutUserInput[]
@@ -30809,20 +32291,6 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
-  export type ResumeUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
-    upsert?: ResumeUpsertWithWhereUniqueWithoutUserInput | ResumeUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: ResumeCreateManyUserInputEnvelope
-    set?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    disconnect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    delete?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
-    update?: ResumeUpdateWithWhereUniqueWithoutUserInput | ResumeUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: ResumeUpdateManyWithWhereWithoutUserInput | ResumeUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
-  }
-
   export type LlmCallUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<LlmCallCreateWithoutUserInput, LlmCallUncheckedCreateWithoutUserInput> | LlmCallCreateWithoutUserInput[] | LlmCallUncheckedCreateWithoutUserInput[]
     connectOrCreate?: LlmCallCreateOrConnectWithoutUserInput | LlmCallCreateOrConnectWithoutUserInput[]
@@ -30835,6 +32303,20 @@ export namespace Prisma {
     update?: LlmCallUpdateWithWhereUniqueWithoutUserInput | LlmCallUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: LlmCallUpdateManyWithWhereWithoutUserInput | LlmCallUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: LlmCallScalarWhereInput | LlmCallScalarWhereInput[]
+  }
+
+  export type ResumeUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput> | ResumeCreateWithoutUserInput[] | ResumeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResumeCreateOrConnectWithoutUserInput | ResumeCreateOrConnectWithoutUserInput[]
+    upsert?: ResumeUpsertWithWhereUniqueWithoutUserInput | ResumeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ResumeCreateManyUserInputEnvelope
+    set?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    disconnect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    delete?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    connect?: ResumeWhereUniqueInput | ResumeWhereUniqueInput[]
+    update?: ResumeUpdateWithWhereUniqueWithoutUserInput | ResumeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ResumeUpdateManyWithWhereWithoutUserInput | ResumeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
   }
 
   export type GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput = {
@@ -30933,6 +32415,20 @@ export namespace Prisma {
     update?: InvoiceUpdateWithWhereUniqueWithoutUserInput | InvoiceUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: InvoiceUpdateManyWithWhereWithoutUserInput | InvoiceUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: InvoiceScalarWhereInput | InvoiceScalarWhereInput[]
+  }
+
+  export type ChatbotUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput> | ChatbotCreateWithoutUserInput[] | ChatbotUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ChatbotCreateOrConnectWithoutUserInput | ChatbotCreateOrConnectWithoutUserInput[]
+    upsert?: ChatbotUpsertWithWhereUniqueWithoutUserInput | ChatbotUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ChatbotCreateManyUserInputEnvelope
+    set?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    disconnect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    delete?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    connect?: ChatbotWhereUniqueInput | ChatbotWhereUniqueInput[]
+    update?: ChatbotUpdateWithWhereUniqueWithoutUserInput | ChatbotUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ChatbotUpdateManyWithWhereWithoutUserInput | ChatbotUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ChatbotScalarWhereInput | ChatbotScalarWhereInput[]
   }
 
   export type VerificationTokenUncheckedUpdateManyWithoutUserNestedInput = {
@@ -32697,6 +34193,22 @@ export namespace Prisma {
     push?: string | string[]
   }
 
+  export type UserCreateNestedOneWithoutChatbotInput = {
+    create?: XOR<UserCreateWithoutChatbotInput, UserUncheckedCreateWithoutChatbotInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChatbotInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneWithoutChatbotNestedInput = {
+    create?: XOR<UserCreateWithoutChatbotInput, UserUncheckedCreateWithoutChatbotInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChatbotInput
+    upsert?: UserUpsertWithoutChatbotInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutChatbotInput, UserUpdateWithoutChatbotInput>, UserUncheckedUpdateWithoutChatbotInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -33124,44 +34636,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type ResumeCreateWithoutUserInput = {
-    id?: string
-    filename: string
-    fileHash: string
-    mimeType: string
-    images?: ResumeCreateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    llmCalls?: LlmCallCreateNestedManyWithoutResumeInput
-    extractedResumes?: ExtractedResumeCreateNestedManyWithoutResumeInput
-    generatedRoasts?: GeneratedRoastCreateNestedManyWithoutResumeInput
-    generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutResumeInput
-  }
-
-  export type ResumeUncheckedCreateWithoutUserInput = {
-    id?: string
-    filename: string
-    fileHash: string
-    mimeType: string
-    images?: ResumeCreateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    llmCalls?: LlmCallUncheckedCreateNestedManyWithoutResumeInput
-    extractedResumes?: ExtractedResumeUncheckedCreateNestedManyWithoutResumeInput
-    generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutResumeInput
-    generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutResumeInput
-  }
-
-  export type ResumeCreateOrConnectWithoutUserInput = {
-    where: ResumeWhereUniqueInput
-    create: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput>
-  }
-
-  export type ResumeCreateManyUserInputEnvelope = {
-    data: ResumeCreateManyUserInput | ResumeCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
   export type LlmCallCreateWithoutUserInput = {
     id?: string
     provider: string
@@ -33217,6 +34691,44 @@ export namespace Prisma {
 
   export type LlmCallCreateManyUserInputEnvelope = {
     data: LlmCallCreateManyUserInput | LlmCallCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ResumeCreateWithoutUserInput = {
+    id?: string
+    filename: string
+    fileHash: string
+    mimeType: string
+    images?: ResumeCreateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    llmCalls?: LlmCallCreateNestedManyWithoutResumeInput
+    extractedResumes?: ExtractedResumeCreateNestedManyWithoutResumeInput
+    generatedRoasts?: GeneratedRoastCreateNestedManyWithoutResumeInput
+    generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutResumeInput
+  }
+
+  export type ResumeUncheckedCreateWithoutUserInput = {
+    id?: string
+    filename: string
+    fileHash: string
+    mimeType: string
+    images?: ResumeCreateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    llmCalls?: LlmCallUncheckedCreateNestedManyWithoutResumeInput
+    extractedResumes?: ExtractedResumeUncheckedCreateNestedManyWithoutResumeInput
+    generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutResumeInput
+    generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutResumeInput
+  }
+
+  export type ResumeCreateOrConnectWithoutUserInput = {
+    where: ResumeWhereUniqueInput
+    create: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput>
+  }
+
+  export type ResumeCreateManyUserInputEnvelope = {
+    data: ResumeCreateManyUserInput | ResumeCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -33478,6 +34990,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ChatbotCreateWithoutUserInput = {
+    id?: string
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChatbotUncheckedCreateWithoutUserInput = {
+    id?: string
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ChatbotCreateOrConnectWithoutUserInput = {
+    where: ChatbotWhereUniqueInput
+    create: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput>
+  }
+
+  export type ChatbotCreateManyUserInputEnvelope = {
+    data: ChatbotCreateManyUserInput | ChatbotCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type VerificationTokenCreateWithoutUserInput = {
     id?: string
     token: string
@@ -33533,36 +35075,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Session"> | Date | string
   }
 
-  export type ResumeUpsertWithWhereUniqueWithoutUserInput = {
-    where: ResumeWhereUniqueInput
-    update: XOR<ResumeUpdateWithoutUserInput, ResumeUncheckedUpdateWithoutUserInput>
-    create: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput>
-  }
-
-  export type ResumeUpdateWithWhereUniqueWithoutUserInput = {
-    where: ResumeWhereUniqueInput
-    data: XOR<ResumeUpdateWithoutUserInput, ResumeUncheckedUpdateWithoutUserInput>
-  }
-
-  export type ResumeUpdateManyWithWhereWithoutUserInput = {
-    where: ResumeScalarWhereInput
-    data: XOR<ResumeUpdateManyMutationInput, ResumeUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type ResumeScalarWhereInput = {
-    AND?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
-    OR?: ResumeScalarWhereInput[]
-    NOT?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
-    id?: StringFilter<"Resume"> | string
-    userId?: StringNullableFilter<"Resume"> | string | null
-    filename?: StringFilter<"Resume"> | string
-    fileHash?: StringFilter<"Resume"> | string
-    mimeType?: StringFilter<"Resume"> | string
-    images?: StringNullableListFilter<"Resume">
-    metadata?: JsonNullableFilter<"Resume">
-    createdAt?: DateTimeFilter<"Resume"> | Date | string
-  }
-
   export type LlmCallUpsertWithWhereUniqueWithoutUserInput = {
     where: LlmCallWhereUniqueInput
     update: XOR<LlmCallUpdateWithoutUserInput, LlmCallUncheckedUpdateWithoutUserInput>
@@ -33604,6 +35116,36 @@ export namespace Prisma {
     generatedInterviewPrepId?: StringNullableFilter<"LlmCall"> | string | null
     createdAt?: DateTimeFilter<"LlmCall"> | Date | string
     completedAt?: DateTimeNullableFilter<"LlmCall"> | Date | string | null
+  }
+
+  export type ResumeUpsertWithWhereUniqueWithoutUserInput = {
+    where: ResumeWhereUniqueInput
+    update: XOR<ResumeUpdateWithoutUserInput, ResumeUncheckedUpdateWithoutUserInput>
+    create: XOR<ResumeCreateWithoutUserInput, ResumeUncheckedCreateWithoutUserInput>
+  }
+
+  export type ResumeUpdateWithWhereUniqueWithoutUserInput = {
+    where: ResumeWhereUniqueInput
+    data: XOR<ResumeUpdateWithoutUserInput, ResumeUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ResumeUpdateManyWithWhereWithoutUserInput = {
+    where: ResumeScalarWhereInput
+    data: XOR<ResumeUpdateManyMutationInput, ResumeUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ResumeScalarWhereInput = {
+    AND?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
+    OR?: ResumeScalarWhereInput[]
+    NOT?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
+    id?: StringFilter<"Resume"> | string
+    userId?: StringNullableFilter<"Resume"> | string | null
+    filename?: StringFilter<"Resume"> | string
+    fileHash?: StringFilter<"Resume"> | string
+    mimeType?: StringFilter<"Resume"> | string
+    images?: StringNullableListFilter<"Resume">
+    metadata?: JsonNullableFilter<"Resume">
+    createdAt?: DateTimeFilter<"Resume"> | Date | string
   }
 
   export type GeneratedRoastUpsertWithWhereUniqueWithoutUserInput = {
@@ -33831,6 +35373,36 @@ export namespace Prisma {
     paidAt?: DateTimeNullableFilter<"Invoice"> | Date | string | null
   }
 
+  export type ChatbotUpsertWithWhereUniqueWithoutUserInput = {
+    where: ChatbotWhereUniqueInput
+    update: XOR<ChatbotUpdateWithoutUserInput, ChatbotUncheckedUpdateWithoutUserInput>
+    create: XOR<ChatbotCreateWithoutUserInput, ChatbotUncheckedCreateWithoutUserInput>
+  }
+
+  export type ChatbotUpdateWithWhereUniqueWithoutUserInput = {
+    where: ChatbotWhereUniqueInput
+    data: XOR<ChatbotUpdateWithoutUserInput, ChatbotUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ChatbotUpdateManyWithWhereWithoutUserInput = {
+    where: ChatbotScalarWhereInput
+    data: XOR<ChatbotUpdateManyMutationInput, ChatbotUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ChatbotScalarWhereInput = {
+    AND?: ChatbotScalarWhereInput | ChatbotScalarWhereInput[]
+    OR?: ChatbotScalarWhereInput[]
+    NOT?: ChatbotScalarWhereInput | ChatbotScalarWhereInput[]
+    id?: StringFilter<"Chatbot"> | string
+    userId?: StringNullableFilter<"Chatbot"> | string | null
+    anonymousId?: StringNullableFilter<"Chatbot"> | string | null
+    conversationId?: StringFilter<"Chatbot"> | string
+    message?: StringFilter<"Chatbot"> | string
+    role?: StringFilter<"Chatbot"> | string
+    llmMessageId?: StringNullableFilter<"Chatbot"> | string | null
+    createdAt?: DateTimeFilter<"Chatbot"> | Date | string
+  }
+
   export type VerificationTokenUpsertWithWhereUniqueWithoutUserInput = {
     where: VerificationTokenWhereUniqueInput
     update: XOR<VerificationTokenUpdateWithoutUserInput, VerificationTokenUncheckedUpdateWithoutUserInput>
@@ -33877,8 +35449,8 @@ export namespace Prisma {
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
@@ -33886,6 +35458,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -33906,8 +35479,8 @@ export namespace Prisma {
     lastRoastReset?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
@@ -33915,6 +35488,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -33951,8 +35525,8 @@ export namespace Prisma {
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
@@ -33960,6 +35534,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -33980,8 +35555,8 @@ export namespace Prisma {
     lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
@@ -33989,6 +35564,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34010,8 +35586,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
@@ -34019,6 +35595,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutVerificationTokensInput = {
@@ -34039,8 +35616,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
@@ -34048,6 +35625,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutVerificationTokensInput = {
@@ -34084,8 +35662,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
@@ -34093,6 +35671,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVerificationTokensInput = {
@@ -34113,8 +35692,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
@@ -34122,6 +35701,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutLlmCallsInput = {
@@ -34150,6 +35730,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -34179,6 +35760,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -34505,6 +36087,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -34534,6 +36117,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34991,6 +36575,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -35020,6 +36605,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -35241,6 +36827,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -35270,6 +36857,7 @@ export namespace Prisma {
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -36276,14 +37864,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -36305,14 +37894,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -36651,14 +38241,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -36680,14 +38271,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -36902,14 +38494,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -36931,14 +38524,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -37166,14 +38760,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -37195,14 +38790,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -37396,14 +38992,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -37425,14 +39022,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -37627,14 +39225,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -37656,14 +39255,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -37818,14 +39418,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -37847,14 +39448,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -38079,14 +39681,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -38108,14 +39711,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -38286,14 +39890,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -38315,14 +39920,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -38395,14 +40001,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -38424,14 +40031,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -38494,14 +40102,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     invoices?: InvoiceCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -38523,14 +40132,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -38605,14 +40215,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -38634,14 +40245,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -38706,14 +40318,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
-    resumes?: ResumeCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
   }
 
@@ -38735,14 +40348,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
     generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
     generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
     interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
     sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
+    chatbot?: ChatbotUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -38780,14 +40394,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -38809,14 +40424,151 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
     generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
     generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
     generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
     interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
     sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
+    chatbot?: ChatbotUncheckedUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutChatbotInput = {
+    id?: string
+    email: string
+    name?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    hashedPassword?: string | null
+    subscriptionTier?: $Enums.SubscriptionTier
+    subscriptionId?: string | null
+    customerId?: string | null
+    subscriptionEndsAt?: Date | string | null
+    monthlyRoasts?: number
+    totalRoasts?: number
+    bonusCredits?: number
+    lastRoastReset?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    llmCalls?: LlmCallCreateNestedManyWithoutUserInput
+    resumes?: ResumeCreateNestedManyWithoutUserInput
+    generatedRoasts?: GeneratedRoastCreateNestedManyWithoutUserInput
+    generatedCoverLetters?: GeneratedCoverLetterCreateNestedManyWithoutUserInput
+    generatedResumes?: GeneratedResumeCreateNestedManyWithoutUserInput
+    generatedInterviewPreps?: GeneratedInterviewPrepCreateNestedManyWithoutUserInput
+    interviewEvaluations?: InterviewEvaluationCreateNestedManyWithoutUserInput
+    sharedAnalyses?: SharedAnalysisCreateNestedManyWithoutUserInput
+    invoices?: InvoiceCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutChatbotInput = {
+    id?: string
+    email: string
+    name?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    hashedPassword?: string | null
+    subscriptionTier?: $Enums.SubscriptionTier
+    subscriptionId?: string | null
+    customerId?: string | null
+    subscriptionEndsAt?: Date | string | null
+    monthlyRoasts?: number
+    totalRoasts?: number
+    bonusCredits?: number
+    lastRoastReset?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    llmCalls?: LlmCallUncheckedCreateNestedManyWithoutUserInput
+    resumes?: ResumeUncheckedCreateNestedManyWithoutUserInput
+    generatedRoasts?: GeneratedRoastUncheckedCreateNestedManyWithoutUserInput
+    generatedCoverLetters?: GeneratedCoverLetterUncheckedCreateNestedManyWithoutUserInput
+    generatedResumes?: GeneratedResumeUncheckedCreateNestedManyWithoutUserInput
+    generatedInterviewPreps?: GeneratedInterviewPrepUncheckedCreateNestedManyWithoutUserInput
+    interviewEvaluations?: InterviewEvaluationUncheckedCreateNestedManyWithoutUserInput
+    sharedAnalyses?: SharedAnalysisUncheckedCreateNestedManyWithoutUserInput
+    invoices?: InvoiceUncheckedCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutChatbotInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutChatbotInput, UserUncheckedCreateWithoutChatbotInput>
+  }
+
+  export type UserUpsertWithoutChatbotInput = {
+    update: XOR<UserUpdateWithoutChatbotInput, UserUncheckedUpdateWithoutChatbotInput>
+    create: XOR<UserCreateWithoutChatbotInput, UserUncheckedCreateWithoutChatbotInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutChatbotInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutChatbotInput, UserUncheckedUpdateWithoutChatbotInput>
+  }
+
+  export type UserUpdateWithoutChatbotInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    monthlyRoasts?: IntFieldUpdateOperationsInput | number
+    totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
+    lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    llmCalls?: LlmCallUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUpdateManyWithoutUserNestedInput
+    generatedRoasts?: GeneratedRoastUpdateManyWithoutUserNestedInput
+    generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutUserNestedInput
+    generatedResumes?: GeneratedResumeUpdateManyWithoutUserNestedInput
+    generatedInterviewPreps?: GeneratedInterviewPrepUpdateManyWithoutUserNestedInput
+    interviewEvaluations?: InterviewEvaluationUpdateManyWithoutUserNestedInput
+    sharedAnalyses?: SharedAnalysisUpdateManyWithoutUserNestedInput
+    invoices?: InvoiceUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutChatbotInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionTier?: EnumSubscriptionTierFieldUpdateOperationsInput | $Enums.SubscriptionTier
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    monthlyRoasts?: IntFieldUpdateOperationsInput | number
+    totalRoasts?: IntFieldUpdateOperationsInput | number
+    bonusCredits?: IntFieldUpdateOperationsInput | number
+    lastRoastReset?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    llmCalls?: LlmCallUncheckedUpdateManyWithoutUserNestedInput
+    resumes?: ResumeUncheckedUpdateManyWithoutUserNestedInput
+    generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutUserNestedInput
+    generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutUserNestedInput
+    generatedResumes?: GeneratedResumeUncheckedUpdateManyWithoutUserNestedInput
+    generatedInterviewPreps?: GeneratedInterviewPrepUncheckedUpdateManyWithoutUserNestedInput
+    interviewEvaluations?: InterviewEvaluationUncheckedUpdateManyWithoutUserNestedInput
+    sharedAnalyses?: SharedAnalysisUncheckedUpdateManyWithoutUserNestedInput
+    invoices?: InvoiceUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -38824,16 +40576,6 @@ export namespace Prisma {
     id?: string
     sessionToken: string
     expires: Date | string
-    createdAt?: Date | string
-  }
-
-  export type ResumeCreateManyUserInput = {
-    id?: string
-    filename: string
-    fileHash: string
-    mimeType: string
-    images?: ResumeCreateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -38858,6 +40600,16 @@ export namespace Prisma {
     generatedInterviewPrepId?: string | null
     createdAt?: Date | string
     completedAt?: Date | string | null
+  }
+
+  export type ResumeCreateManyUserInput = {
+    id?: string
+    filename: string
+    fileHash: string
+    mimeType: string
+    images?: ResumeCreateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
   }
 
   export type GeneratedRoastCreateManyUserInput = {
@@ -38945,6 +40697,16 @@ export namespace Prisma {
     paidAt?: Date | string | null
   }
 
+  export type ChatbotCreateManyUserInput = {
+    id?: string
+    anonymousId?: string | null
+    conversationId: string
+    message: string
+    role: string
+    llmMessageId?: string | null
+    createdAt?: Date | string
+  }
+
   export type VerificationTokenCreateManyUserInput = {
     id?: string
     token: string
@@ -38972,44 +40734,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sessionToken?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ResumeUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    filename?: StringFieldUpdateOperationsInput | string
-    fileHash?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    images?: ResumeUpdateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    llmCalls?: LlmCallUpdateManyWithoutResumeNestedInput
-    extractedResumes?: ExtractedResumeUpdateManyWithoutResumeNestedInput
-    generatedRoasts?: GeneratedRoastUpdateManyWithoutResumeNestedInput
-    generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutResumeNestedInput
-  }
-
-  export type ResumeUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    filename?: StringFieldUpdateOperationsInput | string
-    fileHash?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    images?: ResumeUpdateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    llmCalls?: LlmCallUncheckedUpdateManyWithoutResumeNestedInput
-    extractedResumes?: ExtractedResumeUncheckedUpdateManyWithoutResumeNestedInput
-    generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutResumeNestedInput
-    generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutResumeNestedInput
-  }
-
-  export type ResumeUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    filename?: StringFieldUpdateOperationsInput | string
-    fileHash?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    images?: ResumeUpdateimagesInput | string[]
-    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39082,6 +40806,44 @@ export namespace Prisma {
     generatedInterviewPrepId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ResumeUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    images?: ResumeUpdateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    llmCalls?: LlmCallUpdateManyWithoutResumeNestedInput
+    extractedResumes?: ExtractedResumeUpdateManyWithoutResumeNestedInput
+    generatedRoasts?: GeneratedRoastUpdateManyWithoutResumeNestedInput
+    generatedCoverLetters?: GeneratedCoverLetterUpdateManyWithoutResumeNestedInput
+  }
+
+  export type ResumeUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    images?: ResumeUpdateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    llmCalls?: LlmCallUncheckedUpdateManyWithoutResumeNestedInput
+    extractedResumes?: ExtractedResumeUncheckedUpdateManyWithoutResumeNestedInput
+    generatedRoasts?: GeneratedRoastUncheckedUpdateManyWithoutResumeNestedInput
+    generatedCoverLetters?: GeneratedCoverLetterUncheckedUpdateManyWithoutResumeNestedInput
+  }
+
+  export type ResumeUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    images?: ResumeUpdateimagesInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GeneratedRoastUpdateWithoutUserInput = {
@@ -39355,6 +41117,36 @@ export namespace Prisma {
     itemCount?: IntFieldUpdateOperationsInput | number
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ChatbotUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatbotUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatbotUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    anonymousId?: NullableStringFieldUpdateOperationsInput | string | null
+    conversationId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    llmMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VerificationTokenUpdateWithoutUserInput = {
