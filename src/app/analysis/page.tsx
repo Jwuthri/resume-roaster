@@ -251,9 +251,21 @@ Note: Original resume text was not available, using analysis data for optimizati
             // Continue with existing data
             proceedWithExistingData()
           },
-          onCancel: () => {
-            // User wants fresh processing
-            proceedWithFreshExtraction(resumeText, selectedLLM, true) // Pass bypassCache=true
+          onCancel: async () => {
+            // User wants fresh processing - properly handle async operation
+            try {
+              await proceedWithFreshExtraction(resumeText, selectedLLM, true) // Pass bypassCache=true
+            } catch (error) {
+              console.error('Error in fresh extraction:', error)
+              // Show error to user
+              showAlert({
+                title: "Generation Failed",
+                description: error instanceof Error ? error.message : "Failed to generate new optimized resume. Please try again.",
+                type: "error",
+                confirmText: "OK"
+              })
+              setIsGeneratingOptimized(false)
+            }
           }
         })
         return

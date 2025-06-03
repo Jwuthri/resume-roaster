@@ -19,8 +19,8 @@ export interface AlertDialogProps {
   type?: 'info' | 'success' | 'warning' | 'error'
   confirmText?: string
   cancelText?: string
-  onConfirm?: () => void
-  onCancel?: () => void
+  onConfirm?: () => void | Promise<void>
+  onCancel?: () => void | Promise<void>
   showCancel?: boolean
 }
 
@@ -82,17 +82,39 @@ export function AlertDialog({
   onCancel,
   showCancel = false
 }: AlertDialogProps) {
+  const [isConfirmLoading, setIsConfirmLoading] = React.useState(false)
+  const [isCancelLoading, setIsCancelLoading] = React.useState(false)
   const colors = getAlertColors(type)
   const icon = getAlertIcon(type)
 
-  const handleConfirm = () => {
-    onConfirm?.()
-    onOpenChange(false)
+  const handleConfirm = async () => {
+    if (isConfirmLoading || isCancelLoading) return
+    
+    setIsConfirmLoading(true)
+    try {
+      await onConfirm?.()
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Error in confirm callback:', error)
+      // Don't close the dialog if there's an error
+    } finally {
+      setIsConfirmLoading(false)
+    }
   }
 
-  const handleCancel = () => {
-    onCancel?.()
-    onOpenChange(false)
+  const handleCancel = async () => {
+    if (isConfirmLoading || isCancelLoading) return
+    
+    setIsCancelLoading(true)
+    try {
+      await onCancel?.()
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Error in cancel callback:', error)
+      // Don't close the dialog if there's an error
+    } finally {
+      setIsCancelLoading(false)
+    }
   }
 
   return (
@@ -116,17 +138,33 @@ export function AlertDialog({
             <Button
               variant="outline"
               onClick={handleCancel}
+              disabled={isConfirmLoading || isCancelLoading}
               className="w-full sm:w-auto"
             >
-              {cancelText}
+              {isCancelLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                  Processing...
+                </>
+              ) : (
+                cancelText
+              )}
             </Button>
           )}
           <Button
             onClick={handleConfirm}
+            disabled={isConfirmLoading || isCancelLoading}
             className="w-full sm:w-auto"
             variant={type === 'error' ? 'destructive' : 'default'}
           >
-            {confirmText}
+            {isConfirmLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                Processing...
+              </>
+            ) : (
+              confirmText
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

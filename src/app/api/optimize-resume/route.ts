@@ -382,9 +382,22 @@ Please use the optimize_resume_data function to return the structured optimizati
         }
       })
 
-      // Save the optimized resume to database
-      const generatedResume = await db.generatedResume.create({
-        data: {
+      // Save the optimized resume to database using upsert to handle regeneration
+      const generatedResume = await db.generatedResume.upsert({
+        where: {
+          contentHash: contentHash
+        },
+        update: {
+          // Update existing record with new data (for regeneration)
+          content: optimizedContent,
+          data: optimizedData,
+          atsScore: atsScore,
+          keywordsMatched: keywordsMatched,
+          roastId: roastId,
+          extractedResumeId: analysis.extractedResumeId,
+          extractedJobId: analysis.extractedJobId
+        },
+        create: {
           userId: user.id,
           templateId: 'optimized-content', // Generic identifier for optimized content
           contentHash: contentHash,

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { resumeData, jobDescription, analysisData, roastId, llm = OPENAI_MODELS.MINI } = await request.json()
+    const { resumeData, jobDescription, analysisData, roastId, llm = OPENAI_MODELS.MINI, bypassCache = false } = await request.json()
 
     if (!resumeData) {
       return NextResponse.json(
@@ -26,9 +26,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get user from database
+    const user = await db.user.findUnique({
+      where: { email: session.user.email }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    console.log('=== INTERVIEW PREP DEBUG ===')
+    console.log('User ID:', user.id)
+    console.log('Roast ID:', roastId)
+    console.log('Selected LLM:', llm)
+    console.log('Bypass cache:', bypassCache)
+
     // Check if user can afford this model
-    const userId = session.user.id!
-    const affordability = await UserService.checkModelAffordability(userId, llm)
+    const affordability = await UserService.checkModelAffordability(user.id, llm)
     if (!affordability.canAfford) {
       return NextResponse.json(
         { 
@@ -41,27 +58,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create content hash for deduplication (include LLM in hash)
+    // Create content hash for deduplication (include LLM and userId in hash for user-specific caching)
     const contentString = JSON.stringify({
       resumeData,
       jobDescription: jobDescription || '',
       analysisData: analysisData || {},
-      llm
+      llm,
+      userId: user.id // Include userId to make cache user-specific
     })
     const contentHash = createHash('sha256').update(contentString).digest('hex')
 
-    // Check for existing interview prep with the same content hash
-    const existingInterviewPrep = await db.generatedInterviewPrep.findUnique({
-      where: { contentHash }
-    })
+    console.log('Content hash for user:', user.id, 'with LLM:', llm, 'is:', contentHash)
 
-    if (existingInterviewPrep) {
-      return NextResponse.json({
-        interviewPrep: existingInterviewPrep.data,
-        cached: true,
-        id: existingInterviewPrep.id,
-        usageCount: 1
+    // Check for existing interview prep with the same content hash AND user ID (unless bypassing)
+    if (!bypassCache) {
+      const existingInterviewPrep = await db.generatedInterviewPrep.findFirst({
+        where: { 
+          contentHash: contentHash,
+          userId: user.id // Ensure cache is user-specific
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
       })
+
+      if (existingInterviewPrep) {
+        console.log('Returning existing interview prep from database for user:', user.id)
+        
+        return NextResponse.json({
+          interviewPrep: existingInterviewPrep.data,
+          cached: true,
+          id: existingInterviewPrep.id,
+          usageCount: 1,
+          metadata: {
+            fromDatabase: true,
+            roastId: roastId
+          }
+        })
+      }
     }
 
     console.log('No existing interview prep found, generating new one...')
@@ -76,10 +110,19 @@ export async function POST(request: NextRequest) {
 
     console.log('Interview prep generated successfully')
 
+    // Deduct credits for successful model usage
+    try {
+      await UserService.deductModelCredits(user.id, llm)
+      console.log(`Successfully deducted ${affordability.creditCost} credits for model ${llm}`)
+    } catch (creditError) {
+      console.error('Failed to deduct credits:', creditError)
+      // Log the error but don't fail the request since the generation was successful
+    }
+
     // Save to database
     const savedInterviewPrep = await db.generatedInterviewPrep.create({
       data: {
-        userId: userId,
+        userId: user.id,
         roastId: roastId,
         contentHash,
         data: interviewPrepData as any,
@@ -87,11 +130,20 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    console.log('✅ Interview prep saved to database:')
+    console.log('   - Generated Interview Prep ID:', savedInterviewPrep.id)
+    console.log('   - User ID:', user.id)
+    console.log('   - Roast ID:', roastId)
+    console.log('   - Content Hash:', contentHash)
+
     return NextResponse.json({
       interviewPrep: interviewPrepData,
       cached: false,
       id: savedInterviewPrep.id,
-      usageCount: 1
+      usageCount: 1,
+      metadata: {
+        creditsDeducted: affordability.creditCost
+      }
     })
 
   } catch (error) {
