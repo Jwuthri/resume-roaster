@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers/session-provider";
 import { ChatbotProvider } from "@/components/providers/chatbot-provider";
 import { Toaster } from "sonner";
 import { Chatbot } from "@/components/ui/chatbot";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 export const metadata: Metadata = {
   title: "Resume Roaster - Brutally Honest Resume Feedback",
@@ -48,12 +49,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <Providers>
-          <ChatbotProvider>
-            {children}
-            <Chatbot />
-          </ChatbotProvider>
-        </Providers>
+        <PostHogProvider>
+          <Providers>
+            <ChatbotProvider>
+              {children}
+              <Chatbot />
+            </ChatbotProvider>
+          </Providers>
+        </PostHogProvider>
         <Toaster />
       </body>
     </html>

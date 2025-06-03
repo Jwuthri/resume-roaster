@@ -17,6 +17,7 @@ import { useFileExtraction } from "@/hooks/useFileExtraction"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Footer } from "@/components/ui/footer"
+import { PostHogTest } from "@/components/ui/posthog-test"
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -573,6 +574,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* PostHog Test Section - TEMPORARY FOR TESTING */}
+      {/* <section className="py-10 px-4 bg-gray-50">
+        <div className="container mx-auto">
+          <PostHogTest />
+        </div>
+      </section> */}
 
       {/* Features Section */}
       <section className="py-20 px-4 bg-white">

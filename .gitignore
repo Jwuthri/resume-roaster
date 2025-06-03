@@ -45,3 +45,5 @@ next-env.d.ts
 test-*.js
 debug-*.js
 src/app/api/debug/
+
+.env.local
