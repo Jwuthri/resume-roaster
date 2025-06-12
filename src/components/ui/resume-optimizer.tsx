@@ -475,7 +475,9 @@ export default function ResumeOptimizer() {
         experience: savedProfile.experience || [],
         education: savedProfile.education || [],
         skills: savedProfile.skills || prev.skills,
-        projects: savedProfile.projects || []
+        projects: savedProfile.projects || [],
+        publications: savedProfile.publications || [],
+        training: savedProfile.training || []
       }))
       setProfileDataLoaded(true)
     }

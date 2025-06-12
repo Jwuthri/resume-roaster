@@ -239,6 +239,7 @@ ${resumeContent}
 **JOB DESCRIPTION:**
 ${jobContent}
 
+Ignore the weird emojis/emoticons in the resume that might be a bad extraction from the PDF.
 Please provide a comprehensive analysis following the framework above.`
 
     await LLMLogger.logMessage({
