@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     // Save extracted data
     const savedExtracted = await ExtractedResumeService.create({
       resumeId: resumeId || crypto.randomUUID(),
+      userId: userId || undefined,
       contentHash,
       data: extractedData
     })

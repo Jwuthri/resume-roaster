@@ -43,6 +43,8 @@ model User {
   sessions                Session[]
   llmCalls                LlmCall[]
   resumes                 Resume[]
+  extractedResumes        ExtractedResume[]
+  extractedJobDescriptions ExtractedJobDescription[]
   generatedRoasts         GeneratedRoast[]
   generatedCoverLetters   GeneratedCoverLetter[]
   generatedResumes        GeneratedResume[]
@@ -212,31 +214,37 @@ model Resume {
 model ExtractedResume {
   id              String   @id @default(cuid())
   resumeId        String   @map("resume_id")
+  userId          String?  @map("user_id") // Track which user uploaded this resume
   contentHash     String   @unique @map("content_hash") // For deduplication
   data            Json     // Structured resume data
   createdAt       DateTime @default(now()) @map("created_at")
 
   // Relations
-  resume                Resume                @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  llmCalls              LlmCall[]
-  summarizedResumes     SummarizedResume[]
-  generatedRoasts       GeneratedRoast[]
-  generatedCoverLetters GeneratedCoverLetter[]
-  generatedResumes      GeneratedResume[]
+  resume                  Resume                   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  user                    User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  llmCalls                LlmCall[]
+  summarizedResumes       SummarizedResume[]
+  generatedRoasts         GeneratedRoast[]
+  generatedCoverLetters   GeneratedCoverLetter[]
+  generatedResumes        GeneratedResume[]
   generatedInterviewPreps GeneratedInterviewPrep[]
 
+  @@index([resumeId])
+  @@index([userId])
   @@index([contentHash])
   @@map("extracted_resumes")
 }
 
 model ExtractedJobDescription {
   id              String   @id @default(cuid())
+  userId          String?  @map("user_id") // Track which user uploaded this job description
   contentHash     String   @unique @map("content_hash") // For deduplication
   originalText    String   @db.Text @map("original_text")
   data            Json     // Structured job data
   createdAt       DateTime @default(now()) @map("created_at")
 
   // Relations
+  user                        User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
   llmCalls                    LlmCall[]
   summarizedJobDescriptions   SummarizedJobDescription[]
   generatedRoasts             GeneratedRoast[]
@@ -244,6 +252,7 @@ model ExtractedJobDescription {
   generatedResumes            GeneratedResume[]
   generatedInterviewPreps     GeneratedInterviewPrep[]
 
+  @@index([userId])
   @@index([contentHash])
   @@map("extracted_job_descriptions")
 }

@@ -124,6 +124,7 @@ export class ExtractedResumeService {
   // Create extracted resume data
   static async create(data: {
     resumeId: string
+    userId?: string
     contentHash: string
     data: any
   }) {
@@ -151,6 +152,7 @@ export class JobDescriptionService {
 
   // Create extracted job description
   static async create(data: {
+    userId?: string
     contentHash: string
     originalText: string
     data: any

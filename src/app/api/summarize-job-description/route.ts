@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Save the job description to ExtractedJobDescription table
       jobDescriptionRecord = await JobDescriptionService.create({
+        userId: userId || undefined,
         contentHash: jobDescriptionHash,
         originalText: jobDescription.trim(),
         data: {

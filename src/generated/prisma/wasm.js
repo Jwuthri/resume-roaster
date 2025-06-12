@@ -213,6 +213,7 @@ exports.Prisma.ResumeScalarFieldEnum = {
 exports.Prisma.ExtractedResumeScalarFieldEnum = {
   id: 'id',
   resumeId: 'resumeId',
+  userId: 'userId',
   contentHash: 'contentHash',
   data: 'data',
   createdAt: 'createdAt'
@@ -220,6 +221,7 @@ exports.Prisma.ExtractedResumeScalarFieldEnum = {
 
 exports.Prisma.ExtractedJobDescriptionScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   contentHash: 'contentHash',
   originalText: 'originalText',
   data: 'data',

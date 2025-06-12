@@ -256,24 +256,32 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      const savedExtracted = await ExtractedResumeService.create({
-        resumeId: savedResume.id,
-        contentHash: resumeContentHash,
-        data: {
-          text: extractedText,
-          pages: estimatedPages,
-          wordCount,
-          aiProvider: 'basic-extraction',
-          summary: "Resume content extracted using basic PDF extraction",
-          sections: ["Resume Content"],
-          processingTime
-        }
-      })
+      // Check if we already have extracted data for this resume
+      let extractedData = await ExtractedResumeService.findByHash(resumeContentHash)
+      
+      if (!extractedData) {
+        // Create new extracted data record
+        extractedData = await ExtractedResumeService.create({
+          resumeId: savedResume.id,
+          userId: userId || undefined, // Include the user ID
+          contentHash: resumeContentHash,
+          data: {
+            text: extractedText,
+            wordCount,
+            estimatedPages,
+            extractedAt: new Date().toISOString(),
+            extractionMethod: 'basic'
+          }
+        })
+        console.log('Created new extracted data record')
+      } else {
+        console.log('Using existing extracted data')
+      }
 
       const resultData: ExtractedResumeData = {
         text: extractedText,
         resumeId: savedResume.id,
-        extractedResumeId: savedExtracted.id,
+        extractedResumeId: extractedData.id,
         metadata: {
           pages: estimatedPages,
           wordCount,
@@ -294,7 +302,7 @@ export async function POST(request: NextRequest) {
         sections: ["Resume Content"],
         fromCache: false,
         resumeId: savedResume.id,
-        extractedResumeId: savedExtracted.id
+        extractedResumeId: extractedData.id
       })
 
     } finally {

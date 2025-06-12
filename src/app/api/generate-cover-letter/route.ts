@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       console.log('Job description is long, getting/creating summary...')
       
       try {
-        jobSummaryData = await getOrCreateJobSummary(jobDescription)
+        jobSummaryData = await getOrCreateJobSummary(jobDescription, user.id)
         effectiveJobDescription = jobSummaryData.summary
         console.log('Using job summary:', jobSummaryData.cached ? 'cached' : 'newly generated')
         console.log('Summary length:', effectiveJobDescription.length)

@@ -11,7 +11,7 @@ export function shouldSummarizeJobDescription(jobDescription: string, maxLength 
 /**
  * Get or create job description summary
  */
-export async function getOrCreateJobSummary(jobDescription: string) {
+export async function getOrCreateJobSummary(jobDescription: string, userId?: string) {
   // Generate content hash for caching
   const contentHash = crypto
     .createHash('sha256')
@@ -51,6 +51,7 @@ export async function getOrCreateJobSummary(jobDescription: string) {
   // First create the ExtractedJobDescription record
   const extractedJob = await db.extractedJobDescription.create({
     data: {
+      userId, // Include the user ID
       contentHash: contentHash + '_extracted', // Different hash for extracted vs summary
       originalText: jobDescription,
       data: {
