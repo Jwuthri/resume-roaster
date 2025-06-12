@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // For now, we'll use an in-memory store (resets on server restart)
 const roastCounts = new Map<string, { count: number; lastReset: string }>()
 
-const MAX_FREE_ROASTS = 3
+const MAX_FREE_ROASTS = 10
 
 function getClientFingerprint(request: NextRequest): string {
   // Create a simple fingerprint from IP and User-Agent

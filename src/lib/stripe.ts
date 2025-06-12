@@ -40,9 +40,9 @@ export const STRIPE_PRICE_IDS = typeof window === 'undefined' ? {
 export const SUBSCRIPTION_TIERS = {
   FREE: {
     name: 'Free',
-    monthlyRoasts: 5,
+    monthlyRoasts: 10,
     features: [
-      '5 credits per month',
+      '10 credits per month',
       'AI-powered PDF extraction',
       'Basic markdown formatting',
       'Claude 4 Sonnet analysis',

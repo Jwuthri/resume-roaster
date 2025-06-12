@@ -32,7 +32,9 @@ import {
   User,
   Save,
   Edit3,
-  RefreshCw
+  RefreshCw,
+  BookOpen,
+  Award
 } from "lucide-react"
 import { ResumeData } from "@/lib/resume-templates"
 import { generatePDF, generateDOCX, downloadBlob } from "@/lib/document-generators"
@@ -129,7 +131,9 @@ const sampleResumeData: ResumeData = {
       technologies: ["React", "Node.js", "MongoDB", "Stripe"],
       link: "https://github.com/alexjohnson/ecommerce"
     }
-  ]
+  ],
+  publications: [],
+  training: []
 }
 
 // localStorage utilities for resume data - Updated to exclude job description
@@ -162,6 +166,8 @@ interface UserProfile {
   education?: ResumeData['education']
   skills?: ResumeData['skills']
   projects?: ResumeData['projects']
+  publications?: ResumeData['publications']
+  training?: ResumeData['training']
   lastUpdated: string
 }
 
@@ -196,7 +202,9 @@ export default function ResumeOptimizer() {
       languages: [],
       certifications: []
     },
-    projects: []
+    projects: [],
+    publications: [],
+    training: []
   })
   
   const [jobDescription, setJobDescription] = useState('')
@@ -287,6 +295,27 @@ export default function ResumeOptimizer() {
                     technologies: Array.isArray(proj.technologies) ? proj.technologies : [],
                     link: proj.link || ''
                   }))
+                : [],
+              publications: (Array.isArray(parsedData.publications) && parsedData.publications.length > 0)
+                ? parsedData.publications.map((pub: any) => ({
+                    title: pub.title || '',
+                    authors: pub.authors || '',
+                    journal: pub.journal || '',
+                    conference: pub.conference || '',
+                    year: pub.year || '',
+                    doi: pub.doi || '',
+                    link: pub.link || ''
+                  }))
+                : [],
+              training: (Array.isArray(parsedData.training) && parsedData.training.length > 0)
+                ? parsedData.training.map((cert: any) => ({
+                    name: cert.name || '',
+                    provider: cert.provider || '',
+                    completionDate: cert.completionDate || '',
+                    expirationDate: cert.expirationDate || '',
+                    credentialId: cert.credentialId || '',
+                    link: cert.link || ''
+                  }))
                 : []
             }
             
@@ -356,7 +385,28 @@ export default function ResumeOptimizer() {
                     technologies: Array.isArray(proj.technologies) ? proj.technologies : [],
                     link: proj.link || ''
                   }))
-                : savedProfile?.projects || []
+                : savedProfile?.projects || [],
+              publications: (Array.isArray(parsedData.publications) && parsedData.publications.length > 0)
+                ? parsedData.publications.map((pub: any) => ({
+                    title: pub.title || '',
+                    authors: pub.authors || '',
+                    journal: pub.journal || '',
+                    conference: pub.conference || '',
+                    year: pub.year || '',
+                    doi: pub.doi || '',
+                    link: pub.link || ''
+                  }))
+                : savedProfile?.publications || [],
+              training: (Array.isArray(parsedData.training) && parsedData.training.length > 0)
+                ? parsedData.training.map((cert: any) => ({
+                    name: cert.name || '',
+                    provider: cert.provider || '',
+                    completionDate: cert.completionDate || '',
+                    expirationDate: cert.expirationDate || '',
+                    credentialId: cert.credentialId || '',
+                    link: cert.link || ''
+                  }))
+                : savedProfile?.training || []
             }
             
             setResumeData(mergedData)
@@ -382,6 +432,29 @@ export default function ResumeOptimizer() {
           
           console.log('Successfully loaded prefilled data from analysis')
           return // Exit early if we loaded prefilled data
+        } else if (isFromAnalysisFlag) {
+          // We're from analysis but don't have structured resume data
+          // This can happen with older analyses - we should still show the optimizer
+          console.log('From analysis but no structured resume data - user can still use optimizer')
+          setIsFromAnalysis(true)
+          setHasOptimizedData(false)
+          
+          // Still set job description if available
+          if (analysisJobDescription) {
+            setJobDescription(analysisJobDescription)
+          }
+          
+          // Clean up session storage
+          sessionStorage.removeItem('optimizedResumeData')
+          sessionStorage.removeItem('extractedResumeData')
+          sessionStorage.removeItem('analysisJobDescription')
+          sessionStorage.removeItem('isFromAnalysis')
+          sessionStorage.removeItem('optimizedDataTimestamp')
+          sessionStorage.removeItem('extractedDataTimestamp')
+          
+          // Remove the prefilled parameter from URL
+          const newUrl = window.location.pathname
+          window.history.replaceState({}, '', newUrl)
         }
       } catch (error) {
         console.error('Failed to load prefilled data:', error)
@@ -474,6 +547,8 @@ export default function ResumeOptimizer() {
         education: resumeData.education,
         skills: resumeData.skills,
         projects: resumeData.projects,
+        publications: resumeData.publications,
+        training: resumeData.training,
         lastUpdated: new Date().toISOString()
       }
       saveToLocalStorage(RESUME_DATA_KEY, profileToSave)
@@ -504,7 +579,9 @@ export default function ResumeOptimizer() {
         languages: [],
         certifications: []
       },
-      projects: []
+      projects: [],
+      publications: [],
+      training: []
     })
     setJobDescription('')
     setProfileDataLoaded(false)
@@ -644,6 +721,79 @@ export default function ResumeOptimizer() {
     setResumeData(prev => ({
       ...prev,
       projects: (prev.projects || []).filter((_, i) => i !== index)
+    }))
+  }
+
+  // Function to add publication
+  const addPublication = () => {
+    setResumeData(prev => ({
+      ...prev,
+      publications: [
+        ...(prev.publications || []),
+        {
+          title: '',
+          authors: '',
+          journal: '',
+          conference: '',
+          year: '',
+          doi: '',
+          link: ''
+        }
+      ]
+    }))
+  }
+
+  // Function to update publication
+  const updatePublication = (index: number, field: string, value: any) => {
+    setResumeData(prev => ({
+      ...prev,
+      publications: (prev.publications || []).map((pub, i) => 
+        i === index ? { ...pub, [field]: value } : pub
+      )
+    }))
+  }
+
+  // Function to remove publication
+  const removePublication = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      publications: (prev.publications || []).filter((_, i) => i !== index)
+    }))
+  }
+
+  // Function to add training/certification
+  const addTraining = () => {
+    setResumeData(prev => ({
+      ...prev,
+      training: [
+        ...(prev.training || []),
+        {
+          name: '',
+          provider: '',
+          completionDate: '',
+          expirationDate: '',
+          credentialId: '',
+          link: ''
+        }
+      ]
+    }))
+  }
+
+  // Function to update training/certification
+  const updateTraining = (index: number, field: string, value: any) => {
+    setResumeData(prev => ({
+      ...prev,
+      training: (prev.training || []).map((cert, i) => 
+        i === index ? { ...cert, [field]: value } : cert
+      )
+    }))
+  }
+
+  // Function to remove training/certification
+  const removeTraining = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      training: (prev.training || []).filter((_, i) => i !== index)
     }))
   }
 
@@ -880,6 +1030,25 @@ ${proj.name}: ${proj.description}
 Technologies: ${proj.technologies.join(', ')}
 Link: ${proj.link}
 `).join('\n') || ''}
+
+PUBLICATIONS:
+${resumeData.publications?.map(pub => `
+${pub.title}
+Authors: ${pub.authors}
+Published in: ${pub.journal || pub.conference || ''} (${pub.year})
+DOI: ${pub.doi || 'N/A'}
+Link: ${pub.link || 'N/A'}
+`).join('\n') || 'None'}
+
+TRAINING & CERTIFICATIONS:
+${resumeData.training?.map(cert => `
+${cert.name}
+Provider: ${cert.provider}
+Completed: ${cert.completionDate}
+Expires: ${cert.expirationDate || 'N/A'}
+Credential ID: ${cert.credentialId || 'N/A'}
+Link: ${cert.link || 'N/A'}
+`).join('\n') || 'None'}
         `.trim()
 
         const extractResponse = await fetch('/api/extract-resume', {
@@ -1190,7 +1359,7 @@ Link: ${proj.link}
             <div className="lg:col-span-8">
               <Tabs defaultValue="basic" className="space-y-8">
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border-0">
-                  <TabsList className="grid w-full grid-cols-4 bg-gray-100 p-1 rounded-lg">
+                  <TabsList className="grid w-full grid-cols-6 bg-gray-100 p-1 rounded-lg">
                     <TabsTrigger value="basic" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
                       <User className="h-4 w-4 mr-2" />
                       Basic Info
@@ -1202,6 +1371,14 @@ Link: ${proj.link}
                     <TabsTrigger value="education" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
                       <FileText className="h-4 w-4 mr-2" />
                       Education
+                    </TabsTrigger>
+                    <TabsTrigger value="publications" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Publications
+                    </TabsTrigger>
+                    <TabsTrigger value="training" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Training
                     </TabsTrigger>
                     <TabsTrigger value="optimize" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
                       <Zap className="h-4 w-4 mr-2" />
@@ -1724,6 +1901,263 @@ Link: ${proj.link}
                           >
                             <Code className="h-4 w-4 mr-2" />
                             Add Your First Project
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="publications" className="space-y-6">
+                  {/* Publications Section */}
+                  <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                          <span>Publications</span>
+                        </CardTitle>
+                        <Button 
+                          onClick={addPublication} 
+                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg"
+                          size="sm"
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Add Publication
+                        </Button>
+                      </div>
+                      <CardDescription>
+                        Add your research publications, papers, and academic contributions (optional)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      {(resumeData.publications || []).map((publication, index) => (
+                        <div key={index} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 space-y-4">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-semibold text-gray-900 flex items-center">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-sm font-bold text-blue-600">{index + 1}</span>
+                              </div>
+                              Publication {index + 1}
+                            </h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removePublication(index)}
+                              className="text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                            >
+                              <span className="mr-2">✕</span>
+                              Remove
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700">Title</Label>
+                              <Input
+                                value={publication.title}
+                                onChange={(e) => updatePublication(index, 'title', e.target.value)}
+                                placeholder="Machine Learning Applications in Healthcare"
+                                className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700">Authors</Label>
+                              <Input
+                                value={publication.authors}
+                                onChange={(e) => updatePublication(index, 'authors', e.target.value)}
+                                placeholder="Smith, J., Doe, A., Johnson, M."
+                                className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Journal</Label>
+                                <Input
+                                  value={publication.journal || ''}
+                                  onChange={(e) => updatePublication(index, 'journal', e.target.value)}
+                                  placeholder="Nature Machine Intelligence"
+                                  className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Conference</Label>
+                                <Input
+                                  value={publication.conference || ''}
+                                  onChange={(e) => updatePublication(index, 'conference', e.target.value)}
+                                  placeholder="ICML 2024"
+                                  className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Year</Label>
+                                <Input
+                                  value={publication.year}
+                                  onChange={(e) => updatePublication(index, 'year', e.target.value)}
+                                  placeholder="2024"
+                                  className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">DOI (optional)</Label>
+                                <Input
+                                  value={publication.doi || ''}
+                                  onChange={(e) => updatePublication(index, 'doi', e.target.value)}
+                                  placeholder="10.1038/s42256-024-00000-0"
+                                  className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Link (optional)</Label>
+                                <Input
+                                  value={publication.link || ''}
+                                  onChange={(e) => updatePublication(index, 'link', e.target.value)}
+                                  placeholder="https://doi.org/10.1038/..."
+                                  className="mt-1 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {(!resumeData.publications || resumeData.publications.length === 0) && (
+                        <div className="text-center py-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FileText className="h-8 w-8 text-blue-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">No publications added yet</h3>
+                          <p className="text-gray-600 mb-4">Add your research publications and academic contributions</p>
+                          <Button 
+                            onClick={addPublication}
+                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Add Your First Publication
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="training" className="space-y-6">
+                  {/* Training & Certifications Section */}
+                  <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-xl">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <span>Training & Certifications</span>
+                        </CardTitle>
+                        <Button 
+                          onClick={addTraining} 
+                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg"
+                          size="sm"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Add Certification
+                        </Button>
+                      </div>
+                      <CardDescription>
+                        Add your professional certifications, training courses, and credentials (optional)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      {(resumeData.training || []).map((cert, index) => (
+                        <div key={index} className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 space-y-4">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-semibold text-gray-900 flex items-center">
+                              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-sm font-bold text-green-600">{index + 1}</span>
+                              </div>
+                              Certification {index + 1}
+                            </h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeTraining(index)}
+                              className="text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                            >
+                              <span className="mr-2">✕</span>
+                              Remove
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700">Certification Name</Label>
+                              <Input
+                                value={cert.name}
+                                onChange={(e) => updateTraining(index, 'name', e.target.value)}
+                                placeholder="AWS Certified Solutions Architect"
+                                className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700">Provider</Label>
+                              <Input
+                                value={cert.provider}
+                                onChange={(e) => updateTraining(index, 'provider', e.target.value)}
+                                placeholder="Amazon Web Services"
+                                className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Completion Date</Label>
+                                <Input
+                                  value={cert.completionDate}
+                                  onChange={(e) => updateTraining(index, 'completionDate', e.target.value)}
+                                  placeholder="March 2024"
+                                  className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Expiration Date (optional)</Label>
+                                <Input
+                                  value={cert.expirationDate || ''}
+                                  onChange={(e) => updateTraining(index, 'expirationDate', e.target.value)}
+                                  placeholder="March 2027"
+                                  className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Credential ID (optional)</Label>
+                                <Input
+                                  value={cert.credentialId || ''}
+                                  onChange={(e) => updateTraining(index, 'credentialId', e.target.value)}
+                                  placeholder="AWS-SAA-123456789"
+                                  className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium text-gray-700">Verification Link (optional)</Label>
+                                <Input
+                                  value={cert.link || ''}
+                                  onChange={(e) => updateTraining(index, 'link', e.target.value)}
+                                  placeholder="https://aws.amazon.com/verification/..."
+                                  className="mt-1 border-gray-200 focus:border-green-400 focus:ring-green-400"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {(!resumeData.training || resumeData.training.length === 0) && (
+                        <div className="text-center py-12 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="h-8 w-8 text-green-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">No certifications added yet</h3>
+                          <p className="text-gray-600 mb-4">Add your professional certifications and training</p>
+                          <Button 
+                            onClick={addTraining}
+                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Add Your First Certification
                           </Button>
                         </div>
                       )}

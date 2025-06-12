@@ -38,7 +38,7 @@ export default function HelpPage() {
     {
       category: "Account & Billing",
       question: "How many free roasts do I get?",
-      answer: "New users get 3 free resume roasts. After that, you can upgrade to our Pro plan for unlimited roasts and premium features."
+      answer: "New users get 10 free resume roasts. After that, you can upgrade to our Pro plan for unlimited roasts and premium features."
     },
     {
       category: "Account & Billing",

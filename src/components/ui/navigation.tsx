@@ -26,9 +26,9 @@ export function Navigation({ currentPage }: NavigationProps) {
   const isAuthenticated = status === 'authenticated'
 
   const navigationItems = [
-    { name: 'Resume Optimizer', path: '/resume-optimizer', showAlways: true },
-    { name: 'Pricing', path: '/pricing', showAlways: true },
+    // { name: 'Resume Optimizer', path: '/resume-optimizer', showAlways: true },
     { name: 'Dashboard', path: '/dashboard', authRequired: true },
+    { name: 'Pricing', path: '/pricing', showAlways: true },
     { name: 'Settings', path: '/settings', authRequired: true },
   ]
 
@@ -75,9 +75,9 @@ export function Navigation({ currentPage }: NavigationProps) {
                   <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/resume-optimizer')}>
+                  {/* <DropdownMenuItem onClick={() => router.push('/resume-optimizer')}>
                     Resume Optimizer
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem onClick={() => router.push('/pricing')}>
                     Pricing
                   </DropdownMenuItem>

@@ -65,6 +65,7 @@ function DashboardContent() {
   const [showResumeOptimizationModal, setShowResumeOptimizationModal] = useState(false)
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisResult | null>(null)
   const [isGeneratingOptimized, setIsGeneratingOptimized] = useState(false)
+  const [isLoadingOptimizer, setIsLoadingOptimizer] = useState<string | null>(null)
   
   const { showAlert, AlertDialog } = useAlertDialog()
 
@@ -348,12 +349,43 @@ function DashboardContent() {
     setShowResumeOptimizationModal(true)
   }
 
-  // New function to route to resume optimizer with pre-filled data
-  const routeToResumeOptimizer = (analysis: AnalysisResult) => {
+  // Function to route to resume optimizer with pre-filled data
+  const routeToResumeOptimizer = async (analysis: AnalysisResult) => {
     try {
-      // Store the resume data and job description in sessionStorage
-      if (analysis.data.resumeData) {
-        sessionStorage.setItem('optimizedResumeData', JSON.stringify(analysis.data.resumeData))
+      // First, try to get cached optimized resume data for this analysis
+      let resumeDataToStore = analysis.data.resumeData
+      
+      // Check if there's a cached optimized resume for this analysis
+      try {
+        const cachedResponse = await fetch('/api/optimize-resume', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            roastId: analysis.id,
+            llm: 'gpt-4o-mini' // Use default model for cache check
+          }),
+        })
+        
+        if (cachedResponse.ok) {
+          const cachedResult = await cachedResponse.json()
+          if (cachedResult.success && cachedResult.cached && cachedResult.data) {
+            // Use the cached optimized data instead of the original analysis data
+            resumeDataToStore = cachedResult.data
+            console.log('Found cached optimized resume data, using it for optimizer')
+          }
+        }
+      } catch (cacheError) {
+        console.log('No cached data found or error checking cache, using original analysis data')
+      }
+      
+      // Store the resume data (either cached optimized or original analysis data)
+      if (resumeDataToStore) {
+        sessionStorage.setItem('optimizedResumeData', JSON.stringify(resumeDataToStore))
+        console.log('Stored resume data for optimizer')
+      } else {
+        console.log('No structured resume data available - optimizer will extract from analysis')
       }
       
       if (analysis.data.jobDescription) {
@@ -432,10 +464,22 @@ function DashboardContent() {
         // Store the optimized result in sessionStorage for the download page
         sessionStorage.setItem('optimizedResumeResult', JSON.stringify(transformedResult))
         
-        // Store resume data if available from the analysis, or create a fallback
-        let resumeDataForDownload = selectedAnalysis.data.resumeData
-        if (!resumeDataForDownload) {
-          // Create a minimal fallback resume data object
+        // Store resume data - prioritize the optimized data from the API result (which includes cached data)
+        let resumeDataForDownload = null
+        
+        // First, try to use the optimized data from the API result (this includes cached data from generated_resume.data)
+        if (result.data && typeof result.data === 'object') {
+          resumeDataForDownload = result.data
+          console.log('Using optimized resume data from API result (includes cached data)')
+        }
+        // Fallback to analysis data if no optimized data available
+        else if (selectedAnalysis.data.resumeData) {
+          resumeDataForDownload = selectedAnalysis.data.resumeData
+          console.log('Using resume data from analysis as fallback')
+        }
+        // Last resort: create minimal fallback
+        else {
+          console.log('No structured resume data available - creating minimal fallback')
           resumeDataForDownload = {
             personalInfo: {
               name: 'Your Name',
@@ -881,10 +925,30 @@ function DashboardContent() {
                               variant="outline" 
                               className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300" 
                               size="sm"
-                              onClick={() => routeToResumeOptimizer(analysis)}
+                              disabled={isLoadingOptimizer === analysis.id}
+                              onClick={async () => {
+                                try {
+                                  setIsLoadingOptimizer(analysis.id)
+                                  await routeToResumeOptimizer(analysis)
+                                } catch (error) {
+                                  console.error('Error routing to resume optimizer:', error)
+                                  toast.error('Failed to load resume optimizer. Please try again.')
+                                } finally {
+                                  setIsLoadingOptimizer(null)
+                                }
+                              }}
                             >
-                              <Sparkles className="h-4 w-4 mr-2" />
-                              Optimize Resume
+                              {isLoadingOptimizer === analysis.id ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500 mr-2"></div>
+                                  Loading...
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="h-4 w-4 mr-2" />
+                                  Optimize Resume
+                                </>
+                              )}
                             </Button>
                           </div>
                         )}

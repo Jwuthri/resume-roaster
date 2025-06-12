@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
                 
                 <p>Once verified, you'll get access to:</p>
                 <ul style="color: #666;">
-                  <li>3 free resume roasts to get started</li>
+                  <li>10 free resume roasts to get started</li>
                   <li>Detailed feedback on your resume's strengths and weaknesses</li>
                   <li>ATS optimization suggestions</li>
                   <li>Professional resume templates</li>

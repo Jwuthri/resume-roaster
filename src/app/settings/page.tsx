@@ -188,8 +188,8 @@ export default function SettingsPage() {
                         <span className="text-sm font-medium text-gray-700">Resume Credits This Month</span>
                         <span className="text-sm text-gray-600">
                           {subscription?.monthlyRoasts || 0} / {
-                            subscription?.tier === 'FREE' ? '3' :
-                            subscription?.tier === 'PLUS' ? '100' : 
+                            subscription?.tier === 'FREE' ? '10' :
+                            subscription?.tier === 'PLUS' ? '200' : 
                             'Unlimited'
                           }
                         </span>
@@ -199,13 +199,13 @@ export default function SettingsPage() {
                           <div 
                             className={`h-2 rounded-full transition-all ${
                               subscription?.tier === 'FREE' 
-                                ? getUsageColor(5 - (subscription?.monthlyRoasts || 0), 5)
-                                : getUsageColor(100 - (subscription?.monthlyRoasts || 0), 100)
+                                ? getUsageColor(10 - (subscription?.monthlyRoasts || 0), 10)
+                                : getUsageColor(200 - (subscription?.monthlyRoasts || 0), 200)
                             }`}
                             style={{
                               width: subscription?.tier === 'FREE' 
-                                ? `${Math.min(((subscription?.monthlyRoasts || 0) / 5) * 100, 100)}%`
-                                : `${Math.min(((subscription?.monthlyRoasts || 0) / 100) * 100, 100)}%`
+                                ? `${Math.min(((subscription?.monthlyRoasts || 0) / 10) * 100, 100)}%`
+                                : `${Math.min(((subscription?.monthlyRoasts || 0) / 200) * 100, 100)}%`
                             }}
                           />
                         </div>

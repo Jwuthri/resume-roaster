@@ -360,7 +360,7 @@ export class UserService {
 
     // Get limits based on subscription tier
     const MONTHLY_LIMITS = {
-      FREE: 5,
+      FREE: 10,
       PLUS: 200,
       PREMIUM: -1 // Unlimited
     } as const
@@ -405,7 +405,7 @@ export class UserService {
     let bonusDecrement = 0
 
     // First use monthly allowance, then bonus credits
-    const monthlyLimit = user.subscriptionTier === 'FREE' ? 5 : 
+    const monthlyLimit = user.subscriptionTier === 'FREE' ? 10 : 
                         user.subscriptionTier === 'PLUS' ? 200 : -1
     
     if (monthlyLimit === -1) {

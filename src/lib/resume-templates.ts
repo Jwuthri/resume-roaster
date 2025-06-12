@@ -40,6 +40,23 @@ export interface ResumeData {
     technologies: string[]
     link?: string
   }>
+  publications?: Array<{
+    title: string
+    authors: string
+    journal?: string
+    conference?: string
+    year: string
+    doi?: string
+    link?: string
+  }>
+  training?: Array<{
+    name: string
+    provider: string
+    completionDate: string
+    expirationDate?: string
+    credentialId?: string
+    link?: string
+  }>
 }
 
 export interface ResumeTemplate {
@@ -265,6 +282,70 @@ export const yourResumeTemplate: ResumeTemplate = {
             font-style: italic;
         }
         
+        .publication-item {
+            margin-bottom: 15px;
+        }
+        
+        .publication-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 3px;
+        }
+        
+        .publication-authors {
+            font-style: italic;
+            font-size: 11pt;
+            margin-bottom: 3px;
+        }
+        
+        .publication-venue {
+            font-size: 11pt;
+            color: #333;
+        }
+        
+        .publication-venue a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .training-item {
+            margin-bottom: 15px;
+        }
+        
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 3px;
+        }
+        
+        .training-name {
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        
+        .training-date {
+            font-style: italic;
+            font-size: 11pt;
+            color: #333;
+        }
+        
+        .training-provider {
+            font-style: italic;
+            font-size: 11pt;
+            margin-bottom: 3px;
+        }
+        
+        .training-details {
+            font-size: 11pt;
+            color: #333;
+        }
+        
+        .training-details a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
         @media print {
             html {
                 background: white !important;
@@ -367,6 +448,45 @@ export const yourResumeTemplate: ResumeTemplate = {
         `).join('')}
     </div>
 
+    ${data.publications && data.publications.length > 0 ? `
+    <div class="section">
+        <div class="section-title">Publications</div>
+        ${data.publications.map(pub => `
+            <div class="publication-item">
+                <div class="publication-title">${pub.title}</div>
+                <div class="publication-authors">${pub.authors}</div>
+                <div class="publication-venue">
+                    ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+                    ${pub.doi ? ` • DOI: ${pub.doi}` : ''}
+                    ${pub.link ? ` • <a href="${pub.link}" target="_blank">Link</a>` : ''}
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.training && data.training.length > 0 ? `
+    <div class="section">
+        <div class="section-title">Training & Certifications</div>
+        ${data.training.map(cert => `
+            <div class="training-item">
+                <div class="training-header">
+                    <div class="training-name">${cert.name}</div>
+                    <div class="training-date">${cert.completionDate}</div>
+                </div>
+                <div class="training-provider">${cert.provider}</div>
+                ${cert.expirationDate || cert.credentialId || cert.link ? `
+                <div class="training-details">
+                    ${cert.expirationDate ? `Expires: ${cert.expirationDate}` : ''}
+                    ${cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}
+                    ${cert.link ? ` • <a href="${cert.link}" target="_blank">Verify</a>` : ''}
+                </div>
+                ` : ''}
+            </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
 </body>
 </html>
     `
@@ -436,6 +556,31 @@ ${project.description}
 
 **🔧 Technologies:** \`${project.technologies.join('`, `')}\`
 ${project.link ? `**🔗 Link:** ${project.link}` : ''}
+`).join('\n')}
+` : ''}
+
+${data.publications && data.publications.length > 0 ? `
+## Publications
+
+${data.publications.map(pub => `
+### ${pub.title}
+**Authors:** ${pub.authors}
+**Published in:** ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+${pub.doi ? `**DOI:** ${pub.doi}` : ''}
+${pub.link ? `**Link:** [View Publication](${pub.link})` : ''}
+`).join('\n')}
+` : ''}
+
+${data.training && data.training.length > 0 ? `
+## Training & Certifications
+
+${data.training.map(cert => `
+### ${cert.name}
+**Provider:** ${cert.provider}
+**Completed:** ${cert.completionDate}
+${cert.expirationDate ? `**Expires:** ${cert.expirationDate}` : ''}
+${cert.credentialId ? `**Credential ID:** ${cert.credentialId}` : ''}
+${cert.link ? `**Verify:** [View Certificate](${cert.link})` : ''}
 `).join('\n')}
 ` : ''}
 
@@ -818,6 +963,45 @@ export const modernTechTemplate: ResumeTemplate = {
                 `).join('')}
             </div>
         </div>
+
+        ${data.publications && data.publications.length > 0 ? `
+        <div class="section">
+            <div class="prompt">$ </div><span class="command">cat publications.bib</span>
+            <div class="output">
+                ${data.publications.map(pub => `
+                    <div class="education-item">
+                        <div class="degree">${pub.title}</div>
+                        <div class="school">${pub.authors}</div>
+                        <div class="edu-details">
+                            ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+                            ${pub.doi ? ` • DOI: ${pub.doi}` : ''}
+                            ${pub.link ? ` • <a href="${pub.link}" style="color: #63b3ed;">🔗 Link</a>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        ${data.training && data.training.length > 0 ? `
+        <div class="section">
+            <div class="prompt">$ </div><span class="command">ls certifications/</span>
+            <div class="output">
+                ${data.training.map(cert => `
+                    <div class="education-item">
+                        <div class="degree">${cert.name}</div>
+                        <div class="school">${cert.provider}</div>
+                        <div class="edu-details">
+                            Completed: ${cert.completionDate}
+                            ${cert.expirationDate ? ` • Expires: ${cert.expirationDate}` : ''}
+                            ${cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}
+                            ${cert.link ? ` • <a href="${cert.link}" style="color: #63b3ed;">🔗 Verify</a>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
     </div>
 </body>
 </html>
@@ -895,6 +1079,31 @@ ${data.education.map(edu => `
 ${edu.gpa ? `📊 **GPA:** ${edu.gpa}` : ''}
 ${edu.honors ? `🏅 **Honors:** ${edu.honors.join(', ')}` : ''}
 `).join('\n')}
+
+${data.publications && data.publications.length > 0 ? `
+## Publications
+
+${data.publications.map(pub => `
+### ${pub.title}
+**Authors:** ${pub.authors}
+**Published in:** ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+${pub.doi ? `**DOI:** ${pub.doi}` : ''}
+${pub.link ? `**Link:** [View Publication](${pub.link})` : ''}
+`).join('\n')}
+` : ''}
+
+${data.training && data.training.length > 0 ? `
+## Training & Certifications
+
+${data.training.map(cert => `
+### ${cert.name}
+**Provider:** ${cert.provider}
+**Completed:** ${cert.completionDate}
+${cert.expirationDate ? `**Expires:** ${cert.expirationDate}` : ''}
+${cert.credentialId ? `**Credential ID:** ${cert.credentialId}` : ''}
+${cert.link ? `**Verify:** [View Certificate](${cert.link})` : ''}
+`).join('\n')}
+` : ''}
 `
   }
 }
@@ -1259,6 +1468,43 @@ export const executiveLeadershipTemplate: ResumeTemplate = {
             </div>
         `).join('')}
     </div>
+
+    ${data.publications && data.publications.length > 0 ? `
+    <div class="section-executive">
+        <div class="section-title-executive">Publications</div>
+        ${data.publications.map(pub => `
+            <div class="education-executive">
+                <div class="degree-executive">${pub.title}</div>
+                <div class="school-executive">${pub.authors}</div>
+                <div class="edu-location-executive">
+                    ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+                </div>
+                <div class="edu-details-executive">
+                    ${pub.doi ? `<div><strong>DOI:</strong> ${pub.doi}</div>` : ''}
+                    ${pub.link ? `<div><strong>Link:</strong> <a href="${pub.link}" style="color: #3498db;">View Publication</a></div>` : ''}
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.training && data.training.length > 0 ? `
+    <div class="section-executive">
+        <div class="section-title-executive">Professional Development</div>
+        ${data.training.map(cert => `
+            <div class="education-executive">
+                <div class="degree-executive">${cert.name}</div>
+                <div class="school-executive">${cert.provider}</div>
+                <div class="edu-details-executive">
+                    <div><strong>Completed:</strong> ${cert.completionDate}</div>
+                    ${cert.expirationDate ? `<div><strong>Expires:</strong> ${cert.expirationDate}</div>` : ''}
+                    ${cert.credentialId ? `<div><strong>Credential ID:</strong> ${cert.credentialId}</div>` : ''}
+                    ${cert.link ? `<div><strong>Verify:</strong> <a href="${cert.link}" style="color: #3498db;">View Certificate</a></div>` : ''}
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    ` : ''}
 </body>
 </html>
     `
@@ -1313,6 +1559,35 @@ ${data.education.map(edu => `
 ${edu.gpa ? `📊 **GPA:** ${edu.gpa}` : ''}
 ${edu.honors ? `🏅 **Honors:** ${edu.honors.join(', ')}` : ''}
 `).join('\n')}
+
+${data.publications && data.publications.length > 0 ? `
+---
+
+## Publications
+
+${data.publications.map(pub => `
+### ${pub.title}
+**Authors:** ${pub.authors}
+**Published in:** ${pub.journal ? pub.journal : pub.conference || ''} (${pub.year})
+${pub.doi ? `**DOI:** ${pub.doi}` : ''}
+${pub.link ? `**Link:** [View Publication](${pub.link})` : ''}
+`).join('\n')}
+` : ''}
+
+${data.training && data.training.length > 0 ? `
+---
+
+## Professional Development
+
+${data.training.map(cert => `
+### ${cert.name}
+**Provider:** ${cert.provider}
+**Completed:** ${cert.completionDate}
+${cert.expirationDate ? `**Expires:** ${cert.expirationDate}` : ''}
+${cert.credentialId ? `**Credential ID:** ${cert.credentialId}` : ''}
+${cert.link ? `**Verify:** [View Certificate](${cert.link})` : ''}
+`).join('\n')}
+` : ''}
 `
   }
 }

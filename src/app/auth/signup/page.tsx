@@ -404,7 +404,7 @@ export default function SignUpPage() {
               <div className="flex items-start space-x-2">
                 <Flame className="h-5 w-5 text-orange-500 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-medium text-orange-900">Start with 3 free roasts</h4>
+                  <h4 className="text-sm font-medium text-orange-900">Start with 10 free roasts</h4>
                   <p className="text-xs text-orange-700">
                     Verify your email to activate your account. No credit card required.
                   </p>

@@ -8,6 +8,8 @@ import { callAnthropicResumeAnalysis } from '@/lib/anthropic-utils'
 import { callOpenAIResumeAnalysis } from '@/lib/openai-utils'
 import { ANTHROPIC_MODELS, OPENAI_MODELS } from '@/lib/constants'
 
+
+
 const ANALYSIS_PROMPT = `You are an expert resume reviewer and career coach. Your task is to analyze a resume against a specific job description and provide brutally honest, actionable feedback.
 
 You will be given:
@@ -221,7 +223,7 @@ export async function POST(request: NextRequest) {
 
     // Create LLM call for logging
     llmCallId = await LLMLogger.createLlmCall({
-      userId: userId ?? undefined,
+      userId,
       provider,
       model: modelToUse,
       operationType: 'resume_analysis',

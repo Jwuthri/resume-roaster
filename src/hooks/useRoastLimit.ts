@@ -45,9 +45,9 @@ export function useRoastLimit() {
         // Fallback to FREE tier limits
         setUserLimits({
           canRoast: true,
-          remaining: 3,
+          remaining: 10,
           used: 0,
-          limit: 3,
+          limit: 10,
           tier: 'FREE'
         })
       }
@@ -55,9 +55,9 @@ export function useRoastLimit() {
       console.error('Error fetching user limits:', error)
       setUserLimits({
         canRoast: true,
-        remaining: 3,
+        remaining: 10,
         used: 0,
-        limit: 3,
+        limit: 10,
         tier: 'FREE'
       })
     } finally {
@@ -128,7 +128,7 @@ export function useRoastLimit() {
     }
   } else {
     // Anonymous user with localStorage limits
-    const maxFreeRoasts = 3
+    const maxFreeRoasts = 10
     const remaining = Math.max(0, maxFreeRoasts - anonymousCount)
     const canRoast = anonymousCount < maxFreeRoasts
 

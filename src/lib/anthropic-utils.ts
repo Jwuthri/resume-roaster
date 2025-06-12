@@ -272,6 +272,7 @@ export async function callAnthropicText(
 
 /**
  * Helper function for resume optimization with tool calling
+ * Enhanced to better integrate certifications, training, and publications
  */
 export async function callAnthropicResumeOptimization(
   userPrompt: string,
@@ -280,7 +281,7 @@ export async function callAnthropicResumeOptimization(
   const tools: Anthropic.Tool[] = [
     {
       name: 'optimize_resume_data',
-      description: 'Optimizes resume data for ATS systems and job requirements while maintaining truthfulness',
+      description: 'Optimizes resume data for ATS systems and job requirements while maintaining truthfulness. Strategically integrates certifications, training, and publications to maximize impact and relevance to the target role.',
       input_schema: {
         type: 'object',
         properties: {
@@ -298,7 +299,10 @@ export async function callAnthropicResumeOptimization(
             },
             required: ['name']
           },
-          summary: { type: 'string' },
+          summary: { 
+            type: 'string',
+            description: 'Professional summary that highlights key certifications and training when relevant to the target role'
+          },
           experience: {
             type: 'array',
             items: {
@@ -311,11 +315,13 @@ export async function callAnthropicResumeOptimization(
                 location: { type: 'string' },
                 achievements: {
                   type: 'array',
-                  items: { type: 'string' }
+                  items: { type: 'string' },
+                  description: 'Quantified achievements that may reference relevant certifications or training applied'
                 },
                 description: {
                   type: 'array',
-                  items: { type: 'string' }
+                  items: { type: 'string' },
+                  description: 'Role descriptions that can mention certifications or training when directly relevant to responsibilities'
                 }
               },
               required: ['title', 'company', 'startDate', 'endDate']
@@ -334,6 +340,11 @@ export async function callAnthropicResumeOptimization(
                 honors: {
                   type: 'array',
                   items: { type: 'string' }
+                },
+                relevantCoursework: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Relevant coursework, especially if it relates to certifications or specialized training'
                 }
               },
               required: ['degree', 'school']
@@ -344,7 +355,8 @@ export async function callAnthropicResumeOptimization(
             properties: {
               technical: {
                 type: 'array',
-                items: { type: 'string' }
+                items: { type: 'string' },
+                description: 'Technical skills, prioritizing those backed by certifications or formal training'
               },
               soft: {
                 type: 'array',
@@ -352,7 +364,13 @@ export async function callAnthropicResumeOptimization(
               },
               languages: {
                 type: 'array',
-                items: { type: 'string' }
+                items: { type: 'string' },
+                description: 'Languages with proficiency levels, including any language certifications'
+              },
+              tools: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Software tools and platforms, especially those with certifications'
               }
             }
           },
@@ -364,9 +382,115 @@ export async function callAnthropicResumeOptimization(
                 name: { type: 'string' },
                 issuer: { type: 'string' },
                 date: { type: 'string' },
-                expirationDate: { type: 'string' }
+                expirationDate: { type: 'string' },
+                credentialId: { type: 'string' },
+                url: { type: 'string' },
+                relevanceScore: {
+                  type: 'number',
+                  description: 'Score 1-10 indicating relevance to target role for prioritization'
+                },
+                description: {
+                  type: 'string',
+                  description: 'Brief description of certification value and skills gained'
+                }
               },
-              required: ['name', 'issuer']
+              required: ['name', 'issuer'],
+              description: 'Professional certifications prioritized by relevance to target role'
+            }
+          },
+          training: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                provider: { type: 'string' },
+                completionDate: { 
+                  type: 'string',
+                  description: 'Date when the training was completed'
+                },
+                expirationDate: { 
+                  type: 'string',
+                  description: 'Date when the certification expires (if applicable)'
+                },
+                credentialId: { 
+                  type: 'string',
+                  description: 'Credential or certificate ID'
+                },
+                link: { 
+                  type: 'string',
+                  description: 'URL to verify the certification'
+                },
+                duration: { type: 'string' },
+                type: {
+                  type: 'string',
+                  enum: ['workshop', 'bootcamp', 'course', 'seminar', 'conference', 'online_course', 'corporate_training', 'certification'],
+                  description: 'Type of training program'
+                },
+                skills: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Key skills or technologies learned'
+                },
+                relevanceScore: {
+                  type: 'number',
+                  description: 'Score 1-10 indicating relevance to target role for prioritization'
+                },
+                description: {
+                  type: 'string',
+                  description: 'Brief description of training content and outcomes'
+                }
+              },
+              required: ['name', 'provider', 'completionDate'],
+              description: 'Professional training and development programs, prioritized by relevance'
+            }
+          },
+          publications: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                title: { type: 'string' },
+                authors: { 
+                  type: 'string',
+                  description: 'Authors as a string (e.g., "Smith, J., Doe, A., Johnson, M.")'
+                },
+                journal: { 
+                  type: 'string',
+                  description: 'Journal name if published in a journal'
+                },
+                conference: { 
+                  type: 'string',
+                  description: 'Conference name if published in a conference'
+                },
+                year: { 
+                  type: 'string',
+                  description: 'Publication year'
+                },
+                doi: { 
+                  type: 'string',
+                  description: 'Digital Object Identifier'
+                },
+                link: { 
+                  type: 'string',
+                  description: 'URL to the publication'
+                },
+                type: {
+                  type: 'string',
+                  enum: ['journal_article', 'conference_paper', 'book_chapter', 'white_paper', 'blog_post', 'technical_report'],
+                  description: 'Type of publication'
+                },
+                relevanceScore: {
+                  type: 'number',
+                  description: 'Score 1-10 indicating relevance to target role for prioritization'
+                },
+                description: {
+                  type: 'string',
+                  description: 'Brief description of publication topic and its relevance to the field'
+                }
+              },
+              required: ['title', 'authors', 'year'],
+              description: 'Academic and professional publications, prioritized by relevance to target role'
             }
           },
           projects: {
@@ -380,10 +504,70 @@ export async function callAnthropicResumeOptimization(
                   type: 'array',
                   items: { type: 'string' }
                 },
-                url: { type: 'string' }
+                url: { type: 'string' },
+                startDate: { type: 'string' },
+                endDate: { type: 'string' },
+                role: { type: 'string' },
+                achievements: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Quantified project outcomes and impact'
+                },
+                certificationsBased: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Certifications or training that enabled this project'
+                }
               },
               required: ['name', 'description']
             }
+          },
+          additionalSections: {
+            type: 'object',
+            properties: {
+              awards: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    issuer: { type: 'string' },
+                    date: { type: 'string' },
+                    description: { type: 'string' }
+                  }
+                }
+              },
+              volunteerWork: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    organization: { type: 'string' },
+                    role: { type: 'string' },
+                    startDate: { type: 'string' },
+                    endDate: { type: 'string' },
+                    description: { type: 'string' },
+                    skills: {
+                      type: 'array',
+                      items: { type: 'string' }
+                    }
+                  }
+                }
+              },
+              professionalMemberships: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    organization: { type: 'string' },
+                    membershipType: { type: 'string' },
+                    startDate: { type: 'string' },
+                    endDate: { type: 'string' }
+                  }
+                }
+              }
+            },
+            description: 'Additional sections that may be relevant based on the target role'
           }
         },
         required: ['personalInfo']

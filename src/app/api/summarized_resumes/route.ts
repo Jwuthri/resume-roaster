@@ -12,12 +12,8 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    // Resume summarization is FREE - no authentication required
+    // This helps users prepare better data for analysis
 
     const { resumeText, resumeId, extractedResumeId, bypassCache = false } = await request.json()
 
@@ -28,16 +24,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user from database
-    const user = await db.user.findUnique({
-      where: { email: session.user.email }
-    })
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+    // Get user from database (optional for free operation)
+    let user = null
+    if (session?.user?.email) {
+      user = await db.user.findUnique({
+        where: { email: session.user.email }
+      })
     }
 
     console.log('Summarized resume API called')
@@ -73,14 +65,16 @@ export async function POST(request: NextRequest) {
 
     console.log('No cached summarized resume found, generating new one...')
 
-    // Create LLM call for logging
-    llmCallId = await LLMLogger.createLlmCall({
-      userId: user.id,
-      provider: 'anthropic',
-      model: ANTHROPIC_MODELS.SONNET,
-      operationType: 'resume_summarization',
-      extractedResumeId: extractedResumeId || undefined
-    })
+    // Create LLM call for logging (optional for anonymous users)
+    if (user) {
+      llmCallId = await LLMLogger.createLlmCall({
+        userId: user.id,
+        provider: 'anthropic',
+        model: ANTHROPIC_MODELS.SONNET,
+        operationType: 'resume_summarization',
+        extractedResumeId: extractedResumeId || undefined
+      })
+    }
 
     // Create the summarization prompt
     const prompt = `Please extract and structure the following resume data into a comprehensive JSON format:
@@ -98,12 +92,14 @@ Extract all relevant information including:
 
 Please use the optimize_resume_data function to return structured data that captures all information accurately.`
 
-    await LLMLogger.logMessage({
-      llmCallId,
-      role: MessageRole.user,
-      content: prompt,
-      messageIndex: 0
-    })
+    if (llmCallId) {
+      await LLMLogger.logMessage({
+        llmCallId,
+        role: MessageRole.user,
+        content: prompt,
+        messageIndex: 0
+      })
+    }
 
     console.log('Sending request to Anthropic for resume summarization...')
 
@@ -127,26 +123,28 @@ Please use the optimize_resume_data function to return structured data that capt
     console.log('Tokens used:', tokensUsed)
     console.log('Cost:', estimatedCost)
 
-    // Log AI response
-    await LLMLogger.logMessage({
-      llmCallId,
-      role: MessageRole.assistant,
-      content: JSON.stringify(summarizedData),
-      messageIndex: 1,
-      totalTokens: tokensUsed,
-      costUsd: estimatedCost,
-      processingTimeMs: processingTime
-    })
+    // Log AI response (only if we have an llmCallId)
+    if (llmCallId) {
+      await LLMLogger.logMessage({
+        llmCallId,
+        role: MessageRole.assistant,
+        content: JSON.stringify(summarizedData),
+        messageIndex: 1,
+        totalTokens: tokensUsed,
+        costUsd: estimatedCost,
+        processingTimeMs: processingTime
+      })
 
-    // Update LLM call as completed
-    await LLMLogger.updateLlmCall({
-      llmCallId,
-      status: 'COMPLETED',
-      totalTokens: tokensUsed,
-      totalCostUsd: estimatedCost,
-      totalProcessingTimeMs: processingTime,
-      completedAt: new Date()
-    })
+      // Update LLM call as completed
+      await LLMLogger.updateLlmCall({
+        llmCallId,
+        status: 'COMPLETED',
+        totalTokens: tokensUsed,
+        totalCostUsd: estimatedCost,
+        totalProcessingTimeMs: processingTime,
+        completedAt: new Date()
+      })
+    }
 
     // Save summarized data
     const savedSummarized = await db.summarizedResume.create({
@@ -193,11 +191,18 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+    // GET is also free, but only return data for authenticated users
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0
+        }
+      })
     }
 
     // Get user from database
@@ -206,10 +211,16 @@ export async function GET(request: NextRequest) {
     })
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0
+        }
+      })
     }
 
     const { searchParams } = new URL(request.url)

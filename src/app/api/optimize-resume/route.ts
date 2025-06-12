@@ -117,23 +117,36 @@ export async function POST(request: NextRequest) {
     console.log('Analysis data keys:', analysis.data ? Object.keys(analysis.data as any) : 'No analysis.data')
     console.log('=== END DEBUG ===')
 
-    // Get summarized resume data with fallback logic
+    // Get resume data with enhanced fallback logic
     let resumeContent = ''
+    let structuredResumeData = null
     
-    // Try to get summarized resume data first
+    // Try to get summarized resume data first (structured format)
     if (analysis.extractedResume && analysis.extractedResume.summarizedResumes && analysis.extractedResume.summarizedResumes.length > 0) {
       const summarizedResume = analysis.extractedResume.summarizedResumes[0]
-      resumeContent = typeof summarizedResume.summary === 'string' 
-        ? summarizedResume.summary 
-        : JSON.stringify(summarizedResume.summary, null, 2)
-      console.log('Using summarized resume data')
+      if (typeof summarizedResume.summary === 'object' && summarizedResume.summary !== null) {
+        // This is structured data - use it directly
+        structuredResumeData = summarizedResume.summary
+        resumeContent = JSON.stringify(summarizedResume.summary, null, 2)
+        console.log('Using structured summarized resume data')
+      } else if (typeof summarizedResume.summary === 'string') {
+        // This is text data
+        resumeContent = summarizedResume.summary
+        console.log('Using text summarized resume data')
+      }
     } 
     // Fallback 1: Try to get extracted resume data directly
     else if (analysis.extractedResume && analysis.extractedResume.data) {
-      resumeContent = typeof analysis.extractedResume.data === 'string' 
-        ? analysis.extractedResume.data 
-        : JSON.stringify(analysis.extractedResume.data, null, 2)
-      console.log('Using extracted resume data as fallback')
+      if (typeof analysis.extractedResume.data === 'object' && analysis.extractedResume.data !== null) {
+        // This is structured data - use it directly
+        structuredResumeData = analysis.extractedResume.data
+        resumeContent = JSON.stringify(analysis.extractedResume.data, null, 2)
+        console.log('Using structured extracted resume data')
+      } else if (typeof analysis.extractedResume.data === 'string') {
+        // This is text data
+        resumeContent = analysis.extractedResume.data
+        console.log('Using text extracted resume data')
+      }
     }
     // Fallback 2: Try to extract resume content from the analysis data itself
     else if (analysis.data && typeof analysis.data === 'object') {
@@ -152,6 +165,11 @@ export async function POST(request: NextRequest) {
         { error: 'No resume data found for this analysis. Please try creating a new analysis.' },
         { status: 400 }
       )
+    }
+
+    // If we don't have structured data yet, we need to extract it from the text
+    if (!structuredResumeData && resumeContent) {
+      console.log('No structured resume data found, will extract from text during optimization')
     }
 
     // Get summarized job description with fallback logic
@@ -242,28 +260,30 @@ export async function POST(request: NextRequest) {
     console.log('No existing optimized resume found, generating new one...')
 
     // Create the optimization prompt
-    const prompt = `You are an expert resume optimizer focused on creating CONCISE, impactful resumes. Create an optimized resume based on the following structured data:
+    const prompt = `You are an expert resume optimizer focused on creating CONCISE, impactful resumes. ${structuredResumeData ? 'Optimize the provided structured resume data' : 'Extract and optimize resume data from the provided text'} based on the job requirements:
 
-SUMMARIZED RESUME DATA:
+${structuredResumeData ? 'STRUCTURED RESUME DATA:' : 'RESUME TEXT TO EXTRACT AND OPTIMIZE:'}
 ${resumeContent}
 
 SUMMARIZED JOB DESCRIPTION:
 ${jobContent}
 
 CRITICAL REQUIREMENTS - FOLLOW STRICTLY:
-1. BE EXTREMELY CONCISE - Each bullet point should be 1 line maximum
-2. Use QUANTIFIED achievements with specific numbers/percentages when possible
-3. Limit job descriptions to 2 bullet points per role
-4. Professional summary should be 1-2 sentences maximum
-5. Skills section should list only the most relevant 4-8 technical skills
-6. ALWAYS include 3-5 relevant soft skills (Leadership, Communication, Problem-solving, etc.)
-7. Focus on IMPACT and RESULTS, not job duties
-8. Use strong action verbs (Led, Increased, Reduced, Implemented, etc.)
-9. Match job keywords naturally but don't stuff them
-10. Prioritize recent and relevant experience
-11. Remove fluff words and unnecessary details
-12. MANDATORY: Include both "achievements" and "description" arrays for each experience entry
-13. MANDATORY: Include "soft" skills array in the skills section
+1. ${structuredResumeData ? 'OPTIMIZE the existing structured data' : 'EXTRACT all information from the resume text and structure it properly'}
+2. BE EXTREMELY CONCISE - Each bullet point should be 1 line maximum
+3. Use QUANTIFIED achievements with specific numbers/percentages when possible
+4. Limit job descriptions to 2 bullet points per role
+5. Professional summary should be 1-2 sentences maximum
+6. Skills section should list only the most relevant 4-8 technical skills
+7. ALWAYS include 3-5 relevant soft skills (Leadership, Communication, Problem-solving, etc.)
+8. Focus on IMPACT and RESULTS, not job duties
+9. Use strong action verbs (Led, Increased, Reduced, Implemented, etc.)
+10. Match job keywords naturally but don't stuff them
+11. Prioritize recent and relevant experience
+12. Remove fluff words and unnecessary details
+13. MANDATORY: Include both "achievements" and "description" arrays for each experience entry
+14. MANDATORY: Include "soft" skills array in the skills section
+15. ${structuredResumeData ? '' : 'EXTRACT ALL information from the resume text - do not omit any experience, education, or skills'}
 
 STRUCTURE GUIDELINES:
 - Summary: 2-3 sentences highlighting key value proposition
@@ -271,13 +291,22 @@ STRUCTURE GUIDELINES:
 - Skills: MUST include "technical", "soft", and "languages" arrays
 - Soft skills: Include relevant interpersonal skills like Leadership, Communication, Problem-solving, Team Collaboration, etc.
 - Keep total content suitable for 1-2 pages resume
+- ${structuredResumeData ? '' : 'Extract all dates in MM/YYYY format'}
 
 MANDATORY FIELDS TO INCLUDE:
 - skills.soft: Array of 3-5 relevant soft skills
+- skills.technical: Array of technical skills and technologies
+- skills.languages: Array of languages (if mentioned)
 - experience[].achievements: Array of quantified accomplishments for each role
 - experience[].description: Array of concise job responsibilities
+- All personal information (name, email, phone, location, etc.)
+- All education entries
+- All work experience entries
+- All projects (if any)
+- All certifications and training (if any)
+- All publications (if any)
 
-Please use the optimize_resume_data function to return the structured optimization result with CONCISE, impactful content that includes ALL required fields.`
+Please use the optimize_resume_data function to return the structured optimization result with CONCISE, impactful content that includes ALL required fields and ${structuredResumeData ? 'optimizes' : 'extracts'} all available information.`
 
     console.log('Optimization prompt length:', prompt.length)
 
@@ -509,8 +538,13 @@ function generateOptimizedResumeContent(optimizedData: any): string {
           <h2>Professional Experience</h2>
           ${optimizedData.experience.map((exp: any) => `
             <div class="experience-item">
-              <h3>${exp.position} - ${exp.company}</h3>
+              <h3>${exp.title || exp.position} - ${exp.company}</h3>
               <div class="dates">${exp.startDate} - ${exp.endDate}</div>
+              ${exp.description?.length ? `
+                <ul>
+                  ${exp.description.map((desc: string) => `<li>${desc}</li>`).join('')}
+                </ul>
+              ` : ''}
               ${exp.achievements?.length ? `
                 <ul>
                   ${exp.achievements.map((achievement: string) => `<li>${achievement}</li>`).join('')}
@@ -521,11 +555,25 @@ function generateOptimizedResumeContent(optimizedData: any): string {
         </section>
       ` : ''}
       
-      ${optimizedData.skills?.length ? `
+      ${optimizedData.skills ? `
         <section class="skills">
           <h2>Skills</h2>
           <div class="skills-list">
-            ${optimizedData.skills.join(', ')}
+            ${optimizedData.skills.technical?.length ? `
+              <div class="skill-category">
+                <strong>Technical:</strong> ${optimizedData.skills.technical.join(', ')}
+              </div>
+            ` : ''}
+            ${optimizedData.skills.soft?.length ? `
+              <div class="skill-category">
+                <strong>Soft Skills:</strong> ${optimizedData.skills.soft.join(', ')}
+              </div>
+            ` : ''}
+            ${optimizedData.skills.languages?.length ? `
+              <div class="skill-category">
+                <strong>Languages:</strong> ${optimizedData.skills.languages.join(', ')}
+              </div>
+            ` : ''}
           </div>
         </section>
       ` : ''}
@@ -535,8 +583,62 @@ function generateOptimizedResumeContent(optimizedData: any): string {
           <h2>Education</h2>
           ${optimizedData.education.map((edu: any) => `
             <div class="education-item">
-              <h3>${edu.degree} in ${edu.field}</h3>
-              <div>${edu.institution} - ${edu.graduationDate}</div>
+              <h3>${edu.degree}${edu.field ? ` in ${edu.field}` : ''}</h3>
+              <div>${edu.school || edu.institution} - ${edu.graduationDate}</div>
+              ${edu.gpa ? `<div>GPA: ${edu.gpa}</div>` : ''}
+              ${edu.honors?.length ? `<div>Honors: ${edu.honors.join(', ')}</div>` : ''}
+            </div>
+          `).join('')}
+        </section>
+      ` : ''}
+      
+      ${optimizedData.publications?.length ? `
+        <section class="publications">
+          <h2>Publications</h2>
+          ${optimizedData.publications.map((pub: any) => `
+            <div class="publication-item">
+              <h3>${pub.title}</h3>
+              <div class="publication-authors">${pub.authors || (Array.isArray(pub.authors) ? pub.authors.join(', ') : '')}</div>
+              <div class="publication-venue">
+                ${pub.journal || pub.publication || pub.conference || ''} (${pub.year || pub.date})
+                ${pub.doi ? ` • DOI: ${pub.doi}` : ''}
+                ${pub.url || pub.link ? ` • <a href="${pub.url || pub.link}" target="_blank">Link</a>` : ''}
+              </div>
+              ${pub.description ? `<div class="publication-description">${pub.description}</div>` : ''}
+            </div>
+          `).join('')}
+        </section>
+      ` : ''}
+      
+      ${optimizedData.training?.length ? `
+        <section class="training">
+          <h2>Training & Certifications</h2>
+          ${optimizedData.training.map((cert: any) => `
+            <div class="training-item">
+              <h3>${cert.name}</h3>
+              <div class="training-provider">${cert.provider}</div>
+              <div class="training-details">
+                Completed: ${cert.completionDate || cert.date}
+                ${cert.expirationDate ? ` • Expires: ${cert.expirationDate}` : ''}
+                ${cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}
+                ${cert.url || cert.link ? ` • <a href="${cert.url || cert.link}" target="_blank">Verify</a>` : ''}
+              </div>
+              ${cert.description ? `<div class="training-description">${cert.description}</div>` : ''}
+              ${cert.skills?.length ? `<div class="training-skills">Skills: ${cert.skills.join(', ')}</div>` : ''}
+            </div>
+          `).join('')}
+        </section>
+      ` : ''}
+      
+      ${optimizedData.projects?.length ? `
+        <section class="projects">
+          <h2>Projects</h2>
+          ${optimizedData.projects.map((proj: any) => `
+            <div class="project-item">
+              <h3>${proj.name}</h3>
+              <div class="project-description">${proj.description}</div>
+              ${proj.technologies?.length ? `<div class="project-tech">Technologies: ${proj.technologies.join(', ')}</div>` : ''}
+              ${proj.link || proj.url ? `<div class="project-link"><a href="${proj.link || proj.url}" target="_blank">View Project</a></div>` : ''}
             </div>
           `).join('')}
         </section>

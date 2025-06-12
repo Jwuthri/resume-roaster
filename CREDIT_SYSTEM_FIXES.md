@@ -159,7 +159,7 @@ Credits are consumed in this order:
 2. **Bonus credits** (purchased credits that don't expire)
 
 ## Subscription Tiers
-- **FREE**: 5 credits/month
+- **FREE**: 10 credits/month
 - **PLUS**: 200 credits/month + ability to purchase bonus credits
 - **PREMIUM**: Unlimited credits
 
