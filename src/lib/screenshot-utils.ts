@@ -86,7 +86,7 @@ export async function generateHTMLScreenshot(
     })
 
     // Convert to base64
-    return screenshotBuffer.toString('base64')
+    return Buffer.from(screenshotBuffer).toString('base64')
 
   } catch (error) {
     console.error('Error generating HTML screenshot:', error)
@@ -203,7 +203,7 @@ export async function generatePaginatedScreenshots(
         }
       })
 
-      screenshots.push(screenshotBuffer.toString('base64'))
+      screenshots.push(Buffer.from(screenshotBuffer).toString('base64'))
     }
 
     return screenshots
