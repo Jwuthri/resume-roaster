@@ -14,6 +14,7 @@ import { ExtractionMethodSelector } from "@/components/ExtractionMethodSelector"
 import { ResumeAnalysisModal } from "@/components/ui/resume-analysis-modal"
 import { useRoastLimit } from "@/hooks/useRoastLimit"
 import { useFileExtraction } from "@/hooks/useFileExtraction"
+import { useUserProfile } from "@/hooks/useUserProfile"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Footer } from "@/components/ui/footer"
@@ -34,6 +35,7 @@ export default function Home() {
   } | null>(null)
   const { data: session } = useSession()
   const { showAlert, AlertDialog } = useAlertDialog()
+  const { updateProfile } = useUserProfile()
   
   const { 
     roastCount, 
@@ -320,28 +322,25 @@ export default function Home() {
       // Increment the roast count
       incrementRoastCount()
       
-      // Store analysis results in sessionStorage to pass to analysis page
-      sessionStorage.setItem('analysisResults', JSON.stringify(result.analysis))
-      sessionStorage.setItem('resumeData', JSON.stringify(resumeData))
-      sessionStorage.setItem('jobDescription', jobDescription)
-      
-      // Store roast ID and document ID for proper caching
-      if (result.roastId) {
-        sessionStorage.setItem('roastId', result.roastId)
-      }
-      if (resumeData.documentId) {
-        sessionStorage.setItem('documentId', resumeData.documentId)
-      }
-      
-      // Store PDF images if available
-      if (pdfImages && pdfImages.length > 0) {
-        sessionStorage.setItem('pdfImages', JSON.stringify(pdfImages))
+      // Store analysis results in database instead of sessionStorage
+      try {
+        if (updateProfile) {
+          await updateProfile({
+            currentRoastId: result.roastId,
+            currentJobDescription: jobDescription,
+            isFromAnalysis: true,
+            lastPage: '/analysis'
+          })
+        }
+      } catch (error) {
+        console.error('Failed to save analysis data to profile:', error)
+        // Continue with navigation even if profile save fails
       }
       
       // Small delay to show 100% completion
       setTimeout(() => {
-        // Navigate to analysis page
-        router.push("/analysis")
+        // Navigate to analysis page with roast ID as URL parameter
+        router.push(`/analysis?roastId=${result.roastId}`)
       }, 500)
     } catch (error) {
       console.error('Analysis error:', error)

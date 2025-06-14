@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
 
     // Generate the resume
     const generatedResume = format === 'html' 
-      ? template.generateHTML(optimizedData, jobDescription || '')
-      : template.generateMarkdown(optimizedData, jobDescription || '')
+      ? template.generateHTML(optimizedData)
+      : template.generateMarkdown(optimizedData)
 
     const atsScore = skipOptimization ? 0 : calculateATSScore(optimizedData, jobDescription)
     const keywordsFound = skipOptimization ? [] : extractJobKeywords(jobDescription).filter(keyword =>

@@ -275,6 +275,9 @@ Please provide a comprehensive analysis following the framework above.`
     // Extract analysis data from response
     const analysisData = response.data
     
+    // Debug logging for analysis data
+    console.log('📊 Analysis data received with keys:', Object.keys(analysisData))
+    
     // Calculate costs and tokens
     const inputTokens = isAnthropicModel ? response.usage.inputTokens : response.usage.promptTokens
     const outputTokens = isAnthropicModel ? response.usage.outputTokens : response.usage.completionTokens
@@ -297,8 +300,30 @@ Please provide a comprehensive analysis following the framework above.`
       maxTokens: 4000
     })
     
-    // Validate required fields
-    if (!analysisData.overallScore || !analysisData.strengths || !analysisData.weaknesses) {
+    // Validate required fields - fix the validation logic to handle 0 scores properly
+    const hasValidScore = typeof analysisData.overallScore === 'number' && analysisData.overallScore >= 0
+    const hasValidStrengths = Array.isArray(analysisData.strengths)
+    const hasValidWeaknesses = Array.isArray(analysisData.weaknesses)
+    
+    // If arrays are empty, provide default content to ensure the analysis is still useful
+    if (hasValidStrengths && analysisData.strengths.length === 0) {
+      analysisData.strengths = ['Resume structure is present', 'Basic information is included']
+      console.log('🔧 Added default strengths due to empty array')
+    }
+    
+    if (hasValidWeaknesses && analysisData.weaknesses.length === 0) {
+      analysisData.weaknesses = ['Could benefit from more detailed analysis', 'Consider adding more specific examples']
+      console.log('🔧 Added default weaknesses due to empty array')
+    }
+    
+    if (!hasValidScore || !hasValidStrengths || !hasValidWeaknesses) {
+      console.error('❌ Validation failed:', {
+        hasValidScore,
+        hasValidStrengths,
+        hasValidWeaknesses,
+        analysisData: JSON.stringify(analysisData, null, 2)
+      })
+      
       // Update LLM call with error
       await LLMLogger.updateLlmCall({
         llmCallId,

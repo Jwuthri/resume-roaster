@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { ResumeData } from "@/lib/resume-templates"
 import { generatePDF, generateDOCX, downloadBlob } from "@/lib/document-generators"
+import { useUserProfile } from "@/hooks/useUserProfile"
 
 interface OptimizedResumeResponse {
   resume: string
@@ -37,43 +38,134 @@ export default function DownloadPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { showAlert } = useAlertDialog()
+  const { profile, updateProfile } = useUserProfile()
   
   const [optimizedResult, setOptimizedResult] = useState<OptimizedResumeResponse | null>(null)
   const [resumeData, setResumeData] = useState<ResumeData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Load the optimized result from sessionStorage
-    try {
-      const storedResult = sessionStorage.getItem('optimizedResumeResult')
-      const storedResumeData = sessionStorage.getItem('resumeDataForDownload')
-      
-      if (storedResult && storedResumeData) {
-        setOptimizedResult(JSON.parse(storedResult))
-        setResumeData(JSON.parse(storedResumeData))
-      } else {
-        // If no data found, redirect back to resume optimizer
+    const loadOptimizedResume = async () => {
+      try {
+        // First try to load from database
+        let apiUrl = '/api/optimized-resume'
+        if (profile?.currentRoastId) {
+          apiUrl += `?roastId=${profile.currentRoastId}`
+        }
+        
+        const response = await fetch(apiUrl)
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success && result.data) {
+            console.log('Loaded optimized resume from API:', result.data)
+            
+            // Transform database result to match expected format
+            const transformedResult: OptimizedResumeResponse = {
+              resume: result.data.content,
+              format: 'html' as const,
+              template: {
+                id: result.data.templateId,
+                name: 'Resume Template',
+                description: 'Generated resume template',
+                category: 'modern' as const,
+                atsOptimized: false
+              },
+              optimizations: {
+                suggestions: [],
+                keywordsFound: result.data.keywordsMatched || [],
+                atsScore: result.data.atsScore || 0
+              }
+            }
+            setOptimizedResult(transformedResult)
+            
+            // Ensure the structured resume data is properly formatted
+            let structuredData = result.data.data
+            if (structuredData && typeof structuredData === 'object') {
+              // Ensure all required fields exist with proper defaults
+              const processedData: ResumeData = {
+                personalInfo: {
+                  name: structuredData.personalInfo?.name || '',
+                  email: structuredData.personalInfo?.email || '',
+                  phone: structuredData.personalInfo?.phone || '',
+                  location: structuredData.personalInfo?.location || '',
+                  linkedin: structuredData.personalInfo?.linkedin || '',
+                  portfolio: structuredData.personalInfo?.portfolio || '',
+                  github: structuredData.personalInfo?.github || '',
+                  jobTitle: structuredData.personalInfo?.jobTitle || '',
+                  jobDescription: structuredData.personalInfo?.jobDescription || ''
+                },
+                summary: structuredData.summary || '',
+                experience: structuredData.experience || [],
+                education: structuredData.education || [],
+                skills: {
+                  technical: structuredData.skills?.technical || [],
+                  soft: structuredData.skills?.soft || [],
+                  languages: structuredData.skills?.languages || [],
+                  certifications: structuredData.skills?.certifications || []
+                },
+                projects: structuredData.projects || [],
+                publications: structuredData.publications || [],
+                training: structuredData.training || []
+              }
+              console.log('Processed resume data for editing:', processedData)
+              setResumeData(processedData)
+            } else {
+              console.warn('No structured resume data found in API response')
+              setResumeData(null)
+            }
+            
+            setIsLoading(false)
+            return
+          }
+        }
+
+        // Fallback: try to load from sessionStorage (for backward compatibility)
+        const storedResult = sessionStorage.getItem('optimizedResumeResult')
+        const storedResumeData = sessionStorage.getItem('resumeDataForDownload')
+        
+        if (storedResult && storedResumeData) {
+          setOptimizedResult(JSON.parse(storedResult))
+          setResumeData(JSON.parse(storedResumeData))
+          setIsLoading(false)
+          return
+        }
+        
+        // If no optimized resume found, try to load resume data from profile
+        if (profile?.resumeData) {
+          setResumeData(profile.resumeData)
+          showAlert({
+            title: "No Optimized Resume Found",
+            description: "Please generate your resume first.",
+            type: "warning",
+            confirmText: "Go to Resume Optimizer",
+            onConfirm: () => router.push('/resume-optimizer')
+          })
+        } else {
+          // If no data found anywhere, redirect back to resume optimizer
+          showAlert({
+            title: "No Resume Data Found",
+            description: "Please generate your resume first.",
+            type: "warning",
+            confirmText: "Go to Resume Optimizer",
+            onConfirm: () => router.push('/resume-optimizer')
+          })
+        }
+      } catch (error) {
+        console.error('Error loading resume data:', error)
         showAlert({
-          title: "No Resume Data Found",
-          description: "Please generate your resume first.",
-          type: "warning",
+          title: "Error Loading Resume",
+          description: "There was an error loading your resume data.",
+          type: "error",
           confirmText: "Go to Resume Optimizer",
           onConfirm: () => router.push('/resume-optimizer')
         })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error('Error loading resume data:', error)
-      showAlert({
-        title: "Error Loading Resume",
-        description: "There was an error loading your resume data.",
-        type: "error",
-        confirmText: "Go to Resume Optimizer",
-        onConfirm: () => router.push('/resume-optimizer')
-      })
-    } finally {
-      setIsLoading(false)
     }
-  }, [router, showAlert])
+
+    loadOptimizedResume()
+  }, [router, showAlert, profile])
 
   const handleDownloadPDF = async () => {
     if (!optimizedResult) return
@@ -143,11 +235,60 @@ export default function DownloadPage() {
     }
   }
 
-  const handleEditResume = () => {
-    // Clear the stored data and go back to resume optimizer
-    sessionStorage.removeItem('optimizedResumeResult')
-    sessionStorage.removeItem('resumeDataForDownload')
-    router.push('/resume-optimizer')
+  const handleEditResume = async () => {
+    try {
+      // Clear the optimized result from sessionStorage
+      sessionStorage.removeItem('optimizedResumeResult')
+      
+      // Ensure we have resume data to save
+      let dataToSave = resumeData
+      
+      // If we don't have structured resume data but have an optimized result,
+      // we need to extract what we can or show a warning
+      if (!dataToSave || !dataToSave.personalInfo || !dataToSave.personalInfo.name || dataToSave.personalInfo.name === 'Your Name') {
+        // Try to load from the current profile as fallback
+        if (profile?.resumeData && profile.resumeData.personalInfo?.name && profile.resumeData.personalInfo.name !== 'Your Name') {
+          dataToSave = profile.resumeData
+        } else {
+          // Show warning that editing may be limited
+          showAlert({
+            title: "Limited Editing Available",
+            description: "Your resume will be available for editing, but some data may need to be re-entered. The generated content will be preserved.",
+            type: "warning",
+                         confirmText: "Continue to Editor",
+             onConfirm: () => {
+               router.push('/resume-optimizer?reload=true')
+             }
+          })
+          return
+        }
+      }
+      
+      // Save the resume data to the database profile
+      if (dataToSave && updateProfile) {
+        console.log('Saving resume data for editing:', dataToSave)
+        await updateProfile({
+          resumeData: dataToSave,
+          lastPage: '/resume-optimizer'
+        })
+        
+                 // Add a small delay to ensure the data is saved before navigation
+         setTimeout(() => {
+           router.push('/resume-optimizer?reload=true')
+         }, 500)
+               } else {
+           router.push('/resume-optimizer?reload=true')
+         }
+    } catch (error) {
+      console.error('Error saving resume data for editing:', error)
+      showAlert({
+        title: "Error Saving Data",
+        description: "There was an error saving your resume data. You can still edit, but some information may need to be re-entered.",
+        type: "error",
+                 confirmText: "Continue Anyway",
+         onConfirm: () => router.push('/resume-optimizer?reload=true')
+      })
+    }
   }
 
   const handleBackToOptimizer = () => {

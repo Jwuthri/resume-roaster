@@ -29,8 +29,8 @@ export const MODEL_CREDIT_COSTS = {
 export const MODEL_TIER_LABELS = {
   [OPENAI_MODELS.NANO]: 'OpenAI Nano',
   [OPENAI_MODELS.MINI]: 'OpenAI Mini',
-  [OPENAI_MODELS.NORMAL]: 'Claude Sonnet 4',
-  [OPENAI_MODELS.LARGE]: 'Claude Opus 4',
+  [OPENAI_MODELS.NORMAL]: 'OpenAI Normal',
+  [OPENAI_MODELS.LARGE]: 'OpenAI Large',
   [ANTHROPIC_MODELS.HAIKU]: 'Claude Haiku',
   [ANTHROPIC_MODELS.SONNET]: 'Claude Sonnet 4',
   [ANTHROPIC_MODELS.OPUS]: 'Claude Opus 4',

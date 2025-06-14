@@ -281,8 +281,14 @@ exports.Prisma.GeneratedResumeScalarFieldEnum = {
   contentHash: 'contentHash',
   content: 'content',
   data: 'data',
+  images: 'images',
   atsScore: 'atsScore',
   keywordsMatched: 'keywordsMatched',
+  overallScore: 'overallScore',
+  scoringBreakdown: 'scoringBreakdown',
+  scoreLabel: 'scoreLabel',
+  keywordMatchPercentage: 'keywordMatchPercentage',
+  originalAtsScore: 'originalAtsScore',
   createdAt: 'createdAt'
 };
 

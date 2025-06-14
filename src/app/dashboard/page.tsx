@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { FileText, TrendingUp, Calendar, Search, Filter, Eye, Download, ArrowLeft, Trash2, ExternalLink, ChevronDown, ChevronUp, MoreHorizontal, Star, Clock, Target, Share2, Brain, Linkedin, Sparkles, Zap, Crown } from "lucide-react"
+import { FileText, TrendingUp, Calendar, Search, Filter, Eye, Download, ArrowLeft, Trash2, ExternalLink, ChevronDown, ChevronUp, MoreHorizontal, Star, Clock, Target, Share2, Brain, Linkedin, Sparkles, Zap, Crown, GitCompare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,9 +15,11 @@ import { FeatureAnnouncementBanner } from "@/components/ui/feature-announcement-
 import { CoverLetterModal } from "@/components/ui/cover-letter-modal"
 import { InterviewPrepModal } from "@/components/ui/interview-prep-modal"
 import { ResumeOptimizationModal } from "@/components/ui/resume-optimization-modal"
+import { ResumeComparisonModal } from "@/components/ui/resume-comparison-modal"
 import { CreditPurchase } from "@/components/CreditPurchase"
 import { toast } from 'sonner'
 import { useAlertDialog } from "@/components/ui/alert-dialog"
+import { useUserProfile } from "@/hooks/useUserProfile"
 
 interface AnalysisResult {
   id: string
@@ -63,11 +65,15 @@ function DashboardContent() {
   const [showCoverLetterModal, setShowCoverLetterModal] = useState(false)
   const [showInterviewPrepModal, setShowInterviewPrepModal] = useState(false)
   const [showResumeOptimizationModal, setShowResumeOptimizationModal] = useState(false)
+  const [showComparisonModal, setShowComparisonModal] = useState(false)
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisResult | null>(null)
   const [isGeneratingOptimized, setIsGeneratingOptimized] = useState(false)
-  const [isLoadingOptimizer, setIsLoadingOptimizer] = useState<string | null>(null)
+  const [optimizedResumeStatus, setOptimizedResumeStatus] = useState<Record<string, boolean>>({})
+  const [coverLetterStatus, setCoverLetterStatus] = useState<Record<string, boolean>>({})
+  const [interviewPrepStatus, setInterviewPrepStatus] = useState<Record<string, boolean>>({})
   
   const { showAlert, AlertDialog } = useAlertDialog()
+  const { updateProfile } = useUserProfile()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -121,6 +127,87 @@ function DashboardContent() {
     }
   }, [searchParams])
 
+  // Check if optimized resumes exist for analyses
+  const checkOptimizedResumeStatus = async (analysisIds: string[]) => {
+    try {
+      const statusChecks = await Promise.all(
+        analysisIds.map(async (id) => {
+          try {
+            const response = await fetch(`/api/optimized-resume/${id}`)
+            const result = await response.json()
+            return { id, exists: response.ok && result.data?.exists }
+          } catch (error) {
+            console.error(`Failed to check optimized resume for ${id}:`, error)
+            return { id, exists: false }
+          }
+        })
+      )
+
+      const statusMap = statusChecks.reduce((acc, { id, exists }) => {
+        acc[id] = exists
+        return acc
+      }, {} as Record<string, boolean>)
+
+      setOptimizedResumeStatus(statusMap)
+    } catch (error) {
+      console.error('Error checking optimized resume status:', error)
+    }
+  }
+
+  // Check if cover letters exist for analyses
+  const checkCoverLetterStatus = async (analysisIds: string[]) => {
+    try {
+      const statusChecks = await Promise.all(
+        analysisIds.map(async (id) => {
+          try {
+            const response = await fetch(`/api/check-generated-content?analysisId=${id}&type=cover-letter`)
+            const result = await response.json()
+            return { id, exists: response.ok && result.exists }
+          } catch (error) {
+            console.error(`Failed to check cover letter for ${id}:`, error)
+            return { id, exists: false }
+          }
+        })
+      )
+
+      const statusMap = statusChecks.reduce((acc, { id, exists }) => {
+        acc[id] = exists
+        return acc
+      }, {} as Record<string, boolean>)
+
+      setCoverLetterStatus(statusMap)
+    } catch (error) {
+      console.error('Error checking cover letter status:', error)
+    }
+  }
+
+  // Check if interview prep exists for analyses
+  const checkInterviewPrepStatus = async (analysisIds: string[]) => {
+    try {
+      const statusChecks = await Promise.all(
+        analysisIds.map(async (id) => {
+          try {
+            const response = await fetch(`/api/check-generated-content?analysisId=${id}&type=interview-prep`)
+            const result = await response.json()
+            return { id, exists: response.ok && result.exists }
+          } catch (error) {
+            console.error(`Failed to check interview prep for ${id}:`, error)
+            return { id, exists: false }
+          }
+        })
+      )
+
+      const statusMap = statusChecks.reduce((acc, { id, exists }) => {
+        acc[id] = exists
+        return acc
+      }, {} as Record<string, boolean>)
+
+      setInterviewPrepStatus(statusMap)
+    } catch (error) {
+      console.error('Error checking interview prep status:', error)
+    }
+  }
+
   // Fetch analysis history
   const fetchAnalyses = async (page = 1, search = '') => {
     try {
@@ -163,6 +250,16 @@ function DashboardContent() {
         
         setAnalyses(transformedAnalyses)
         setPagination(result.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 })
+
+        // Check status for all generated content types
+        if (transformedAnalyses.length > 0) {
+          const analysisIds = transformedAnalyses.map((analysis: AnalysisResult) => analysis.id)
+          await Promise.all([
+            checkOptimizedResumeStatus(analysisIds),
+            checkCoverLetterStatus(analysisIds),
+            checkInterviewPrepStatus(analysisIds)
+          ])
+        }
       } else {
         console.error('Failed to fetch analyses:', analysesResponse.status, analysesResponse.statusText)
         setAnalyses([])
@@ -349,67 +446,9 @@ function DashboardContent() {
     setShowResumeOptimizationModal(true)
   }
 
-  // Function to route to resume optimizer with pre-filled data
-  const routeToResumeOptimizer = async (analysis: AnalysisResult) => {
-    try {
-      // First, try to get cached optimized resume data for this analysis
-      let resumeDataToStore = analysis.data.resumeData
-      
-      // Check if there's a cached optimized resume for this analysis
-      try {
-        const cachedResponse = await fetch('/api/optimize-resume', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            roastId: analysis.id,
-            llm: 'gpt-4o-mini' // Use default model for cache check
-          }),
-        })
-        
-        if (cachedResponse.ok) {
-          const cachedResult = await cachedResponse.json()
-          if (cachedResult.success && cachedResult.cached && cachedResult.data) {
-            // Use the cached optimized data instead of the original analysis data
-            resumeDataToStore = cachedResult.data
-            console.log('Found cached optimized resume data, using it for optimizer')
-          }
-        }
-      } catch (cacheError) {
-        console.log('No cached data found or error checking cache, using original analysis data')
-      }
-      
-      // Store the resume data (either cached optimized or original analysis data)
-      if (resumeDataToStore) {
-        sessionStorage.setItem('optimizedResumeData', JSON.stringify(resumeDataToStore))
-        console.log('Stored resume data for optimizer')
-      } else {
-        console.log('No structured resume data available - optimizer will extract from analysis')
-      }
-      
-      if (analysis.data.jobDescription) {
-        sessionStorage.setItem('analysisJobDescription', analysis.data.jobDescription)
-      }
-      
-      // Store analysis metadata
-      sessionStorage.setItem('isFromAnalysis', 'true')
-      sessionStorage.setItem('optimizedDataTimestamp', new Date().toISOString())
-      
-      if (analysis.documentId) {
-        sessionStorage.setItem('documentId', analysis.documentId)
-      }
-      
-      if (analysis.id) {
-        sessionStorage.setItem('roastId', analysis.id)
-      }
-      
-      // Navigate to resume optimizer with prefilled flag
-      router.push('/resume-optimizer?prefilled=true')
-    } catch (error) {
-      console.error('Error preparing data for resume optimizer:', error)
-      toast.error('Failed to prepare data. Please try again.')
-    }
+  const openComparisonModal = (analysis: AnalysisResult) => {
+    setSelectedAnalysis(analysis)
+    setShowComparisonModal(true)
   }
 
   const handleOptimizationConfirm = async (selectedLLM: string) => {
@@ -512,6 +551,14 @@ function DashboardContent() {
         throw new Error(result.error || 'Failed to optimize resume')
       }
       
+      // Update the optimized resume status for this analysis
+      if (selectedAnalysis) {
+        setOptimizedResumeStatus(prev => ({
+          ...prev,
+          [selectedAnalysis.id]: true
+        }))
+      }
+      
       setShowResumeOptimizationModal(false)
     } catch (error) {
       console.error('Error generating optimized resume:', error)
@@ -527,6 +574,28 @@ function DashboardContent() {
       toast.success('Cover letter retrieved from cache!')
     } else {
       toast.success('New cover letter generated!')
+    }
+    // Update cover letter status for the current analysis
+    if (selectedAnalysis) {
+      setCoverLetterStatus(prev => ({
+        ...prev,
+        [selectedAnalysis.id]: true
+      }))
+    }
+  }
+
+  const handleInterviewPrepGenerated = (cached: boolean) => {
+    if (cached) {
+      toast.success('Interview prep retrieved from cache!')
+    } else {
+      toast.success('New interview prep generated!')
+    }
+    // Update interview prep status for the current analysis
+    if (selectedAnalysis) {
+      setInterviewPrepStatus(prev => ({
+        ...prev,
+        [selectedAnalysis.id]: true
+      }))
     }
   }
 
@@ -771,19 +840,47 @@ function DashboardContent() {
                             <div className="flex items-center space-x-4 text-xs">
                               <div className="flex items-center space-x-1">
                                 <FileText className="h-3 w-3 text-purple-500" />
-                                <span className={analysis.data.jobDescription ? 'text-purple-600' : 'text-gray-400'}>
-                                  Cover Letter {analysis.data.jobDescription ? 'Available' : 'Needs Job Description'}
+                                <span className={
+                                  coverLetterStatus[analysis.id] 
+                                    ? 'text-purple-600' 
+                                    : analysis.data.jobDescription 
+                                      ? 'text-gray-600' 
+                                      : 'text-gray-400'
+                                }>
+                                  {coverLetterStatus[analysis.id] 
+                                    ? 'Cover Letter Available' 
+                                    : analysis.data.jobDescription 
+                                      ? 'No Cover Letter' 
+                                      : 'Needs Job Description'}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <Brain className="h-3 w-3 text-blue-500" />
-                                <span className={analysis.data.jobDescription ? 'text-blue-600' : 'text-gray-400'}>
-                                  Interview Prep {analysis.data.jobDescription ? 'Available' : 'Needs Job Description'}
+                                <span className={
+                                  interviewPrepStatus[analysis.id] 
+                                    ? 'text-blue-600' 
+                                    : analysis.data.jobDescription 
+                                      ? 'text-gray-600' 
+                                      : 'text-gray-400'
+                                }>
+                                  {interviewPrepStatus[analysis.id] 
+                                    ? 'Interview Prep Available' 
+                                    : analysis.data.jobDescription 
+                                      ? 'No Interview Prep' 
+                                      : 'Needs Job Description'}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <Sparkles className="h-3 w-3 text-orange-500" />
-                                <span className="text-orange-600">Resume Optimization Available</span>
+                                <span className={
+                                  optimizedResumeStatus[analysis.id] 
+                                    ? 'text-orange-600' 
+                                    : 'text-gray-600'
+                                }>
+                                  {optimizedResumeStatus[analysis.id] 
+                                    ? 'Resume Optimization Available' 
+                                    : 'No Optimized Resume'}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -805,34 +902,30 @@ function DashboardContent() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (!analysis.data.analysis) {
                                   alert('Analysis data is not available for this item.')
                                   return
                                 }
                                 
-                                // Store core analysis data
-                                sessionStorage.setItem('analysisResults', JSON.stringify(analysis.data.analysis))
-                                sessionStorage.setItem('resumeData', JSON.stringify(analysis.data.resumeData))
-                                sessionStorage.setItem('jobDescription', analysis.data.jobDescription || '')
-                                sessionStorage.setItem('roastId', analysis.id)
-                                
-                                if (analysis.documentId) {
-                                  sessionStorage.setItem('documentId', analysis.documentId)
-                                } else {
-                                  sessionStorage.removeItem('documentId')
+                                try {
+                                  // Store analysis data in database instead of sessionStorage
+                                  if (updateProfile) {
+                                    await updateProfile({
+                                      currentRoastId: analysis.id,
+                                      currentJobDescription: analysis.data.jobDescription || '',
+                                      isFromDashboard: true,
+                                      lastPage: '/analysis'
+                                    })
+                                  }
+                                  
+                                  // Navigate to analysis page with roast ID
+                                  router.push(`/analysis?roastId=${analysis.id}`)
+                                } catch (error) {
+                                  console.error('Failed to save analysis data:', error)
+                                  // Still navigate even if save fails
+                                  router.push(`/analysis?roastId=${analysis.id}`)
                                 }
-                                
-                                if (analysis.pdfImages && analysis.pdfImages.length > 0) {
-                                  sessionStorage.setItem('pdfImages', JSON.stringify(analysis.pdfImages))
-                                } else {
-                                  sessionStorage.removeItem('pdfImages')
-                                }
-                                
-                                sessionStorage.setItem('isFromDashboard', 'true')
-                                sessionStorage.setItem('dashboardRoastId', analysis.id)
-                                
-                                router.push('/analysis')
                               }}
                               className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
                             >
@@ -888,7 +981,7 @@ function DashboardContent() {
                               <div className="flex items-center justify-between mb-2">
                                 <Search className="h-5 w-5 text-orange-600" />
                                 <span className="text-2xl font-bold text-orange-700">
-                                  {analysis.data.analysis.keywordMatch?.matchPercentage || 0}%
+                                  {Math.round(analysis.data.analysis.keywordMatch?.matchPercentage || 0)}%
                                 </span>
                               </div>
                               <div className="text-sm font-medium text-orange-700">Match</div>
@@ -898,7 +991,7 @@ function DashboardContent() {
 
                         {/* Action Buttons */}
                         {analysis.data.analysis && analysis.data.resumeData && (
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
                             <Button 
                               variant="outline" 
                               className="w-full border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300" 
@@ -925,30 +1018,21 @@ function DashboardContent() {
                               variant="outline" 
                               className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300" 
                               size="sm"
-                              disabled={isLoadingOptimizer === analysis.id}
-                              onClick={async () => {
-                                try {
-                                  setIsLoadingOptimizer(analysis.id)
-                                  await routeToResumeOptimizer(analysis)
-                                } catch (error) {
-                                  console.error('Error routing to resume optimizer:', error)
-                                  toast.error('Failed to load resume optimizer. Please try again.')
-                                } finally {
-                                  setIsLoadingOptimizer(null)
-                                }
-                              }}
+                              onClick={() => openResumeOptimizationModal(analysis)}
                             >
-                              {isLoadingOptimizer === analysis.id ? (
-                                <>
-                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500 mr-2"></div>
-                                  Loading...
-                                </>
-                              ) : (
-                                <>
-                                  <Sparkles className="h-4 w-4 mr-2" />
-                                  Optimize Resume
-                                </>
-                              )}
+                              <Sparkles className="h-4 w-4 mr-2" />
+                              Optimize Resume
+                            </Button>
+
+                            <Button 
+                              variant="outline" 
+                              className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300" 
+                              size="sm"
+                              onClick={() => openComparisonModal(analysis)}
+                              disabled={!optimizedResumeStatus[analysis.id]}
+                            >
+                              <GitCompare className="h-4 w-4 mr-2" />
+                              Compare Resumes
                             </Button>
                           </div>
                         )}
@@ -1017,13 +1101,13 @@ function DashboardContent() {
                                   <div className="flex items-center justify-between mb-4">
                                     <span className="text-sm font-medium text-gray-700">Resume-Job Match Rate</span>
                                     <span className="text-lg font-bold text-gray-900">
-                                      {analysis.data.analysis.keywordMatch.matchPercentage}%
+                                      {Math.round(analysis.data.analysis.keywordMatch.matchPercentage || 0)}%
                                     </span>
                                   </div>
                                   <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
                                     <div 
                                       className="h-3 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-700"
-                                      style={{ width: `${analysis.data.analysis.keywordMatch.matchPercentage}%` }}
+                                      style={{ width: `${Math.round(analysis.data.analysis.keywordMatch.matchPercentage || 0)}%` }}
                                     ></div>
                                   </div>
                                   <p className={`text-sm font-medium ${getKeywordMatchStatus(analysis.data.analysis.keywordMatch.matchPercentage).color}`}>
@@ -1112,6 +1196,7 @@ function DashboardContent() {
         jobDescription={selectedAnalysis?.data.jobDescription}
         analysisData={selectedAnalysis?.data.analysis}
         roastId={selectedAnalysis?.id}
+        onInterviewPrepGenerated={handleInterviewPrepGenerated}
       />
 
       {/* Resume Optimization Modal */}
@@ -1120,6 +1205,17 @@ function DashboardContent() {
         onClose={() => setShowResumeOptimizationModal(false)}
         onConfirm={handleOptimizationConfirm}
         isGenerating={isGeneratingOptimized}
+      />
+
+      {/* Resume Comparison Modal */}
+      <ResumeComparisonModal
+        isOpen={showComparisonModal}
+        onClose={() => setShowComparisonModal(false)}
+        analysisId={selectedAnalysis?.id || ''}
+        originalResumeData={selectedAnalysis?.data.resumeData}
+        jobDescription={selectedAnalysis?.data.jobDescription || ''}
+        analysisData={selectedAnalysis?.data.analysis}
+        pdfImages={selectedAnalysis?.pdfImages}
       />
       
       <Footer />

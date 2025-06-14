@@ -321,7 +321,7 @@ export default function SharedAnalysisPage() {
                         ? 'text-yellow-600'
                         : 'text-red-600'
                   }`}>
-                    {analysis.keywordMatch.matchPercentage}%
+                    {Math.round(analysis.keywordMatch.matchPercentage || 0)}%
                   </span>
                 </div>
                 <p className="text-xs text-gray-600">

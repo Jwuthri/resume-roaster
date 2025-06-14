@@ -6,6 +6,8 @@ import { LLMLogger, MessageRole } from '@/lib/llm-logger'
 import { ANTHROPIC_MODELS, ANTHROPIC_CONTEXT_SIZES, ANTHROPIC_TEMPERATURES, callAnthropicResumeOptimization } from '@/lib/anthropic-utils'
 import { callOpenAIText, callOpenAIResumeOptimization, CONTEXT_SIZES, TEMPERATURES } from '@/lib/openai-utils'
 import { OPENAI_MODELS } from '@/lib/constants'
+import { generateHTMLScreenshot } from '@/lib/screenshot-utils'
+import { getTemplateById } from '@/lib/resume-templates'
 import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -329,7 +331,8 @@ Please use the optimize_resume_data function to return the structured optimizati
         systemPrompt: 'You are an expert resume optimizer specializing in CONCISE, high-impact resumes. Create optimized resume content that is brief, quantified, and tailored to specific job requirements. Prioritize brevity and impact over lengthy descriptions. Use the provided tool to return structured optimization results with concise content.'
       })
       
-      optimizedData = response.data
+      // Extract the new data structure
+      optimizedData = response.data.optimizedData || response.data
       processingTime = response.processingTime
       tokensUsed = response.usage.totalTokens
       estimatedCost = response.cost
@@ -342,8 +345,9 @@ Please use the optimize_resume_data function to return the structured optimizati
         systemPrompt: 'You are an expert resume optimizer specializing in CONCISE, high-impact resumes. Create optimized resume content that is brief, quantified, and tailored to specific job requirements. Prioritize brevity and impact over lengthy descriptions. Use the provided tool to return structured optimization results with concise content.'
       })
       
-      // Function calling returns structured data directly
-      optimizedData = openAIResponse.data
+      // Extract the new data structure
+      optimizedData = openAIResponse.data.optimizedData || openAIResponse.data
+      response = openAIResponse
       processingTime = openAIResponse.processingTime
       tokensUsed = openAIResponse.usage.totalTokens
       estimatedCost = openAIResponse.cost
@@ -352,6 +356,16 @@ Please use the optimize_resume_data function to return the structured optimizati
     console.log('Resume optimization completed successfully')
     console.log('Processing time:', processingTime, 'ms')
     console.log('Tokens used:', tokensUsed)
+
+    // Extract scoring information from the response
+    const scoringData = response.data.scoring || {}
+    const improvements = response.data.improvements || []
+    
+    console.log('📊 Extracted scoring data:', {
+      overallScore: scoringData.overallScore,
+      scoreLabel: scoringData.scoreLabel,
+      keywordMatchPercentage: scoringData.keywordMatch?.matchPercentage
+    })
 
     // Deduct credits for successful model usage
     try {
@@ -362,12 +376,57 @@ Please use the optimize_resume_data function to return the structured optimizati
       // Log the error but don't fail the request since the optimization was successful
     }
 
-    // Calculate ATS score and extract keywords
+    // Calculate ATS score for the optimized resume and extract keywords
     const atsScore = calculateATSScore(optimizedData, jobContent)
     const keywordsMatched = extractKeywordsMatched(optimizedData, jobContent)
 
+    // Get original analysis scoring for comparison
+    const originalScore = (analysis?.data && typeof analysis.data === 'object' && 'overallScore' in analysis.data) 
+      ? (analysis.data as any).overallScore : null
+    const originalAtsScore = (analysis?.data && typeof analysis.data === 'object' && 'keywordMatch' in analysis.data) 
+      ? (analysis.data as any).keywordMatch?.matchPercentage : null
+
+    console.log('📈 Score comparison:', {
+      originalScore,
+      optimizedScore: scoringData.overallScore,
+      originalAtsScore,
+      optimizedAtsScore: scoringData.keywordMatch?.matchPercentage
+    })
+
     // Generate optimized resume content (HTML)
     const optimizedContent = generateOptimizedResumeContent(optimizedData)
+
+    // Generate screenshots of the optimized resume
+    let optimizedImages: string[] = []
+    try {
+      console.log('Generating screenshots for optimized resume...')
+      
+      // Use the template to generate properly styled HTML
+      const template = getTemplateById('your-resume-style')
+      if (template) {
+        const styledHTML = template.generateHTML(optimizedData)
+        const screenshot = await generateHTMLScreenshot(styledHTML, {
+          width: 794,
+          height: 1123,
+          format: 'png',
+          fullPage: true
+        })
+        optimizedImages = [screenshot]
+        console.log('Successfully generated optimized resume screenshot')
+      } else {
+        console.warn('Template not found, using basic HTML for screenshot')
+        const screenshot = await generateHTMLScreenshot(optimizedContent, {
+          width: 794,
+          height: 1123,
+          format: 'png',
+          fullPage: true
+        })
+        optimizedImages = [screenshot]
+      }
+    } catch (screenshotError) {
+      console.error('Failed to generate optimized resume screenshots:', screenshotError)
+      // Continue without screenshots - don't fail the entire operation
+    }
 
     // Store the optimization in database
     let llmCallId = null
@@ -405,7 +464,7 @@ Please use the optimize_resume_data function to return the structured optimizati
         data: {
           llmCallId: llmCall.id,
           role: 'assistant',
-          content: JSON.stringify(optimizedData),
+          content: JSON.stringify(response.data),
           messageIndex: 1,
           totalTokens: Math.floor(tokensUsed * 0.2) // Estimate output tokens
         }
@@ -420,11 +479,18 @@ Please use the optimize_resume_data function to return the structured optimizati
           // Update existing record with new data (for regeneration)
           content: optimizedContent,
           data: optimizedData,
+          images: optimizedImages,
           atsScore: atsScore,
           keywordsMatched: keywordsMatched,
           roastId: roastId,
           extractedResumeId: analysis.extractedResumeId,
-          extractedJobId: analysis.extractedJobId
+          extractedJobId: analysis.extractedJobId,
+          // Add new scoring fields
+          overallScore: scoringData.overallScore || null,
+          scoringBreakdown: scoringData.scoringBreakdown || null,
+          scoreLabel: scoringData.scoreLabel || null,
+          keywordMatchPercentage: scoringData.keywordMatch?.matchPercentage || null,
+          originalAtsScore: originalAtsScore
         },
         create: {
           userId: user.id,
@@ -432,11 +498,18 @@ Please use the optimize_resume_data function to return the structured optimizati
           contentHash: contentHash,
           content: optimizedContent,
           data: optimizedData,
+          images: optimizedImages,
           atsScore: atsScore,
           keywordsMatched: keywordsMatched,
           roastId: roastId,
           extractedResumeId: analysis.extractedResumeId,
-          extractedJobId: analysis.extractedJobId
+          extractedJobId: analysis.extractedJobId,
+          // Add new scoring fields
+          overallScore: scoringData.overallScore || null,
+          scoringBreakdown: scoringData.scoringBreakdown || null,
+          scoreLabel: scoringData.scoreLabel || null,
+          keywordMatchPercentage: scoringData.keywordMatch?.matchPercentage || null,
+          originalAtsScore: originalAtsScore
         }
       })
 
@@ -448,6 +521,7 @@ Please use the optimize_resume_data function to return the structured optimizati
       console.log('   - Extracted Resume ID:', analysis.extractedResumeId)
       console.log('   - Extracted Job ID:', analysis.extractedJobId)
       console.log('   - Content Hash:', contentHash)
+      console.log('   - Overall Score:', scoringData.overallScore)
     } catch (dbError) {
       console.error('Failed to store resume optimization:', dbError)
       // Continue without failing the request
@@ -459,15 +533,22 @@ Please use the optimize_resume_data function to return the structured optimizati
       data: optimizedData,
       cached: false,
       resumeId: generatedResumeId,
+      scoring: scoringData,
+      improvements,
       metadata: {
         tokensUsed,
         processingTime,
         estimatedCost,
         atsScore,
         keywordsMatched,
-        optimizationSuggestions: optimizedData.suggestions || ['Resume optimized for target job'],
+        optimizationSuggestions: improvements,
         llmCallId,
-        creditsDeducted: affordability.creditCost
+        creditsDeducted: affordability.creditCost,
+        // Score comparisons
+        originalScore,
+        optimizedScore: scoringData.overallScore,
+        originalAtsScore,
+        optimizedAtsScore: scoringData.keywordMatch?.matchPercentage
       }
     })
 

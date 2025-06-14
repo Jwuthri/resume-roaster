@@ -18259,10 +18259,16 @@ export namespace Prisma {
 
   export type GeneratedResumeAvgAggregateOutputType = {
     atsScore: number | null
+    overallScore: number | null
+    keywordMatchPercentage: number | null
+    originalAtsScore: number | null
   }
 
   export type GeneratedResumeSumAggregateOutputType = {
     atsScore: number | null
+    overallScore: number | null
+    keywordMatchPercentage: number | null
+    originalAtsScore: number | null
   }
 
   export type GeneratedResumeMinAggregateOutputType = {
@@ -18275,6 +18281,10 @@ export namespace Prisma {
     contentHash: string | null
     content: string | null
     atsScore: number | null
+    overallScore: number | null
+    scoreLabel: string | null
+    keywordMatchPercentage: number | null
+    originalAtsScore: number | null
     createdAt: Date | null
   }
 
@@ -18288,6 +18298,10 @@ export namespace Prisma {
     contentHash: string | null
     content: string | null
     atsScore: number | null
+    overallScore: number | null
+    scoreLabel: string | null
+    keywordMatchPercentage: number | null
+    originalAtsScore: number | null
     createdAt: Date | null
   }
 
@@ -18301,8 +18315,14 @@ export namespace Prisma {
     contentHash: number
     content: number
     data: number
+    images: number
     atsScore: number
     keywordsMatched: number
+    overallScore: number
+    scoringBreakdown: number
+    scoreLabel: number
+    keywordMatchPercentage: number
+    originalAtsScore: number
     createdAt: number
     _all: number
   }
@@ -18310,10 +18330,16 @@ export namespace Prisma {
 
   export type GeneratedResumeAvgAggregateInputType = {
     atsScore?: true
+    overallScore?: true
+    keywordMatchPercentage?: true
+    originalAtsScore?: true
   }
 
   export type GeneratedResumeSumAggregateInputType = {
     atsScore?: true
+    overallScore?: true
+    keywordMatchPercentage?: true
+    originalAtsScore?: true
   }
 
   export type GeneratedResumeMinAggregateInputType = {
@@ -18326,6 +18352,10 @@ export namespace Prisma {
     contentHash?: true
     content?: true
     atsScore?: true
+    overallScore?: true
+    scoreLabel?: true
+    keywordMatchPercentage?: true
+    originalAtsScore?: true
     createdAt?: true
   }
 
@@ -18339,6 +18369,10 @@ export namespace Prisma {
     contentHash?: true
     content?: true
     atsScore?: true
+    overallScore?: true
+    scoreLabel?: true
+    keywordMatchPercentage?: true
+    originalAtsScore?: true
     createdAt?: true
   }
 
@@ -18352,8 +18386,14 @@ export namespace Prisma {
     contentHash?: true
     content?: true
     data?: true
+    images?: true
     atsScore?: true
     keywordsMatched?: true
+    overallScore?: true
+    scoringBreakdown?: true
+    scoreLabel?: true
+    keywordMatchPercentage?: true
+    originalAtsScore?: true
     createdAt?: true
     _all?: true
   }
@@ -18454,8 +18494,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonValue
+    images: string[]
     atsScore: number | null
     keywordsMatched: string[]
+    overallScore: number | null
+    scoringBreakdown: JsonValue | null
+    scoreLabel: string | null
+    keywordMatchPercentage: number | null
+    originalAtsScore: number | null
     createdAt: Date
     _count: GeneratedResumeCountAggregateOutputType | null
     _avg: GeneratedResumeAvgAggregateOutputType | null
@@ -18488,8 +18534,14 @@ export namespace Prisma {
     contentHash?: boolean
     content?: boolean
     data?: boolean
+    images?: boolean
     atsScore?: boolean
     keywordsMatched?: boolean
+    overallScore?: boolean
+    scoringBreakdown?: boolean
+    scoreLabel?: boolean
+    keywordMatchPercentage?: boolean
+    originalAtsScore?: boolean
     createdAt?: boolean
     user?: boolean | GeneratedResume$userArgs<ExtArgs>
     roast?: boolean | GeneratedResume$roastArgs<ExtArgs>
@@ -18509,8 +18561,14 @@ export namespace Prisma {
     contentHash?: boolean
     content?: boolean
     data?: boolean
+    images?: boolean
     atsScore?: boolean
     keywordsMatched?: boolean
+    overallScore?: boolean
+    scoringBreakdown?: boolean
+    scoreLabel?: boolean
+    keywordMatchPercentage?: boolean
+    originalAtsScore?: boolean
     createdAt?: boolean
     user?: boolean | GeneratedResume$userArgs<ExtArgs>
     roast?: boolean | GeneratedResume$roastArgs<ExtArgs>
@@ -18528,8 +18586,14 @@ export namespace Prisma {
     contentHash?: boolean
     content?: boolean
     data?: boolean
+    images?: boolean
     atsScore?: boolean
     keywordsMatched?: boolean
+    overallScore?: boolean
+    scoringBreakdown?: boolean
+    scoreLabel?: boolean
+    keywordMatchPercentage?: boolean
+    originalAtsScore?: boolean
     createdAt?: boolean
     user?: boolean | GeneratedResume$userArgs<ExtArgs>
     roast?: boolean | GeneratedResume$roastArgs<ExtArgs>
@@ -18547,12 +18611,18 @@ export namespace Prisma {
     contentHash?: boolean
     content?: boolean
     data?: boolean
+    images?: boolean
     atsScore?: boolean
     keywordsMatched?: boolean
+    overallScore?: boolean
+    scoringBreakdown?: boolean
+    scoreLabel?: boolean
+    keywordMatchPercentage?: boolean
+    originalAtsScore?: boolean
     createdAt?: boolean
   }
 
-  export type GeneratedResumeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "roastId" | "extractedResumeId" | "extractedJobId" | "templateId" | "contentHash" | "content" | "data" | "atsScore" | "keywordsMatched" | "createdAt", ExtArgs["result"]["generatedResume"]>
+  export type GeneratedResumeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "roastId" | "extractedResumeId" | "extractedJobId" | "templateId" | "contentHash" | "content" | "data" | "images" | "atsScore" | "keywordsMatched" | "overallScore" | "scoringBreakdown" | "scoreLabel" | "keywordMatchPercentage" | "originalAtsScore" | "createdAt", ExtArgs["result"]["generatedResume"]>
   export type GeneratedResumeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | GeneratedResume$userArgs<ExtArgs>
     roast?: boolean | GeneratedResume$roastArgs<ExtArgs>
@@ -18593,8 +18663,14 @@ export namespace Prisma {
       contentHash: string
       content: string
       data: Prisma.JsonValue
+      images: string[]
       atsScore: number | null
       keywordsMatched: string[]
+      overallScore: number | null
+      scoringBreakdown: Prisma.JsonValue | null
+      scoreLabel: string | null
+      keywordMatchPercentage: number | null
+      originalAtsScore: number | null
       createdAt: Date
     }, ExtArgs["result"]["generatedResume"]>
     composites: {}
@@ -19033,8 +19109,14 @@ export namespace Prisma {
     readonly contentHash: FieldRef<"GeneratedResume", 'String'>
     readonly content: FieldRef<"GeneratedResume", 'String'>
     readonly data: FieldRef<"GeneratedResume", 'Json'>
+    readonly images: FieldRef<"GeneratedResume", 'String[]'>
     readonly atsScore: FieldRef<"GeneratedResume", 'Int'>
     readonly keywordsMatched: FieldRef<"GeneratedResume", 'String[]'>
+    readonly overallScore: FieldRef<"GeneratedResume", 'Int'>
+    readonly scoringBreakdown: FieldRef<"GeneratedResume", 'Json'>
+    readonly scoreLabel: FieldRef<"GeneratedResume", 'String'>
+    readonly keywordMatchPercentage: FieldRef<"GeneratedResume", 'Int'>
+    readonly originalAtsScore: FieldRef<"GeneratedResume", 'Int'>
     readonly createdAt: FieldRef<"GeneratedResume", 'DateTime'>
   }
     
@@ -26751,8 +26833,14 @@ export namespace Prisma {
     contentHash: 'contentHash',
     content: 'content',
     data: 'data',
+    images: 'images',
     atsScore: 'atsScore',
     keywordsMatched: 'keywordsMatched',
+    overallScore: 'overallScore',
+    scoringBreakdown: 'scoringBreakdown',
+    scoreLabel: 'scoreLabel',
+    keywordMatchPercentage: 'keywordMatchPercentage',
+    originalAtsScore: 'originalAtsScore',
     createdAt: 'createdAt'
   };
 
@@ -28197,8 +28285,14 @@ export namespace Prisma {
     contentHash?: StringFilter<"GeneratedResume"> | string
     content?: StringFilter<"GeneratedResume"> | string
     data?: JsonFilter<"GeneratedResume">
+    images?: StringNullableListFilter<"GeneratedResume">
     atsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     keywordsMatched?: StringNullableListFilter<"GeneratedResume">
+    overallScore?: IntNullableFilter<"GeneratedResume"> | number | null
+    scoringBreakdown?: JsonNullableFilter<"GeneratedResume">
+    scoreLabel?: StringNullableFilter<"GeneratedResume"> | string | null
+    keywordMatchPercentage?: IntNullableFilter<"GeneratedResume"> | number | null
+    originalAtsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     createdAt?: DateTimeFilter<"GeneratedResume"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     roast?: XOR<GeneratedRoastNullableScalarRelationFilter, GeneratedRoastWhereInput> | null
@@ -28217,8 +28311,14 @@ export namespace Prisma {
     contentHash?: SortOrder
     content?: SortOrder
     data?: SortOrder
+    images?: SortOrder
     atsScore?: SortOrderInput | SortOrder
     keywordsMatched?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    scoringBreakdown?: SortOrderInput | SortOrder
+    scoreLabel?: SortOrderInput | SortOrder
+    keywordMatchPercentage?: SortOrderInput | SortOrder
+    originalAtsScore?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
     roast?: GeneratedRoastOrderByWithRelationInput
@@ -28240,8 +28340,14 @@ export namespace Prisma {
     templateId?: StringFilter<"GeneratedResume"> | string
     content?: StringFilter<"GeneratedResume"> | string
     data?: JsonFilter<"GeneratedResume">
+    images?: StringNullableListFilter<"GeneratedResume">
     atsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     keywordsMatched?: StringNullableListFilter<"GeneratedResume">
+    overallScore?: IntNullableFilter<"GeneratedResume"> | number | null
+    scoringBreakdown?: JsonNullableFilter<"GeneratedResume">
+    scoreLabel?: StringNullableFilter<"GeneratedResume"> | string | null
+    keywordMatchPercentage?: IntNullableFilter<"GeneratedResume"> | number | null
+    originalAtsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     createdAt?: DateTimeFilter<"GeneratedResume"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     roast?: XOR<GeneratedRoastNullableScalarRelationFilter, GeneratedRoastWhereInput> | null
@@ -28260,8 +28366,14 @@ export namespace Prisma {
     contentHash?: SortOrder
     content?: SortOrder
     data?: SortOrder
+    images?: SortOrder
     atsScore?: SortOrderInput | SortOrder
     keywordsMatched?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    scoringBreakdown?: SortOrderInput | SortOrder
+    scoreLabel?: SortOrderInput | SortOrder
+    keywordMatchPercentage?: SortOrderInput | SortOrder
+    originalAtsScore?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: GeneratedResumeCountOrderByAggregateInput
     _avg?: GeneratedResumeAvgOrderByAggregateInput
@@ -28283,8 +28395,14 @@ export namespace Prisma {
     contentHash?: StringWithAggregatesFilter<"GeneratedResume"> | string
     content?: StringWithAggregatesFilter<"GeneratedResume"> | string
     data?: JsonWithAggregatesFilter<"GeneratedResume">
+    images?: StringNullableListFilter<"GeneratedResume">
     atsScore?: IntNullableWithAggregatesFilter<"GeneratedResume"> | number | null
     keywordsMatched?: StringNullableListFilter<"GeneratedResume">
+    overallScore?: IntNullableWithAggregatesFilter<"GeneratedResume"> | number | null
+    scoringBreakdown?: JsonNullableWithAggregatesFilter<"GeneratedResume">
+    scoreLabel?: StringNullableWithAggregatesFilter<"GeneratedResume"> | string | null
+    keywordMatchPercentage?: IntNullableWithAggregatesFilter<"GeneratedResume"> | number | null
+    originalAtsScore?: IntNullableWithAggregatesFilter<"GeneratedResume"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"GeneratedResume"> | Date | string
   }
 
@@ -29982,8 +30100,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutGeneratedResumesInput
     roast?: GeneratedRoastCreateNestedOneWithoutGeneratedResumesInput
@@ -30002,8 +30126,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutGeneratedResumeInput
   }
@@ -30014,8 +30144,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutGeneratedResumesNestedInput
     roast?: GeneratedRoastUpdateOneWithoutGeneratedResumesNestedInput
@@ -30034,8 +30170,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     llmCalls?: LlmCallUncheckedUpdateManyWithoutGeneratedResumeNestedInput
   }
@@ -30050,8 +30192,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -30061,8 +30209,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -30076,8 +30230,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -31778,13 +31938,22 @@ export namespace Prisma {
     contentHash?: SortOrder
     content?: SortOrder
     data?: SortOrder
+    images?: SortOrder
     atsScore?: SortOrder
     keywordsMatched?: SortOrder
+    overallScore?: SortOrder
+    scoringBreakdown?: SortOrder
+    scoreLabel?: SortOrder
+    keywordMatchPercentage?: SortOrder
+    originalAtsScore?: SortOrder
     createdAt?: SortOrder
   }
 
   export type GeneratedResumeAvgOrderByAggregateInput = {
     atsScore?: SortOrder
+    overallScore?: SortOrder
+    keywordMatchPercentage?: SortOrder
+    originalAtsScore?: SortOrder
   }
 
   export type GeneratedResumeMaxOrderByAggregateInput = {
@@ -31797,6 +31966,10 @@ export namespace Prisma {
     contentHash?: SortOrder
     content?: SortOrder
     atsScore?: SortOrder
+    overallScore?: SortOrder
+    scoreLabel?: SortOrder
+    keywordMatchPercentage?: SortOrder
+    originalAtsScore?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -31810,11 +31983,18 @@ export namespace Prisma {
     contentHash?: SortOrder
     content?: SortOrder
     atsScore?: SortOrder
+    overallScore?: SortOrder
+    scoreLabel?: SortOrder
+    keywordMatchPercentage?: SortOrder
+    originalAtsScore?: SortOrder
     createdAt?: SortOrder
   }
 
   export type GeneratedResumeSumOrderByAggregateInput = {
     atsScore?: SortOrder
+    overallScore?: SortOrder
+    keywordMatchPercentage?: SortOrder
+    originalAtsScore?: SortOrder
   }
 
   export type GeneratedInterviewPrepCountOrderByAggregateInput = {
@@ -34168,6 +34348,10 @@ export namespace Prisma {
     deleteMany?: LlmCallScalarWhereInput | LlmCallScalarWhereInput[]
   }
 
+  export type GeneratedResumeCreateimagesInput = {
+    set: string[]
+  }
+
   export type GeneratedResumeCreatekeywordsMatchedInput = {
     set: string[]
   }
@@ -34208,6 +34392,11 @@ export namespace Prisma {
     connectOrCreate?: LlmCallCreateOrConnectWithoutGeneratedResumeInput | LlmCallCreateOrConnectWithoutGeneratedResumeInput[]
     createMany?: LlmCallCreateManyGeneratedResumeInputEnvelope
     connect?: LlmCallWhereUniqueInput | LlmCallWhereUniqueInput[]
+  }
+
+  export type GeneratedResumeUpdateimagesInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type GeneratedResumeUpdatekeywordsMatchedInput = {
@@ -35236,8 +35425,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     roast?: GeneratedRoastCreateNestedOneWithoutGeneratedResumesInput
     extractedResume?: ExtractedResumeCreateNestedOneWithoutGeneratedResumesInput
@@ -35254,8 +35449,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutGeneratedResumeInput
   }
@@ -35714,8 +35915,14 @@ export namespace Prisma {
     contentHash?: StringFilter<"GeneratedResume"> | string
     content?: StringFilter<"GeneratedResume"> | string
     data?: JsonFilter<"GeneratedResume">
+    images?: StringNullableListFilter<"GeneratedResume">
     atsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     keywordsMatched?: StringNullableListFilter<"GeneratedResume">
+    overallScore?: IntNullableFilter<"GeneratedResume"> | number | null
+    scoringBreakdown?: JsonNullableFilter<"GeneratedResume">
+    scoreLabel?: StringNullableFilter<"GeneratedResume"> | string | null
+    keywordMatchPercentage?: IntNullableFilter<"GeneratedResume"> | number | null
+    originalAtsScore?: IntNullableFilter<"GeneratedResume"> | number | null
     createdAt?: DateTimeFilter<"GeneratedResume"> | Date | string
   }
 
@@ -36438,8 +36645,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutGeneratedResumesInput
     roast?: GeneratedRoastCreateNestedOneWithoutGeneratedResumesInput
@@ -36457,8 +36670,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -36839,8 +37058,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutGeneratedResumesNestedInput
     roast?: GeneratedRoastUpdateOneWithoutGeneratedResumesNestedInput
@@ -36858,8 +37083,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -37711,8 +37942,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutGeneratedResumesInput
     roast?: GeneratedRoastCreateNestedOneWithoutGeneratedResumesInput
@@ -37729,8 +37966,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutGeneratedResumeInput
   }
@@ -38245,8 +38488,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutGeneratedResumesInput
     roast?: GeneratedRoastCreateNestedOneWithoutGeneratedResumesInput
@@ -38263,8 +38512,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutGeneratedResumeInput
   }
@@ -38945,8 +39200,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     user?: UserCreateNestedOneWithoutGeneratedResumesInput
     extractedResume?: ExtractedResumeCreateNestedOneWithoutGeneratedResumesInput
@@ -38963,8 +39224,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
     llmCalls?: LlmCallUncheckedCreateNestedManyWithoutGeneratedResumeInput
   }
@@ -41557,8 +41824,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -41922,8 +42195,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roast?: GeneratedRoastUpdateOneWithoutGeneratedResumesNestedInput
     extractedResume?: ExtractedResumeUpdateOneWithoutGeneratedResumesNestedInput
@@ -41940,8 +42219,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     llmCalls?: LlmCallUncheckedUpdateManyWithoutGeneratedResumeNestedInput
   }
@@ -41955,8 +42240,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -42541,8 +42832,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -42744,8 +43041,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutGeneratedResumesNestedInput
     roast?: GeneratedRoastUpdateOneWithoutGeneratedResumesNestedInput
@@ -42762,8 +43065,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     llmCalls?: LlmCallUncheckedUpdateManyWithoutGeneratedResumeNestedInput
   }
@@ -42777,8 +43086,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -42889,8 +43204,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -43092,8 +43413,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutGeneratedResumesNestedInput
     roast?: GeneratedRoastUpdateOneWithoutGeneratedResumesNestedInput
@@ -43110,8 +43437,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     llmCalls?: LlmCallUncheckedUpdateManyWithoutGeneratedResumeNestedInput
   }
@@ -43125,8 +43458,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -43228,8 +43567,14 @@ export namespace Prisma {
     contentHash: string
     content: string
     data: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeCreateimagesInput | string[]
     atsScore?: number | null
     keywordsMatched?: GeneratedResumeCreatekeywordsMatchedInput | string[]
+    overallScore?: number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: string | null
+    keywordMatchPercentage?: number | null
+    originalAtsScore?: number | null
     createdAt?: Date | string
   }
 
@@ -43394,8 +43739,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneWithoutGeneratedResumesNestedInput
     extractedResume?: ExtractedResumeUpdateOneWithoutGeneratedResumesNestedInput
@@ -43412,8 +43763,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     llmCalls?: LlmCallUncheckedUpdateManyWithoutGeneratedResumeNestedInput
   }
@@ -43427,8 +43784,14 @@ export namespace Prisma {
     contentHash?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     data?: JsonNullValueInput | InputJsonValue
+    images?: GeneratedResumeUpdateimagesInput | string[]
     atsScore?: NullableIntFieldUpdateOperationsInput | number | null
     keywordsMatched?: GeneratedResumeUpdatekeywordsMatchedInput | string[]
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    scoringBreakdown?: NullableJsonNullValueInput | InputJsonValue
+    scoreLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    keywordMatchPercentage?: NullableIntFieldUpdateOperationsInput | number | null
+    originalAtsScore?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

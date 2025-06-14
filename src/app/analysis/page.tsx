@@ -41,6 +41,7 @@ import Link from "next/link"
 import { ArrowLeft, ChevronDown } from "lucide-react"
 import { useAnalysisActions } from "@/hooks/useAnalysisActions"
 import { useSubscription } from "@/hooks/useSubscription"
+import { useUserProfile } from "@/hooks/useUserProfile"
 import { Footer } from "@/components/ui/footer"
 import { CoverLetterModal } from "@/components/ui/cover-letter-modal"
 import { Navigation } from "@/components/ui/navigation"
@@ -94,6 +95,7 @@ export default function AnalysisPage() {
   
   const { downloadReport, shareAnalysis, isDownloading, isSharing } = useAnalysisActions()
   const { subscription } = useSubscription()
+  const { profile, updateProfile } = useUserProfile()
   const router = useRouter()
   const { showAlert, AlertDialog } = useAlertDialog()
 
@@ -247,9 +249,9 @@ Note: Original resume text was not available, using analysis data for optimizati
           confirmText: "Use Existing (Instant)",
           cancelText: "Generate New",
           showCancel: true,
-          onConfirm: () => {
+          onConfirm: async () => {
             // Continue with existing data
-            proceedWithExistingData()
+            await proceedWithExistingData()
           },
           onCancel: async () => {
             // User wants fresh processing - properly handle async operation
@@ -307,12 +309,27 @@ Note: Original resume text was not available, using analysis data for optimizati
   }
 
   // Helper function to proceed with existing data
-  const proceedWithExistingData = () => {
+  const proceedWithExistingData = async () => {
     // Store the analysis data for the resume optimizer
     sessionStorage.setItem('roastId', roastId || '')
     sessionStorage.setItem('isFromAnalysis', 'true')
     if (jobDescription) {
       sessionStorage.setItem('analysisJobDescription', jobDescription)
+    }
+    
+    // Update profile with current roast ID and job description
+    if (updateProfile) {
+      try {
+        await updateProfile({
+          currentRoastId: roastId || null,
+          currentJobDescription: jobDescription || null,
+          isFromAnalysis: true,
+          lastPage: '/resume-optimizer'
+        })
+        console.log('✅ Profile updated with roast ID:', roastId)
+      } catch (error) {
+        console.error('❌ Failed to update profile:', error)
+      }
     }
     
     // Redirect to Resume Optimizer with prefilled parameter
@@ -353,11 +370,11 @@ Note: Original resume text was not available, using analysis data for optimizati
     console.log('Optimization completed and saved to database')
     
     // Proceed with the optimized data
-    proceedWithOptimizedData(optimizedData, result)
+    await proceedWithOptimizedData(optimizedData, result)
   }
 
   // Helper function to proceed with optimized data
-  const proceedWithOptimizedData = (optimizedData: any, result: any) => {
+  const proceedWithOptimizedData = async (optimizedData: any, result: any) => {
     console.log('Optimized data ready:', optimizedData)
     
     // Store the optimized data in session storage with analysis context
@@ -367,6 +384,21 @@ Note: Original resume text was not available, using analysis data for optimizati
     sessionStorage.setItem('roastId', roastId || '')
     if (jobDescription) {
       sessionStorage.setItem('analysisJobDescription', jobDescription)
+    }
+    
+    // Update profile with current roast ID and job description
+    if (updateProfile) {
+      try {
+        await updateProfile({
+          currentRoastId: roastId || null,
+          currentJobDescription: jobDescription || null,
+          isFromAnalysis: true,
+          lastPage: '/resume-optimizer'
+        })
+        console.log('✅ Profile updated with roast ID:', roastId)
+      } catch (error) {
+        console.error('❌ Failed to update profile:', error)
+      }
     }
     
     // Redirect to Resume Optimizer with prefilled parameter
@@ -409,161 +441,223 @@ Note: Original resume text was not available, using analysis data for optimizati
   }
 
   useEffect(() => {
-    // Load analysis results from sessionStorage
-    const storedAnalysis = sessionStorage.getItem('analysisResults')
-    const storedResumeData = sessionStorage.getItem('resumeData')
-    const storedJobDescription = sessionStorage.getItem('jobDescription')
-    const storedRoastId = sessionStorage.getItem('roastId')
-    const storedPdfImages = sessionStorage.getItem('pdfImages')
-    const storedDocumentId = sessionStorage.getItem('documentId')
-    const storedExtractedResumeId = sessionStorage.getItem('extractedResumeId')
-    const isFromDashboard = sessionStorage.getItem('isFromDashboard') === 'true'
-    const dashboardRoastId = sessionStorage.getItem('dashboardRoastId')
-    
-    console.log('=== ANALYSIS PAGE LOAD DEBUG ===')
-    console.log('Stored analysis:', !!storedAnalysis)
-    console.log('Stored resume data:', !!storedResumeData)
-    console.log('Stored job description:', !!storedJobDescription)
-    console.log('Stored roast ID:', storedRoastId)
-    console.log('Stored document ID:', storedDocumentId)
-    console.log('Stored extracted resume ID:', storedExtractedResumeId)
-    console.log('Stored PDF images:', !!storedPdfImages)
-    console.log('Is from dashboard:', isFromDashboard)
-    console.log('Dashboard roast ID:', dashboardRoastId)
-    
-    // Load resume data first
-    if (storedResumeData) {
-      try {
-        const parsedResumeData = JSON.parse(storedResumeData)
-        // Ensure documentId is included in resumeData
-        if (storedDocumentId && !parsedResumeData.documentId) {
-          parsedResumeData.documentId = storedDocumentId
-        }
-        // Ensure extractedResumeId is included in resumeData
-        if (storedExtractedResumeId && !parsedResumeData.extractedResumeId) {
-          parsedResumeData.extractedResumeId = storedExtractedResumeId
-        }
-        setResumeData(parsedResumeData)
-        console.log('✅ Resume data loaded successfully')
-      } catch (error) {
-        console.error('❌ Failed to parse resume data:', error)
+    const loadAnalysisData = async () => {
+      // Load analysis results from URL parameters and database instead of sessionStorage
+      const urlParams = new URLSearchParams(window.location.search)
+      const urlRoastId = urlParams.get('roastId')
+      
+      // Try sessionStorage as fallback for backward compatibility
+      const storedAnalysis = sessionStorage.getItem('analysisResults')
+      const storedResumeData = sessionStorage.getItem('resumeData')
+      const storedJobDescription = sessionStorage.getItem('jobDescription')
+      const storedRoastId = sessionStorage.getItem('roastId')
+      const storedPdfImages = sessionStorage.getItem('pdfImages')
+      const storedDocumentId = sessionStorage.getItem('documentId')
+      const storedExtractedResumeId = sessionStorage.getItem('extractedResumeId')
+      const isFromDashboard = sessionStorage.getItem('isFromDashboard') === 'true'
+      const dashboardRoastId = sessionStorage.getItem('dashboardRoastId')
+      
+      console.log('=== ANALYSIS PAGE LOAD DEBUG ===')
+      console.log('URL roast ID:', urlRoastId)
+      console.log('Stored analysis:', !!storedAnalysis)
+      console.log('Stored resume data:', !!storedResumeData)
+      console.log('Stored job description:', !!storedJobDescription)
+      console.log('Stored roast ID:', storedRoastId)
+      console.log('Stored document ID:', storedDocumentId)
+      console.log('Stored extracted resume ID:', storedExtractedResumeId)
+      console.log('Stored PDF images:', !!storedPdfImages)
+      console.log('Is from dashboard:', isFromDashboard)
+      console.log('Dashboard roast ID:', dashboardRoastId)
+      
+      // Determine roast ID - prioritize URL parameter, then profile, then sessionStorage
+      let finalRoastId = null
+      if (urlRoastId) {
+        finalRoastId = urlRoastId
+        setRoastId(urlRoastId)
+        console.log('✅ Using URL roast ID:', urlRoastId)
+      } else if (profile?.currentRoastId) {
+        finalRoastId = profile.currentRoastId
+        setRoastId(profile.currentRoastId)
+        console.log('✅ Using profile roast ID:', profile.currentRoastId)
+      } else if (dashboardRoastId) {
+        finalRoastId = dashboardRoastId
+        setRoastId(dashboardRoastId)
+        console.log('✅ Using dashboard roast ID:', dashboardRoastId)
+      } else if (storedRoastId) {
+        finalRoastId = storedRoastId
+        setRoastId(storedRoastId)
+        console.log('✅ Using stored roast ID:', storedRoastId)
       }
-    }
-    
-    // Load job description
-    if (storedJobDescription) {
-      setJobDescription(storedJobDescription)
-      console.log('✅ Job description loaded successfully:', storedJobDescription.length, 'characters')
-    } else {
-      // Fallback: check if job description is stored in analysis data
+      
+      // If we have a roast ID but no sessionStorage data, fetch from API
+      if (finalRoastId && (!storedAnalysis || !storedResumeData)) {
+        console.log('🔄 Fetching analysis data from API for roast ID:', finalRoastId)
+        try {
+          const response = await fetch(`/api/analysis/${finalRoastId}`)
+          if (response.ok) {
+            const result = await response.json()
+            if (result.success) {
+              console.log('✅ Analysis data fetched from API:', result.data)
+              
+              // Set the data from API
+              setAnalysisData(result.data.analysisData)
+              setResumeData(result.data.resumeData)
+              setJobDescription(result.data.jobDescription)
+              setPdfImages(result.data.pdfImages || [])
+              setDocumentId(result.data.documentId)
+              
+              // Store in sessionStorage for future use
+              if (result.data.analysisData) {
+                sessionStorage.setItem('analysisResults', JSON.stringify(result.data.analysisData))
+              }
+              if (result.data.resumeData) {
+                sessionStorage.setItem('resumeData', JSON.stringify(result.data.resumeData))
+              }
+              if (result.data.jobDescription) {
+                sessionStorage.setItem('jobDescription', result.data.jobDescription)
+              }
+              if (result.data.pdfImages && result.data.pdfImages.length > 0) {
+                sessionStorage.setItem('pdfImages', JSON.stringify(result.data.pdfImages))
+              }
+              if (result.data.documentId) {
+                sessionStorage.setItem('documentId', result.data.documentId)
+              }
+              if (result.data.extractedResumeId) {
+                sessionStorage.setItem('extractedResumeId', result.data.extractedResumeId)
+              }
+              sessionStorage.setItem('roastId', finalRoastId)
+              
+              setIsLoading(false)
+              console.log('=== ANALYSIS PAGE LOAD COMPLETE (API) ===')
+              return
+            }
+          } else {
+            console.error('❌ Failed to fetch analysis data from API:', response.status)
+          }
+        } catch (error) {
+          console.error('❌ Error fetching analysis data from API:', error)
+        }
+      }
+      
+      // Fallback to sessionStorage if API fetch failed or no roast ID
+      console.log('📝 Loading data from sessionStorage or fallbacks')
+      
+      // Load resume data first
+      if (storedResumeData) {
+        try {
+          const parsedResumeData = JSON.parse(storedResumeData)
+          // Ensure documentId is included in resumeData
+          if (storedDocumentId && !parsedResumeData.documentId) {
+            parsedResumeData.documentId = storedDocumentId
+          }
+          // Ensure extractedResumeId is included in resumeData
+          if (storedExtractedResumeId && !parsedResumeData.extractedResumeId) {
+            parsedResumeData.extractedResumeId = storedExtractedResumeId
+          }
+          setResumeData(parsedResumeData)
+          console.log('✅ Resume data loaded from sessionStorage')
+        } catch (error) {
+          console.error('❌ Failed to parse resume data:', error)
+        }
+      }
+      
+      // Load job description - prioritize profile, then sessionStorage
+      if (profile?.currentJobDescription) {
+        setJobDescription(profile.currentJobDescription)
+        console.log('✅ Job description loaded from profile:', profile.currentJobDescription.length, 'characters')
+      } else if (storedJobDescription) {
+        setJobDescription(storedJobDescription)
+        console.log('✅ Job description loaded from sessionStorage:', storedJobDescription.length, 'characters')
+      } else {
+        // Fallback: check if job description is stored in analysis data
+        if (storedAnalysis) {
+          try {
+            const analysis = JSON.parse(storedAnalysis)
+            if (analysis.jobDescription) {
+              setJobDescription(analysis.jobDescription)
+              console.log('✅ Job description loaded from analysis data:', analysis.jobDescription.length, 'characters')
+            }
+          } catch (error) {
+            console.error('❌ Failed to parse analysis for job description fallback:', error)
+          }
+        }
+      }
+      
+      // Load extracted resume ID
+      if (storedExtractedResumeId) {
+        // Store extracted resume ID for future use
+        sessionStorage.setItem('extractedResumeId', storedExtractedResumeId)
+      }
+      
+      // Load PDF images
+      if (storedPdfImages) {
+        try {
+          const parsedImages = JSON.parse(storedPdfImages)
+          setPdfImages(parsedImages)
+          console.log('✅ PDF images loaded successfully:', parsedImages.length, 'images')
+        } catch (error) {
+          console.error('❌ Failed to parse PDF images:', error)
+        }
+      }
+      
+      // Load document ID
+      if (storedDocumentId) {
+        setDocumentId(storedDocumentId)
+      }
+      
+      // Load analysis data
       if (storedAnalysis) {
         try {
           const analysis = JSON.parse(storedAnalysis)
-          if (analysis.jobDescription) {
-            setJobDescription(analysis.jobDescription)
-            console.log('✅ Job description loaded from analysis data:', analysis.jobDescription.length, 'characters')
-          }
+          setAnalysisData(analysis)
+          console.log('✅ Analysis data loaded from sessionStorage')
         } catch (error) {
-          console.error('❌ Failed to parse analysis for job description fallback:', error)
+          console.error('❌ Failed to parse analysis results:', error)
+          // Only fall back to mock data if we don't have real data from dashboard
+          if (!isFromDashboard) {
+            console.log('📝 Using mock data as fallback')
+            setAnalysisData(getMockData())
+            // Only set mock resume data if we don't have real resume data
+            if (!storedResumeData) {
+              setResumeData(getMockResumeData())
+            }
+          }
         }
-      }
-    }
-
-    // Load roast ID - prioritize dashboard roast ID if available
-    let finalRoastId = null
-    if (dashboardRoastId) {
-      finalRoastId = dashboardRoastId
-      setRoastId(dashboardRoastId)
-      console.log('✅ Using dashboard roast ID:', dashboardRoastId)
-    } else if (storedRoastId) {
-      finalRoastId = storedRoastId
-      setRoastId(storedRoastId)
-      console.log('✅ Using stored roast ID:', storedRoastId)
-    } else {
-      console.warn('⚠️ No roast ID found in sessionStorage')
-      console.log('🔍 All sessionStorage keys:', Object.keys(sessionStorage))
-      console.log('🔍 SessionStorage contents:')
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i)
-        if (key) {
-          const value = sessionStorage.getItem(key)
-          console.log(`  ${key}: ${value ? (value.length > 100 ? value.substring(0, 100) + '...' : value) : 'null'}`)
-        }
-      }
-    }
-    
-    // Load extracted resume ID
-    if (storedExtractedResumeId) {
-      // Store extracted resume ID for future use
-      sessionStorage.setItem('extractedResumeId', storedExtractedResumeId)
-    }
-    
-    // Load PDF images
-    if (storedPdfImages) {
-      try {
-        const parsedImages = JSON.parse(storedPdfImages)
-        setPdfImages(parsedImages)
-        console.log('✅ PDF images loaded successfully:', parsedImages.length, 'images')
-      } catch (error) {
-        console.error('❌ Failed to parse PDF images:', error)
-      }
-    }
-    
-    // Load document ID
-    if (storedDocumentId) {
-      setDocumentId(storedDocumentId)
-    }
-    
-    // Load analysis data
-    if (storedAnalysis) {
-      try {
-        const analysis = JSON.parse(storedAnalysis)
-        setAnalysisData(analysis)
-        console.log('✅ Analysis data loaded successfully')
-      } catch (error) {
-        console.error('❌ Failed to parse analysis results:', error)
-        // Only fall back to mock data if we don't have real data from dashboard
-        if (!isFromDashboard) {
-          console.log('📝 Using mock data as fallback')
+      } else {
+        // Only use mock data if we're not coming from dashboard and have no real data
+        if (!isFromDashboard && !finalRoastId) {
+          console.log('📝 No stored analysis found, using mock data')
           setAnalysisData(getMockData())
           // Only set mock resume data if we don't have real resume data
           if (!storedResumeData) {
             setResumeData(getMockResumeData())
           }
+        } else {
+          console.log('⚠️ Coming from dashboard but no analysis data found - this might be an issue')
+          // Still set mock data but preserve real resume/job data
+          setAnalysisData(getMockData())
         }
       }
-    } else {
-      // Only use mock data if we're not coming from dashboard and have no real data
-      if (!isFromDashboard) {
-        console.log('📝 No stored analysis found, using mock data')
-        setAnalysisData(getMockData())
-        // Only set mock resume data if we don't have real resume data
-        if (!storedResumeData) {
-          setResumeData(getMockResumeData())
-        }
-      } else {
-        console.log('⚠️ Coming from dashboard but no analysis data found - this might be an issue')
-        // Still set mock data but preserve real resume/job data
-        setAnalysisData(getMockData())
+      
+      // Clean up dashboard flags after loading
+      if (isFromDashboard) {
+        sessionStorage.removeItem('isFromDashboard')
+        sessionStorage.removeItem('dashboardRoastId')
+        console.log('🧹 Cleaned up dashboard navigation flags')
       }
+      
+      setIsLoading(false)
+      console.log('=== ANALYSIS PAGE LOAD COMPLETE ===')
+      console.log('📊 Final state summary:')
+      console.log('  - Roast ID:', finalRoastId)
+      console.log('  - PDF images:', pdfImages.length)
+      console.log('  - Job description:', !!jobDescription)
+      console.log('  - Analysis data:', !!analysisData)
+      console.log('  - Resume data:', !!resumeData)
     }
     
-    // Clean up dashboard flags after loading
-    if (isFromDashboard) {
-      sessionStorage.removeItem('isFromDashboard')
-      sessionStorage.removeItem('dashboardRoastId')
-      console.log('🧹 Cleaned up dashboard navigation flags')
-    }
-    
-    setIsLoading(false)
-    console.log('=== ANALYSIS PAGE LOAD COMPLETE ===')
-    console.log('📊 Final state summary:')
-    console.log('  - Roast ID:', finalRoastId)
-    console.log('  - PDF images:', pdfImages.length)
-    console.log('  - Job description:', !!jobDescription)
-    console.log('  - Analysis data:', !!analysisData)
-    console.log('  - Resume data:', !!resumeData)
-  }, [])
+    loadAnalysisData()
+  }, [profile])
 
   // Debug effect to log state changes
   useEffect(() => {
@@ -779,6 +873,75 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
           </Card>
         </div>
 
+
+        {/* Scoring Breakdown */}
+        {analysisData.scoringBreakdown && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Score Breakdown</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-br from-cyan-100 to-teal-200 border-cyan-200 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="p-3 bg-cyan-500/20 rounded-lg w-fit mx-auto mb-3">
+                      <Zap className="h-8 w-8 text-cyan-600" />
+                    </div>
+                    <p className="text-sm font-medium text-cyan-700 mb-2">Skills</p>
+                    <div className="relative">
+                      <div className="text-3xl font-bold text-cyan-800 mb-2">{Math.round((analysisData.scoringBreakdown.skills / 40) * 100)}%</div>
+                      <Progress value={Math.round((analysisData.scoringBreakdown.skills / 40) * 100)} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-indigo-100 to-purple-200 border-indigo-200 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="p-3 bg-indigo-500/20 rounded-lg w-fit mx-auto mb-3">
+                      <CheckCircle className="h-8 w-8 text-indigo-600" />
+                    </div>
+                    <p className="text-sm font-medium text-indigo-700 mb-2">Experience</p>
+                    <div className="relative">
+                      <div className="text-3xl font-bold text-indigo-800 mb-2">{Math.round((analysisData.scoringBreakdown.experience / 35) * 100)}%</div>
+                      <Progress value={Math.round((analysisData.scoringBreakdown.experience / 35) * 100)} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-yellow-100 to-orange-200 border-yellow-200 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="p-3 bg-yellow-500/20 rounded-lg w-fit mx-auto mb-3">
+                      <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                    </div>
+                    <p className="text-sm font-medium text-yellow-700 mb-2">Achievements</p>
+                    <div className="relative">
+                      <div className="text-3xl font-bold text-yellow-800 mb-2">{Math.round((analysisData.scoringBreakdown.achievements / 20) * 100)}%</div>
+                      <Progress value={Math.round((analysisData.scoringBreakdown.achievements / 20) * 100)} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-pink-100 to-rose-200 border-pink-200 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="p-3 bg-pink-500/20 rounded-lg w-fit mx-auto mb-3">
+                      <XCircle className="h-8 w-8 text-pink-600" />
+                    </div>
+                    <p className="text-sm font-medium text-pink-700 mb-2">Presentation</p>
+                    <div className="relative">
+                      <div className="text-3xl font-bold text-pink-800 mb-2">{getPresentationPercentage(analysisData.scoringBreakdown.presentation)}%</div>
+                      <Progress value={getPresentationPercentage(analysisData.scoringBreakdown.presentation)} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+        
         {/* Resume and Job Description Overview */}
         <div className="mb-8 grid md:grid-cols-2 gap-6">
           {/* Original Resume Section */}
@@ -903,74 +1066,6 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
           </Card>
         </div>
 
-        {/* Scoring Breakdown */}
-        {analysisData.scoringBreakdown && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Score Breakdown</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-cyan-100 to-teal-200 border-cyan-200 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <div className="p-3 bg-cyan-500/20 rounded-lg w-fit mx-auto mb-3">
-                      <Zap className="h-8 w-8 text-cyan-600" />
-                    </div>
-                    <p className="text-sm font-medium text-cyan-700 mb-2">Skills</p>
-                    <div className="relative">
-                      <div className="text-3xl font-bold text-cyan-800 mb-2">{Math.round((analysisData.scoringBreakdown.skills / 40) * 100)}%</div>
-                      <Progress value={Math.round((analysisData.scoringBreakdown.skills / 40) * 100)} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-indigo-100 to-purple-200 border-indigo-200 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <div className="p-3 bg-indigo-500/20 rounded-lg w-fit mx-auto mb-3">
-                      <CheckCircle className="h-8 w-8 text-indigo-600" />
-                    </div>
-                    <p className="text-sm font-medium text-indigo-700 mb-2">Experience</p>
-                    <div className="relative">
-                      <div className="text-3xl font-bold text-indigo-800 mb-2">{Math.round((analysisData.scoringBreakdown.experience / 35) * 100)}%</div>
-                      <Progress value={Math.round((analysisData.scoringBreakdown.experience / 35) * 100)} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-yellow-100 to-orange-200 border-yellow-200 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <div className="p-3 bg-yellow-500/20 rounded-lg w-fit mx-auto mb-3">
-                      <AlertTriangle className="h-8 w-8 text-yellow-600" />
-                    </div>
-                    <p className="text-sm font-medium text-yellow-700 mb-2">Achievements</p>
-                    <div className="relative">
-                      <div className="text-3xl font-bold text-yellow-800 mb-2">{Math.round((analysisData.scoringBreakdown.achievements / 20) * 100)}%</div>
-                      <Progress value={Math.round((analysisData.scoringBreakdown.achievements / 20) * 100)} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-pink-100 to-rose-200 border-pink-200 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <div className="p-3 bg-pink-500/20 rounded-lg w-fit mx-auto mb-3">
-                      <XCircle className="h-8 w-8 text-pink-600" />
-                    </div>
-                    <p className="text-sm font-medium text-pink-700 mb-2">Presentation</p>
-                    <div className="relative">
-                      <div className="text-3xl font-bold text-pink-800 mb-2">{getPresentationPercentage(analysisData.scoringBreakdown.presentation)}%</div>
-                      <Progress value={getPresentationPercentage(analysisData.scoringBreakdown.presentation)} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-        
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Analysis */}
           <div className="lg:col-span-2 space-y-6">
@@ -1120,7 +1215,7 @@ JavaScript, React, Node.js, HTML, CSS, Git, MongoDB, Express.js`,
                             ? 'text-yellow-600'
                             : 'text-red-600'
                       }`}>
-                        {analysisData.keywordMatch.matchPercentage}%
+                        {Math.round(analysisData.keywordMatch.matchPercentage || 0)}%
                       </span>
                     </div>
                     <Progress 

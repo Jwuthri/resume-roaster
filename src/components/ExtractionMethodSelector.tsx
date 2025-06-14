@@ -76,6 +76,19 @@ export function ExtractionMethodSelector({
       color: 'bg-blue-50 border-blue-200'
     },
     { 
+      id: 'openai-normal',
+      type: 'ai' as const,
+      provider: 'openai' as const,
+      model: OPENAI_MODELS.NORMAL,
+      title: 'OpenAI Normal', 
+      description: 'Advanced generation with superior quality',
+      credits: getModelCreditCost(OPENAI_MODELS.NORMAL),
+      icon: Car,
+      badge: 'Advanced',
+      recommended: false,
+      color: 'bg-green-50 border-green-200'
+    },
+    { 
       id: 'claude-sonnet',
       type: 'ai' as const,
       provider: 'anthropic' as const,

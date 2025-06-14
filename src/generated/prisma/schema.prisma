@@ -353,9 +353,20 @@ model GeneratedResume {
   contentHash       String   @unique @map("content_hash")
   content           String   @db.Text // HTML/Markdown content
   data              Json // Structured data used to generate
-  atsScore          Int?     @map("ats_score")
-  keywordsMatched   String[] @map("keywords_matched")
-  createdAt         DateTime @default(now()) @map("created_at")
+  images            String[] // Base64 encoded screenshots of the optimized resume
+
+  // ATS and scoring fields
+  atsScore        Int?     @map("ats_score")
+  keywordsMatched String[] @map("keywords_matched")
+
+  // New scoring fields from optimization
+  overallScore           Int?    @map("overall_score") // Overall score 0-100
+  scoringBreakdown       Json?   @map("scoring_breakdown") // Detailed breakdown {skills, experience, achievements, presentation}
+  scoreLabel             String? @map("score_label") // "Exceptional Match", "Strong Match", etc.
+  keywordMatchPercentage Int?    @map("keyword_match_percentage") // Percentage of keywords matched
+  originalAtsScore       Int?    @map("original_ats_score") // Original resume ATS score for comparison
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
   user            User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -368,6 +379,7 @@ model GeneratedResume {
   @@index([roastId])
   @@index([contentHash])
   @@index([atsScore])
+  @@index([overallScore])
   @@map("generated_resumes")
 }
 

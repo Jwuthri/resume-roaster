@@ -58,6 +58,15 @@ export function ResumeAnalysisModal({
       recommended: false
     },
     { 
+      value: OPENAI_MODELS.NORMAL, 
+      label: 'OpenAI Normal', 
+      description: 'Advanced analysis with superior quality',
+      credits: 8,
+      icon: Car,
+      badge: 'Advanced',
+      recommended: false
+    },
+    { 
       value: ANTHROPIC_MODELS.SONNET, 
       label: 'Claude Sonnet 4', 
       description: 'Premium quality with superior accuracy',

@@ -128,7 +128,7 @@ KEYWORD ANALYSIS
 ================================================================================
 
 ${keywordMatch.matchPercentage !== undefined ? `
-KEYWORD MATCH RATE: ${keywordMatch.matchPercentage}%
+KEYWORD MATCH RATE: ${Math.round(keywordMatch.matchPercentage || 0)}%
 ${keywordMatch.matchPercentage >= 70 ? '✅ Excellent keyword optimization!' : 
   keywordMatch.matchPercentage >= 50 ? '⚠️  Good match, but room for improvement' : 
   '❌ Needs significant keyword optimization'}
